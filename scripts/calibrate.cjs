@@ -2,8 +2,10 @@
 // Compares each model's archived short-range forecasts against what nearby
 // stations measured over past winters, then writes data/calibration.json with
 // a per-model precipitation correction factor and a skill-based blend weight.
+// Resorts without a station borrow the nearest calibrated resort's numbers.
 //
-//   node scripts/calibrate.cjs
+//   node scripts/calibrate.cjs                  # every resort
+//   CALIBRATE_MAX=15 node scripts/calibrate.cjs  # only the 15 stalest (stays within free API limits)
 
 const fs = require('fs');
 const path = require('path');
@@ -19,6 +21,7 @@ async function getJSON(url) {
     const r = await fetch(url);
     if (r.ok) return r.json();
     if (r.status === 429) { await new Promise((ok) => setTimeout(ok, 60000)); continue; }
+    if (r.status >= 500) { await new Promise((ok) => setTimeout(ok, 5000 * (attempt + 1))); continue; }
     throw new Error(`${r.status} ${url}\n${await r.text()}`);
   }
   throw new Error(`rate limited: ${url}`);
@@ -76,10 +79,21 @@ function pearson(a, b) {
   return sab / Math.sqrt(saa * sbb);
 }
 
+// Several resorts share a station, so fetch each station once per run.
+const stationData = new Map();
+function station(st, tz) {
+  const key = `${st.id}|${tz}`;
+  if (!stationData.has(key)) stationData.set(key, Promise.all([observed(st), modeled(st, tz)]));
+  return stationData.get(key);
+}
+
+const km = (a, b, c, d) => 6371 * 2 * Math.asin(Math.sqrt(Math.sin(((c - a) * Math.PI) / 360) ** 2 + Math.cos((a * Math.PI) / 180) * Math.cos((c * Math.PI) / 180) * Math.sin(((d - b) * Math.PI) / 360) ** 2));
+const BORROW_KM = 80;
+
 async function calibrateResort(resort) {
   const rows = []; // { obs, mod: { modelId: mm } } per station-day
   for (const st of resort.stations) {
-    const [obs, mod] = await Promise.all([observed(st), modeled(st, resort.tz)]);
+    const [obs, mod] = await station(st, resort.tz);
     for (const d of Object.keys(obs)) {
       if (!IN_SEASON(d)) continue;
       const row = { obs: obs[d], mod: {} };
@@ -111,7 +125,10 @@ async function calibrateResort(resort) {
     hrrr.ratio = +(others.reduce((s, x) => s + x, 0) / others.length).toFixed(3);
   }
 
-  return { stations: resort.stations.map((s) => s.name), period: `${START} to ${END} (Nov–Apr)`, models, check: blendCheck(rows, models) };
+  return {
+    updated: new Date().toISOString().slice(0, 10), stations: resort.stations.map((s) => s.name),
+    period: `${START} to ${END} (Nov–Apr)`, models, check: blendCheck(rows, models),
+  };
 }
 
 // Daily error of a plain equal-weight average of raw models vs the calibrated weighted blend.
@@ -137,14 +154,41 @@ function blendCheck(rows, models) {
 }
 
 (async () => {
-  const out = { generated: new Date().toISOString().slice(0, 10), resorts: {} };
-  for (const r of RESORTS) {
-    process.stderr.write(`Calibrating ${r.name}…\n`);
-    out.resorts[r.id] = await calibrateResort(r);
-    console.table(out.resorts[r.id].models);
-    console.log(out.resorts[r.id].check);
-  }
   const file = path.join(__dirname, '..', 'data', 'calibration.json');
+  const prev = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')).resorts : {};
+  const out = { generated: new Date().toISOString().slice(0, 10), resorts: {} };
+  for (const r of RESORTS) if (prev[r.id] && !prev[r.id].borrowedFrom && r.stations.length) out.resorts[r.id] = prev[r.id];
+
+  // Never-calibrated resorts first, then the stalest.
+  const max = +(process.env.CALIBRATE_MAX || Infinity);
+  const todo = RESORTS.filter((r) => r.stations.length)
+    .sort((a, b) => (out.resorts[a.id]?.updated || '').localeCompare(out.resorts[b.id]?.updated || ''))
+    .slice(0, max);
+  for (const r of todo) {
+    try {
+      out.resorts[r.id] = await calibrateResort(r);
+      const k = out.resorts[r.id].check;
+      console.log(`${r.name.padEnd(32)} raw ${k.rawPctOfObserved}% → calibrated ${k.calibratedPctOfObserved}% of observed`);
+    } catch (e) {
+      console.error(`${r.name}: ${e.message.split('\n')[0]}`);
+    }
+  }
+
+  for (const r of RESORTS) {
+    if (r.stations.length) continue;
+    let best = null;
+    for (const o of RESORTS) {
+      const c = out.resorts[o.id];
+      if (!c || c.borrowedFrom) continue;
+      const d = km(r.lat, r.lon, o.lat, o.lon);
+      if (d <= BORROW_KM && (!best || d < best.d)) best = { o, c, d };
+    }
+    if (best) {
+      out.resorts[r.id] = { ...best.c, borrowedFrom: best.o.name };
+      console.log(`${r.name.padEnd(32)} borrows ${best.o.name} (${Math.round(best.d)} km)`);
+    } else console.log(`${r.name.padEnd(32)} no station within ${BORROW_KM} km: uncalibrated`);
+  }
+
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, JSON.stringify(out, null, 2) + '\n');
   process.stderr.write(`Wrote ${file}\n`);

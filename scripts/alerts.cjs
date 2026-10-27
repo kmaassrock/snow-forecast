@@ -5,11 +5,12 @@
 //   NTFY_TOPIC=your-secret-topic node scripts/alerts.cjs
 //
 // Without NTFY_TOPIC it only prints what it would send.
-// Optional: ALERT_RESORTS=purgatory,wolf-creek  SITE_URL=https://you.github.io/snow/
+// ALERT_RESORTS picks the mountains to watch (default: purgatory), e.g. purgatory,wolf-creek.
+// Optional: SITE_URL=https://you.github.io/snow/
 
 const fs = require('fs');
 const path = require('path');
-const { RESORTS } = require('../resorts.js');
+const { RESORTS, DEFAULT_RESORT } = require('../resorts.js');
 const { getForecast, addDays } = require('../core.js');
 
 const OVERNIGHT_IN = +(process.env.OVERNIGHT_IN || 4); // snow by 9 am tomorrow
@@ -32,8 +33,8 @@ async function check(resort, calib) {
 
 (async () => {
   const calibration = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'calibration.json'), 'utf8'));
-  const wanted = (process.env.ALERT_RESORTS || '').split(',').filter(Boolean);
-  const resorts = wanted.length ? RESORTS.filter((r) => wanted.includes(r.id)) : RESORTS;
+  const wanted = (process.env.ALERT_RESORTS || DEFAULT_RESORT).split(',').map((s) => s.trim()).filter(Boolean);
+  const resorts = RESORTS.filter((r) => wanted.includes(r.id));
 
   const lines = [];
   for (const r of resorts) {
@@ -54,7 +55,7 @@ async function check(resort, calib) {
     priority: 4,
   };
   const site = process.env.SITE_URL;
-  if (site) msg.click = site;
+  if (site) msg.click = resorts.length === 1 ? `${site}#${resorts[0].id}` : site;
   console.log(msg.message);
 
   const topic = process.env.NTFY_TOPIC;

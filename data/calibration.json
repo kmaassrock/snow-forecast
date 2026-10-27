@@ -1,7 +1,1790 @@
 {
   "generated": "2026-10-27",
   "resorts": {
+    "bear-valley": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Blue Lakes"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.044,
+          "r": 0.929,
+          "maeMm": 5.77,
+          "days": 725,
+          "weight": 0.998,
+          "measuredRatio": 0.956
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.665,
+          "r": 0.93,
+          "maeMm": 4.62,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.132,
+          "r": 0.915,
+          "maeMm": 5.76,
+          "days": 725,
+          "weight": 0.968
+        },
+        "gfs_global": {
+          "ratio": 0.845,
+          "r": 0.919,
+          "maeMm": 5.72,
+          "days": 710,
+          "weight": 0.976
+        },
+        "gem_seamless": {
+          "ratio": 1.069,
+          "r": 0.903,
+          "maeMm": 5.75,
+          "days": 703,
+          "weight": 0.943
+        },
+        "icon_seamless": {
+          "ratio": 0.998,
+          "r": 0.916,
+          "maeMm": 5.82,
+          "days": 709,
+          "weight": 0.97
+        },
+        "ukmo_seamless": {
+          "ratio": 1.558,
+          "r": 0.87,
+          "maeMm": 7.2,
+          "days": 725,
+          "weight": 0.875
+        }
+      },
+      "check": {
+        "wetDays": 338,
+        "rawPctOfObserved": 95,
+        "calibratedPctOfObserved": 99,
+        "rawMaeMm": 5.25,
+        "calibratedMaeMm": 5.26
+      }
+    },
+    "boreal": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Css Lab"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.219,
+          "r": 0.934,
+          "maeMm": 7.55,
+          "days": 725,
+          "weight": 0.933,
+          "measuredRatio": 1.24
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.843,
+          "r": 0.967,
+          "maeMm": 5.24,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.112,
+          "r": 0.956,
+          "maeMm": 5.7,
+          "days": 725,
+          "weight": 0.977
+        },
+        "gfs_global": {
+          "ratio": 0.953,
+          "r": 0.943,
+          "maeMm": 6.45,
+          "days": 710,
+          "weight": 0.951
+        },
+        "gem_seamless": {
+          "ratio": 1.904,
+          "r": 0.906,
+          "maeMm": 8.71,
+          "days": 703,
+          "weight": 0.878
+        },
+        "icon_seamless": {
+          "ratio": 1,
+          "r": 0.955,
+          "maeMm": 6.11,
+          "days": 709,
+          "weight": 0.975
+        },
+        "ukmo_seamless": {
+          "ratio": 1.505,
+          "r": 0.92,
+          "maeMm": 7.77,
+          "days": 725,
+          "weight": 0.905
+        }
+      },
+      "check": {
+        "wetDays": 322,
+        "rawPctOfObserved": 85,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 5.74,
+        "calibratedMaeMm": 5.58
+      }
+    },
+    "donner-ski-ranch": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Css Lab"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.219,
+          "r": 0.934,
+          "maeMm": 7.55,
+          "days": 725,
+          "weight": 0.933,
+          "measuredRatio": 1.24
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.843,
+          "r": 0.967,
+          "maeMm": 5.24,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.112,
+          "r": 0.956,
+          "maeMm": 5.7,
+          "days": 725,
+          "weight": 0.977
+        },
+        "gfs_global": {
+          "ratio": 0.953,
+          "r": 0.943,
+          "maeMm": 6.45,
+          "days": 710,
+          "weight": 0.951
+        },
+        "gem_seamless": {
+          "ratio": 1.904,
+          "r": 0.906,
+          "maeMm": 8.71,
+          "days": 703,
+          "weight": 0.878
+        },
+        "icon_seamless": {
+          "ratio": 1,
+          "r": 0.955,
+          "maeMm": 6.11,
+          "days": 709,
+          "weight": 0.975
+        },
+        "ukmo_seamless": {
+          "ratio": 1.505,
+          "r": 0.92,
+          "maeMm": 7.77,
+          "days": 725,
+          "weight": 0.905
+        }
+      },
+      "check": {
+        "wetDays": 322,
+        "rawPctOfObserved": 85,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 5.74,
+        "calibratedMaeMm": 5.58
+      }
+    },
+    "heavenly": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Heavenly Valley"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.507,
+          "r": 0.912,
+          "maeMm": 6.3,
+          "days": 725,
+          "weight": 0.955,
+          "measuredRatio": 1.465
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.063,
+          "r": 0.933,
+          "maeMm": 4.09,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.248,
+          "r": 0.895,
+          "maeMm": 6.28,
+          "days": 725,
+          "weight": 0.92
+        },
+        "gfs_global": {
+          "ratio": 1.283,
+          "r": 0.866,
+          "maeMm": 6.78,
+          "days": 710,
+          "weight": 0.862
+        },
+        "gem_seamless": {
+          "ratio": 2,
+          "r": 0.707,
+          "maeMm": 10.48,
+          "days": 703,
+          "weight": 0.574
+        },
+        "icon_seamless": {
+          "ratio": 1.449,
+          "r": 0.851,
+          "maeMm": 7.23,
+          "days": 709,
+          "weight": 0.832
+        },
+        "ukmo_seamless": {
+          "ratio": 2,
+          "r": 0.756,
+          "maeMm": 9.9,
+          "days": 725,
+          "weight": 0.657
+        }
+      },
+      "check": {
+        "wetDays": 281,
+        "rawPctOfObserved": 60,
+        "calibratedPctOfObserved": 88,
+        "rawMaeMm": 6.83,
+        "calibratedMaeMm": 5.91
+      }
+    },
+    "homewood": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Ward Creek #3"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.529,
+          "r": 0.934,
+          "maeMm": 8.02,
+          "days": 722,
+          "weight": 0.969,
+          "measuredRatio": 1.453
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.007,
+          "r": 0.949,
+          "maeMm": 6.94,
+          "days": 361,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.767,
+          "r": 0.914,
+          "maeMm": 8.89,
+          "days": 722,
+          "weight": 0.928
+        },
+        "gfs_global": {
+          "ratio": 1.151,
+          "r": 0.931,
+          "maeMm": 7.39,
+          "days": 707,
+          "weight": 0.962
+        },
+        "gem_seamless": {
+          "ratio": 2,
+          "r": 0.831,
+          "maeMm": 10.89,
+          "days": 700,
+          "weight": 0.767
+        },
+        "icon_seamless": {
+          "ratio": 1.252,
+          "r": 0.938,
+          "maeMm": 7.39,
+          "days": 706,
+          "weight": 0.977
+        },
+        "ukmo_seamless": {
+          "ratio": 2,
+          "r": 0.904,
+          "maeMm": 9.18,
+          "days": 722,
+          "weight": 0.907
+        }
+      },
+      "check": {
+        "wetDays": 329,
+        "rawPctOfObserved": 64,
+        "calibratedPctOfObserved": 94,
+        "rawMaeMm": 8.42,
+        "calibratedMaeMm": 6.83
+      }
+    },
+    "kirkwood": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Carson Pass"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.11,
+          "r": 0.937,
+          "maeMm": 6.03,
+          "days": 725,
+          "weight": 0.981,
+          "measuredRatio": 0.934
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.633,
+          "r": 0.946,
+          "maeMm": 4.35,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 0.938,
+          "r": 0.921,
+          "maeMm": 6.22,
+          "days": 725,
+          "weight": 0.948
+        },
+        "gfs_global": {
+          "ratio": 0.856,
+          "r": 0.9,
+          "maeMm": 6.53,
+          "days": 710,
+          "weight": 0.905
+        },
+        "gem_seamless": {
+          "ratio": 1.387,
+          "r": 0.883,
+          "maeMm": 7.03,
+          "days": 703,
+          "weight": 0.871
+        },
+        "icon_seamless": {
+          "ratio": 1.102,
+          "r": 0.883,
+          "maeMm": 7.31,
+          "days": 709,
+          "weight": 0.871
+        },
+        "ukmo_seamless": {
+          "ratio": 1.744,
+          "r": 0.841,
+          "maeMm": 9.14,
+          "days": 725,
+          "weight": 0.79
+        }
+      },
+      "check": {
+        "wetDays": 293,
+        "rawPctOfObserved": 93,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 5.97,
+        "calibratedMaeMm": 6
+      }
+    },
+    "northstar": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Truckee #2"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.145,
+          "r": 0.909,
+          "maeMm": 5.63,
+          "days": 725,
+          "weight": 0.919,
+          "measuredRatio": 1.191
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.85,
+          "r": 0.948,
+          "maeMm": 4.81,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.089,
+          "r": 0.924,
+          "maeMm": 5.22,
+          "days": 725,
+          "weight": 0.95
+        },
+        "gfs_global": {
+          "ratio": 0.656,
+          "r": 0.931,
+          "maeMm": 4.49,
+          "days": 710,
+          "weight": 0.964
+        },
+        "gem_seamless": {
+          "ratio": 1.885,
+          "r": 0.803,
+          "maeMm": 8.1,
+          "days": 703,
+          "weight": 0.717
+        },
+        "icon_seamless": {
+          "ratio": 0.949,
+          "r": 0.925,
+          "maeMm": 5.3,
+          "days": 709,
+          "weight": 0.952
+        },
+        "ukmo_seamless": {
+          "ratio": 1.439,
+          "r": 0.895,
+          "maeMm": 6.39,
+          "days": 725,
+          "weight": 0.891
+        }
+      },
+      "check": {
+        "wetDays": 278,
+        "rawPctOfObserved": 95,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 4.44,
+        "calibratedMaeMm": 4.58
+      }
+    },
+    "palisades-tahoe-alpine-meadows": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Ward Creek #3"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.529,
+          "r": 0.934,
+          "maeMm": 8.02,
+          "days": 722,
+          "weight": 0.969,
+          "measuredRatio": 1.453
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.007,
+          "r": 0.949,
+          "maeMm": 6.94,
+          "days": 361,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.767,
+          "r": 0.914,
+          "maeMm": 8.89,
+          "days": 722,
+          "weight": 0.928
+        },
+        "gfs_global": {
+          "ratio": 1.151,
+          "r": 0.931,
+          "maeMm": 7.39,
+          "days": 707,
+          "weight": 0.962
+        },
+        "gem_seamless": {
+          "ratio": 2,
+          "r": 0.831,
+          "maeMm": 10.89,
+          "days": 700,
+          "weight": 0.767
+        },
+        "icon_seamless": {
+          "ratio": 1.252,
+          "r": 0.938,
+          "maeMm": 7.39,
+          "days": 706,
+          "weight": 0.977
+        },
+        "ukmo_seamless": {
+          "ratio": 2,
+          "r": 0.904,
+          "maeMm": 9.18,
+          "days": 722,
+          "weight": 0.907
+        }
+      },
+      "check": {
+        "wetDays": 329,
+        "rawPctOfObserved": 64,
+        "calibratedPctOfObserved": 94,
+        "rawMaeMm": 8.42,
+        "calibratedMaeMm": 6.83
+      }
+    },
+    "palisades-tahoe-olympic-valley": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Palisades Tahoe"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.279,
+          "r": 0.888,
+          "maeMm": 9.58,
+          "days": 724,
+          "weight": 0.92,
+          "measuredRatio": 1.065
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.794,
+          "r": 0.926,
+          "maeMm": 7.48,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.144,
+          "r": 0.897,
+          "maeMm": 8.48,
+          "days": 724,
+          "weight": 0.938
+        },
+        "gfs_global": {
+          "ratio": 1.039,
+          "r": 0.89,
+          "maeMm": 8.54,
+          "days": 709,
+          "weight": 0.924
+        },
+        "gem_seamless": {
+          "ratio": 1.337,
+          "r": 0.867,
+          "maeMm": 9.89,
+          "days": 702,
+          "weight": 0.877
+        },
+        "icon_seamless": {
+          "ratio": 1.377,
+          "r": 0.87,
+          "maeMm": 10.08,
+          "days": 708,
+          "weight": 0.883
+        },
+        "ukmo_seamless": {
+          "ratio": 1.982,
+          "r": 0.871,
+          "maeMm": 10.73,
+          "days": 724,
+          "weight": 0.885
+        }
+      },
+      "check": {
+        "wetDays": 319,
+        "rawPctOfObserved": 80,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 7.79,
+        "calibratedMaeMm": 8.14
+      }
+    },
+    "sierra-at-tahoe": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Echo Peak"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.425,
+          "r": 0.927,
+          "maeMm": 8.13,
+          "days": 723,
+          "weight": 0.968,
+          "measuredRatio": 1.318
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.069,
+          "r": 0.942,
+          "maeMm": 6.67,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.385,
+          "r": 0.927,
+          "maeMm": 7.28,
+          "days": 723,
+          "weight": 0.968
+        },
+        "gfs_global": {
+          "ratio": 1.148,
+          "r": 0.907,
+          "maeMm": 7.26,
+          "days": 708,
+          "weight": 0.927
+        },
+        "gem_seamless": {
+          "ratio": 1.91,
+          "r": 0.912,
+          "maeMm": 7.76,
+          "days": 701,
+          "weight": 0.937
+        },
+        "icon_seamless": {
+          "ratio": 1.196,
+          "r": 0.929,
+          "maeMm": 7.21,
+          "days": 707,
+          "weight": 0.973
+        },
+        "ukmo_seamless": {
+          "ratio": 1.841,
+          "r": 0.902,
+          "maeMm": 8.56,
+          "days": 723,
+          "weight": 0.917
+        }
+      },
+      "check": {
+        "wetDays": 334,
+        "rawPctOfObserved": 71,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 7.15,
+        "calibratedMaeMm": 6.27
+      }
+    },
+    "soda-springs": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Css Lab"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.219,
+          "r": 0.934,
+          "maeMm": 7.55,
+          "days": 725,
+          "weight": 0.933,
+          "measuredRatio": 1.24
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.843,
+          "r": 0.967,
+          "maeMm": 5.24,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.112,
+          "r": 0.956,
+          "maeMm": 5.7,
+          "days": 725,
+          "weight": 0.977
+        },
+        "gfs_global": {
+          "ratio": 0.953,
+          "r": 0.943,
+          "maeMm": 6.45,
+          "days": 710,
+          "weight": 0.951
+        },
+        "gem_seamless": {
+          "ratio": 1.904,
+          "r": 0.906,
+          "maeMm": 8.71,
+          "days": 703,
+          "weight": 0.878
+        },
+        "icon_seamless": {
+          "ratio": 1,
+          "r": 0.955,
+          "maeMm": 6.11,
+          "days": 709,
+          "weight": 0.975
+        },
+        "ukmo_seamless": {
+          "ratio": 1.505,
+          "r": 0.92,
+          "maeMm": 7.77,
+          "days": 725,
+          "weight": 0.905
+        }
+      },
+      "check": {
+        "wetDays": 322,
+        "rawPctOfObserved": 85,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 5.74,
+        "calibratedMaeMm": 5.58
+      }
+    },
+    "sugar-bowl": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Css Lab"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.219,
+          "r": 0.934,
+          "maeMm": 7.55,
+          "days": 725,
+          "weight": 0.933,
+          "measuredRatio": 1.24
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.843,
+          "r": 0.967,
+          "maeMm": 5.24,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.112,
+          "r": 0.956,
+          "maeMm": 5.7,
+          "days": 725,
+          "weight": 0.977
+        },
+        "gfs_global": {
+          "ratio": 0.953,
+          "r": 0.943,
+          "maeMm": 6.45,
+          "days": 710,
+          "weight": 0.951
+        },
+        "gem_seamless": {
+          "ratio": 1.904,
+          "r": 0.906,
+          "maeMm": 8.71,
+          "days": 703,
+          "weight": 0.878
+        },
+        "icon_seamless": {
+          "ratio": 1,
+          "r": 0.955,
+          "maeMm": 6.11,
+          "days": 709,
+          "weight": 0.975
+        },
+        "ukmo_seamless": {
+          "ratio": 1.505,
+          "r": 0.92,
+          "maeMm": 7.77,
+          "days": 725,
+          "weight": 0.905
+        }
+      },
+      "check": {
+        "wetDays": 322,
+        "rawPctOfObserved": 85,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 5.74,
+        "calibratedMaeMm": 5.58
+      }
+    },
+    "arapahoe-basin": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Grizzly Peak"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.372,
+          "r": 0.658,
+          "maeMm": 4.55,
+          "days": 725,
+          "weight": 0.856,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.205,
+          "r": 0.711,
+          "maeMm": 3.73,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.463,
+          "r": 0.699,
+          "maeMm": 3.56,
+          "days": 725,
+          "weight": 0.967
+        },
+        "gfs_global": {
+          "ratio": 1.478,
+          "r": 0.598,
+          "maeMm": 4.28,
+          "days": 710,
+          "weight": 0.707
+        },
+        "gem_seamless": {
+          "ratio": 1.142,
+          "r": 0.645,
+          "maeMm": 3.62,
+          "days": 703,
+          "weight": 0.823
+        },
+        "icon_seamless": {
+          "ratio": 1.549,
+          "r": 0.633,
+          "maeMm": 4.09,
+          "days": 709,
+          "weight": 0.793
+        },
+        "ukmo_seamless": {
+          "ratio": 1.397,
+          "r": 0.631,
+          "maeMm": 4.37,
+          "days": 725,
+          "weight": 0.788
+        }
+      },
+      "check": {
+        "wetDays": 467,
+        "rawPctOfObserved": 73,
+        "calibratedPctOfObserved": 101,
+        "rawMaeMm": 3.21,
+        "calibratedMaeMm": 3.54
+      }
+    },
+    "aspen-highlands": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Chapman Tunnel"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.052,
+          "r": 0.741,
+          "maeMm": 4.21,
+          "days": 725,
+          "weight": 0.862,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.142,
+          "r": 0.798,
+          "maeMm": 2.96,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.084,
+          "r": 0.743,
+          "maeMm": 3.09,
+          "days": 725,
+          "weight": 0.867
+        },
+        "gfs_global": {
+          "ratio": 1.032,
+          "r": 0.756,
+          "maeMm": 3.06,
+          "days": 710,
+          "weight": 0.898
+        },
+        "gem_seamless": {
+          "ratio": 0.811,
+          "r": 0.711,
+          "maeMm": 3.24,
+          "days": 703,
+          "weight": 0.794
+        },
+        "icon_seamless": {
+          "ratio": 0.944,
+          "r": 0.709,
+          "maeMm": 3.32,
+          "days": 709,
+          "weight": 0.789
+        },
+        "ukmo_seamless": {
+          "ratio": 1.297,
+          "r": 0.756,
+          "maeMm": 3.44,
+          "days": 725,
+          "weight": 0.898
+        }
+      },
+      "check": {
+        "wetDays": 419,
+        "rawPctOfObserved": 98,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 2.89,
+        "calibratedMaeMm": 2.9
+      }
+    },
+    "aspen-mountain": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Chapman Tunnel"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.052,
+          "r": 0.741,
+          "maeMm": 4.21,
+          "days": 725,
+          "weight": 0.862,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.142,
+          "r": 0.798,
+          "maeMm": 2.96,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.084,
+          "r": 0.743,
+          "maeMm": 3.09,
+          "days": 725,
+          "weight": 0.867
+        },
+        "gfs_global": {
+          "ratio": 1.032,
+          "r": 0.756,
+          "maeMm": 3.06,
+          "days": 710,
+          "weight": 0.898
+        },
+        "gem_seamless": {
+          "ratio": 0.811,
+          "r": 0.711,
+          "maeMm": 3.24,
+          "days": 703,
+          "weight": 0.794
+        },
+        "icon_seamless": {
+          "ratio": 0.944,
+          "r": 0.709,
+          "maeMm": 3.32,
+          "days": 709,
+          "weight": 0.789
+        },
+        "ukmo_seamless": {
+          "ratio": 1.297,
+          "r": 0.756,
+          "maeMm": 3.44,
+          "days": 725,
+          "weight": 0.898
+        }
+      },
+      "check": {
+        "wetDays": 419,
+        "rawPctOfObserved": 98,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 2.89,
+        "calibratedMaeMm": 2.9
+      }
+    },
+    "beaver-creek": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Mccoy Park"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.587,
+          "r": 0.766,
+          "maeMm": 4.22,
+          "days": 724,
+          "weight": 0.94,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 2,
+          "r": 0.79,
+          "maeMm": 3.6,
+          "days": 361,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.422,
+          "r": 0.763,
+          "maeMm": 3.42,
+          "days": 724,
+          "weight": 0.933
+        },
+        "gfs_global": {
+          "ratio": 1.684,
+          "r": 0.767,
+          "maeMm": 3.7,
+          "days": 709,
+          "weight": 0.943
+        },
+        "gem_seamless": {
+          "ratio": 1.235,
+          "r": 0.658,
+          "maeMm": 4.01,
+          "days": 702,
+          "weight": 0.694
+        },
+        "icon_seamless": {
+          "ratio": 1.178,
+          "r": 0.746,
+          "maeMm": 3.7,
+          "days": 708,
+          "weight": 0.892
+        },
+        "ukmo_seamless": {
+          "ratio": 2,
+          "r": 0.762,
+          "maeMm": 4,
+          "days": 724,
+          "weight": 0.93
+        }
+      },
+      "check": {
+        "wetDays": 436,
+        "rawPctOfObserved": 66,
+        "calibratedPctOfObserved": 97,
+        "rawMaeMm": 3.16,
+        "calibratedMaeMm": 3.13
+      }
+    },
+    "breckenridge": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Copper Mountain"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.426,
+          "r": 0.602,
+          "maeMm": 4.56,
+          "days": 725,
+          "weight": 0.691,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.216,
+          "r": 0.724,
+          "maeMm": 3.46,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.398,
+          "r": 0.652,
+          "maeMm": 3.38,
+          "days": 725,
+          "weight": 0.811
+        },
+        "gfs_global": {
+          "ratio": 1.463,
+          "r": 0.6,
+          "maeMm": 3.76,
+          "days": 710,
+          "weight": 0.687
+        },
+        "gem_seamless": {
+          "ratio": 1.356,
+          "r": 0.654,
+          "maeMm": 3.47,
+          "days": 703,
+          "weight": 0.816
+        },
+        "icon_seamless": {
+          "ratio": 1.161,
+          "r": 0.667,
+          "maeMm": 3.36,
+          "days": 709,
+          "weight": 0.849
+        },
+        "ukmo_seamless": {
+          "ratio": 1.965,
+          "r": 0.669,
+          "maeMm": 4.11,
+          "days": 725,
+          "weight": 0.854
+        }
+      },
+      "check": {
+        "wetDays": 448,
+        "rawPctOfObserved": 71,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 2.89,
+        "calibratedMaeMm": 3.17
+      }
+    },
+    "buttermilk": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Chapman Tunnel"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.052,
+          "r": 0.741,
+          "maeMm": 4.21,
+          "days": 725,
+          "weight": 0.862,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.142,
+          "r": 0.798,
+          "maeMm": 2.96,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.084,
+          "r": 0.743,
+          "maeMm": 3.09,
+          "days": 725,
+          "weight": 0.867
+        },
+        "gfs_global": {
+          "ratio": 1.032,
+          "r": 0.756,
+          "maeMm": 3.06,
+          "days": 710,
+          "weight": 0.898
+        },
+        "gem_seamless": {
+          "ratio": 0.811,
+          "r": 0.711,
+          "maeMm": 3.24,
+          "days": 703,
+          "weight": 0.794
+        },
+        "icon_seamless": {
+          "ratio": 0.944,
+          "r": 0.709,
+          "maeMm": 3.32,
+          "days": 709,
+          "weight": 0.789
+        },
+        "ukmo_seamless": {
+          "ratio": 1.297,
+          "r": 0.756,
+          "maeMm": 3.44,
+          "days": 725,
+          "weight": 0.898
+        }
+      },
+      "check": {
+        "wetDays": 419,
+        "rawPctOfObserved": 98,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 2.89,
+        "calibratedMaeMm": 2.9
+      }
+    },
+    "copper-mountain": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Copper Mountain"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.426,
+          "r": 0.602,
+          "maeMm": 4.56,
+          "days": 725,
+          "weight": 0.691,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.216,
+          "r": 0.724,
+          "maeMm": 3.46,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.398,
+          "r": 0.652,
+          "maeMm": 3.38,
+          "days": 725,
+          "weight": 0.811
+        },
+        "gfs_global": {
+          "ratio": 1.463,
+          "r": 0.6,
+          "maeMm": 3.76,
+          "days": 710,
+          "weight": 0.687
+        },
+        "gem_seamless": {
+          "ratio": 1.356,
+          "r": 0.654,
+          "maeMm": 3.47,
+          "days": 703,
+          "weight": 0.816
+        },
+        "icon_seamless": {
+          "ratio": 1.161,
+          "r": 0.667,
+          "maeMm": 3.36,
+          "days": 709,
+          "weight": 0.849
+        },
+        "ukmo_seamless": {
+          "ratio": 1.965,
+          "r": 0.669,
+          "maeMm": 4.11,
+          "days": 725,
+          "weight": 0.854
+        }
+      },
+      "check": {
+        "wetDays": 448,
+        "rawPctOfObserved": 71,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 2.89,
+        "calibratedMaeMm": 3.17
+      }
+    },
+    "crested-butte": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Butte"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.105,
+          "r": 0.764,
+          "maeMm": 4.39,
+          "days": 725,
+          "weight": 0.705,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.528,
+          "r": 0.91,
+          "maeMm": 3.05,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 0.918,
+          "r": 0.816,
+          "maeMm": 3.24,
+          "days": 725,
+          "weight": 0.804
+        },
+        "gfs_global": {
+          "ratio": 0.812,
+          "r": 0.78,
+          "maeMm": 3.23,
+          "days": 710,
+          "weight": 0.735
+        },
+        "gem_seamless": {
+          "ratio": 1.409,
+          "r": 0.802,
+          "maeMm": 3.45,
+          "days": 703,
+          "weight": 0.777
+        },
+        "icon_seamless": {
+          "ratio": 1.04,
+          "r": 0.813,
+          "maeMm": 3.34,
+          "days": 709,
+          "weight": 0.798
+        },
+        "ukmo_seamless": {
+          "ratio": 0.921,
+          "r": 0.782,
+          "maeMm": 3.51,
+          "days": 725,
+          "weight": 0.738
+        }
+      },
+      "check": {
+        "wetDays": 359,
+        "rawPctOfObserved": 100,
+        "calibratedPctOfObserved": 101,
+        "rawMaeMm": 3.03,
+        "calibratedMaeMm": 3.01
+      }
+    },
+    "echo-mountain": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Echo Lake"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.268,
+          "r": 0.815,
+          "maeMm": 3.75,
+          "days": 725,
+          "weight": 1,
+          "measuredRatio": 1.551
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.293,
+          "r": 0.761,
+          "maeMm": 3.43,
+          "days": 362,
+          "weight": 0.872
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.125,
+          "r": 0.812,
+          "maeMm": 2.84,
+          "days": 725,
+          "weight": 0.993
+        },
+        "gfs_global": {
+          "ratio": 1.112,
+          "r": 0.765,
+          "maeMm": 3.32,
+          "days": 710,
+          "weight": 0.881
+        },
+        "gem_seamless": {
+          "ratio": 1.12,
+          "r": 0.713,
+          "maeMm": 3.61,
+          "days": 703,
+          "weight": 0.765
+        },
+        "icon_seamless": {
+          "ratio": 1.2,
+          "r": 0.792,
+          "maeMm": 3.17,
+          "days": 709,
+          "weight": 0.944
+        },
+        "ukmo_seamless": {
+          "ratio": 1.758,
+          "r": 0.662,
+          "maeMm": 4.66,
+          "days": 725,
+          "weight": 0.66
+        }
+      },
+      "check": {
+        "wetDays": 332,
+        "rawPctOfObserved": 81,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 2.67,
+        "calibratedMaeMm": 2.83
+      }
+    },
+    "eldora": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Lake Eldora"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.555,
+          "r": 0.703,
+          "maeMm": 4.68,
+          "days": 725,
+          "weight": 0.9,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.27,
+          "r": 0.741,
+          "maeMm": 3.41,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.604,
+          "r": 0.737,
+          "maeMm": 3.67,
+          "days": 725,
+          "weight": 0.989
+        },
+        "gfs_global": {
+          "ratio": 1.688,
+          "r": 0.715,
+          "maeMm": 4.11,
+          "days": 710,
+          "weight": 0.931
+        },
+        "gem_seamless": {
+          "ratio": 1.211,
+          "r": 0.67,
+          "maeMm": 3.57,
+          "days": 703,
+          "weight": 0.818
+        },
+        "icon_seamless": {
+          "ratio": 1.752,
+          "r": 0.69,
+          "maeMm": 4.48,
+          "days": 709,
+          "weight": 0.867
+        },
+        "ukmo_seamless": {
+          "ratio": 1.803,
+          "r": 0.694,
+          "maeMm": 4.4,
+          "days": 725,
+          "weight": 0.877
+        }
+      },
+      "check": {
+        "wetDays": 464,
+        "rawPctOfObserved": 64,
+        "calibratedPctOfObserved": 99,
+        "rawMaeMm": 2.98,
+        "calibratedMaeMm": 3.46
+      }
+    },
+    "granby-ranch": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Stillwater Creek"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.171,
+          "r": 0.501,
+          "maeMm": 4.74,
+          "days": 711,
+          "weight": 0.683,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.488,
+          "r": 0.542,
+          "maeMm": 4.26,
+          "days": 362,
+          "weight": 0.8
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.274,
+          "r": 0.593,
+          "maeMm": 3.42,
+          "days": 711,
+          "weight": 0.958
+        },
+        "gfs_global": {
+          "ratio": 1.012,
+          "r": 0.576,
+          "maeMm": 3.31,
+          "days": 696,
+          "weight": 0.903
+        },
+        "gem_seamless": {
+          "ratio": 1.006,
+          "r": 0.566,
+          "maeMm": 3.49,
+          "days": 691,
+          "weight": 0.872
+        },
+        "icon_seamless": {
+          "ratio": 0.979,
+          "r": 0.606,
+          "maeMm": 3.25,
+          "days": 697,
+          "weight": 1
+        },
+        "ukmo_seamless": {
+          "ratio": 1.267,
+          "r": 0.564,
+          "maeMm": 3.89,
+          "days": 711,
+          "weight": 0.866
+        }
+      },
+      "check": {
+        "wetDays": 368,
+        "rawPctOfObserved": 90,
+        "calibratedPctOfObserved": 101,
+        "rawMaeMm": 3.01,
+        "calibratedMaeMm": 3.13
+      }
+    },
+    "keystone": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Grizzly Peak"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.372,
+          "r": 0.658,
+          "maeMm": 4.55,
+          "days": 725,
+          "weight": 0.856,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.205,
+          "r": 0.711,
+          "maeMm": 3.73,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.463,
+          "r": 0.699,
+          "maeMm": 3.56,
+          "days": 725,
+          "weight": 0.967
+        },
+        "gfs_global": {
+          "ratio": 1.478,
+          "r": 0.598,
+          "maeMm": 4.28,
+          "days": 710,
+          "weight": 0.707
+        },
+        "gem_seamless": {
+          "ratio": 1.142,
+          "r": 0.645,
+          "maeMm": 3.62,
+          "days": 703,
+          "weight": 0.823
+        },
+        "icon_seamless": {
+          "ratio": 1.549,
+          "r": 0.633,
+          "maeMm": 4.09,
+          "days": 709,
+          "weight": 0.793
+        },
+        "ukmo_seamless": {
+          "ratio": 1.397,
+          "r": 0.631,
+          "maeMm": 4.37,
+          "days": 725,
+          "weight": 0.788
+        }
+      },
+      "check": {
+        "wetDays": 467,
+        "rawPctOfObserved": 73,
+        "calibratedPctOfObserved": 101,
+        "rawMaeMm": 3.21,
+        "calibratedMaeMm": 3.54
+      }
+    },
+    "loveland-basin": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Loveland Basin"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.329,
+          "r": 0.751,
+          "maeMm": 4.16,
+          "days": 725,
+          "weight": 0.868,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.108,
+          "r": 0.806,
+          "maeMm": 2.79,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.409,
+          "r": 0.798,
+          "maeMm": 2.81,
+          "days": 725,
+          "weight": 0.98
+        },
+        "gfs_global": {
+          "ratio": 1.504,
+          "r": 0.754,
+          "maeMm": 3.2,
+          "days": 710,
+          "weight": 0.875
+        },
+        "gem_seamless": {
+          "ratio": 1.102,
+          "r": 0.746,
+          "maeMm": 2.87,
+          "days": 703,
+          "weight": 0.857
+        },
+        "icon_seamless": {
+          "ratio": 1.495,
+          "r": 0.75,
+          "maeMm": 3.28,
+          "days": 709,
+          "weight": 0.866
+        },
+        "ukmo_seamless": {
+          "ratio": 1.353,
+          "r": 0.786,
+          "maeMm": 3.25,
+          "days": 725,
+          "weight": 0.951
+        }
+      },
+      "check": {
+        "wetDays": 458,
+        "rawPctOfObserved": 75,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 2.35,
+        "calibratedMaeMm": 2.58
+      }
+    },
+    "monarch-mountain": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Porphyry Creek"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.833,
+          "r": 0.711,
+          "maeMm": 5.29,
+          "days": 725,
+          "weight": 0.638,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.4,
+          "r": 0.89,
+          "maeMm": 3.38,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.829,
+          "r": 0.819,
+          "maeMm": 4.07,
+          "days": 725,
+          "weight": 0.847
+        },
+        "gfs_global": {
+          "ratio": 1.812,
+          "r": 0.781,
+          "maeMm": 4.53,
+          "days": 710,
+          "weight": 0.77
+        },
+        "gem_seamless": {
+          "ratio": 1.959,
+          "r": 0.791,
+          "maeMm": 4.34,
+          "days": 703,
+          "weight": 0.79
+        },
+        "icon_seamless": {
+          "ratio": 2,
+          "r": 0.771,
+          "maeMm": 4.3,
+          "days": 709,
+          "weight": 0.75
+        },
+        "ukmo_seamless": {
+          "ratio": 2,
+          "r": 0.676,
+          "maeMm": 5.64,
+          "days": 725,
+          "weight": 0.577
+        }
+      },
+      "check": {
+        "wetDays": 375,
+        "rawPctOfObserved": 51,
+        "calibratedPctOfObserved": 95,
+        "rawMaeMm": 3.9,
+        "calibratedMaeMm": 3.58
+      }
+    },
+    "powderhorn": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Mesa Lakes"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.138,
+          "r": 0.725,
+          "maeMm": 6.09,
+          "days": 725,
+          "weight": 0.722,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.024,
+          "r": 0.853,
+          "maeMm": 3.37,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.018,
+          "r": 0.718,
+          "maeMm": 4.47,
+          "days": 725,
+          "weight": 0.709
+        },
+        "gfs_global": {
+          "ratio": 1.187,
+          "r": 0.694,
+          "maeMm": 4.62,
+          "days": 710,
+          "weight": 0.662
+        },
+        "gem_seamless": {
+          "ratio": 1.158,
+          "r": 0.724,
+          "maeMm": 4.47,
+          "days": 703,
+          "weight": 0.72
+        },
+        "icon_seamless": {
+          "ratio": 1.148,
+          "r": 0.708,
+          "maeMm": 4.57,
+          "days": 709,
+          "weight": 0.689
+        },
+        "ukmo_seamless": {
+          "ratio": 1.292,
+          "r": 0.702,
+          "maeMm": 5.06,
+          "days": 725,
+          "weight": 0.677
+        }
+      },
+      "check": {
+        "wetDays": 406,
+        "rawPctOfObserved": 87,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 3.78,
+        "calibratedMaeMm": 4.05
+      }
+    },
     "purgatory": {
+      "updated": "2026-10-27",
       "stations": [
         "Spud Mountain",
         "Cascade #2"
@@ -67,72 +1850,272 @@
         "calibratedMaeMm": 4.04
       }
     },
-    "wolf-creek": {
+    "silverton-mountain": {
+      "updated": "2026-10-27",
       "stations": [
-        "Wolf Creek Summit"
+        "Red Mountain Pass"
       ],
       "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
-          "ratio": 1.643,
-          "r": 0.829,
-          "maeMm": 6.84,
+          "ratio": 1.341,
+          "r": 0.745,
+          "maeMm": 5.23,
           "days": 725,
-          "weight": 0.771,
+          "weight": 0.754,
           "measuredRatio": 2
         },
         "ncep_nbm_conus": {
-          "ratio": 1.214,
-          "r": 0.944,
+          "ratio": 1.167,
+          "r": 0.857,
+          "maeMm": 3.65,
+          "days": 362,
+          "weight": 0.998
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.618,
+          "r": 0.854,
+          "maeMm": 3.8,
+          "days": 725,
+          "weight": 0.991
+        },
+        "gfs_global": {
+          "ratio": 1.138,
+          "r": 0.836,
           "maeMm": 3.86,
+          "days": 710,
+          "weight": 0.949
+        },
+        "gem_seamless": {
+          "ratio": 1.305,
+          "r": 0.764,
+          "maeMm": 4.24,
+          "days": 703,
+          "weight": 0.793
+        },
+        "icon_seamless": {
+          "ratio": 1.253,
+          "r": 0.852,
+          "maeMm": 3.88,
+          "days": 709,
+          "weight": 0.986
+        },
+        "ukmo_seamless": {
+          "ratio": 1.566,
+          "r": 0.858,
+          "maeMm": 3.93,
+          "days": 725,
+          "weight": 1
+        }
+      },
+      "check": {
+        "wetDays": 403,
+        "rawPctOfObserved": 75,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 3.39,
+        "calibratedMaeMm": 3.42
+      }
+    },
+    "ski-cooper": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Fremont Pass"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.466,
+          "r": 0.713,
+          "maeMm": 3.91,
+          "days": 725,
+          "weight": 0.86,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.296,
+          "r": 0.769,
+          "maeMm": 2.85,
           "days": 362,
           "weight": 1
         },
         "ecmwf_ifs": {
-          "ratio": 2,
-          "r": 0.919,
-          "maeMm": 4.75,
+          "ratio": 1.6,
+          "r": 0.727,
+          "maeMm": 3.13,
           "days": 725,
-          "weight": 0.948
+          "weight": 0.894
         },
         "gfs_global": {
-          "ratio": 1.459,
-          "r": 0.909,
-          "maeMm": 4.86,
+          "ratio": 1.569,
+          "r": 0.677,
+          "maeMm": 3.44,
           "days": 710,
-          "weight": 0.927
+          "weight": 0.775
         },
         "gem_seamless": {
-          "ratio": 1.342,
-          "r": 0.872,
-          "maeMm": 5.18,
+          "ratio": 1.433,
+          "r": 0.681,
+          "maeMm": 3.32,
           "days": 703,
-          "weight": 0.853
+          "weight": 0.784
         },
         "icon_seamless": {
-          "ratio": 1.842,
-          "r": 0.884,
-          "maeMm": 5.62,
+          "ratio": 1.28,
+          "r": 0.727,
+          "maeMm": 3.11,
           "days": 709,
-          "weight": 0.877
+          "weight": 0.894
         },
         "ukmo_seamless": {
-          "ratio": 2,
-          "r": 0.725,
-          "maeMm": 7.23,
+          "ratio": 1.621,
+          "r": 0.707,
+          "maeMm": 3.56,
           "days": 725,
-          "weight": 0.59
+          "weight": 0.845
         }
       },
       "check": {
-        "wetDays": 370,
-        "rawPctOfObserved": 56,
-        "calibratedPctOfObserved": 93,
-        "rawMaeMm": 5.06,
-        "calibratedMaeMm": 4.27
+        "wetDays": 442,
+        "rawPctOfObserved": 68,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 2.65,
+        "calibratedMaeMm": 2.8
+      }
+    },
+    "steamboat": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Dry Lake"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.198,
+          "r": 0.668,
+          "maeMm": 5.8,
+          "days": 725,
+          "weight": 0.642,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.102,
+          "r": 0.834,
+          "maeMm": 3.46,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.459,
+          "r": 0.795,
+          "maeMm": 4.08,
+          "days": 725,
+          "weight": 0.909
+        },
+        "gfs_global": {
+          "ratio": 1.086,
+          "r": 0.795,
+          "maeMm": 4.01,
+          "days": 710,
+          "weight": 0.909
+        },
+        "gem_seamless": {
+          "ratio": 0.888,
+          "r": 0.771,
+          "maeMm": 4.23,
+          "days": 703,
+          "weight": 0.855
+        },
+        "icon_seamless": {
+          "ratio": 1.416,
+          "r": 0.773,
+          "maeMm": 4.26,
+          "days": 709,
+          "weight": 0.859
+        },
+        "ukmo_seamless": {
+          "ratio": 1.239,
+          "r": 0.789,
+          "maeMm": 4.47,
+          "days": 725,
+          "weight": 0.895
+        }
+      },
+      "check": {
+        "wetDays": 465,
+        "rawPctOfObserved": 85,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 3.47,
+        "calibratedMaeMm": 3.67
+      }
+    },
+    "telluride": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Red Mountain Pass"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.341,
+          "r": 0.745,
+          "maeMm": 5.23,
+          "days": 725,
+          "weight": 0.754,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.167,
+          "r": 0.857,
+          "maeMm": 3.65,
+          "days": 362,
+          "weight": 0.998
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.618,
+          "r": 0.854,
+          "maeMm": 3.8,
+          "days": 725,
+          "weight": 0.991
+        },
+        "gfs_global": {
+          "ratio": 1.138,
+          "r": 0.836,
+          "maeMm": 3.86,
+          "days": 710,
+          "weight": 0.949
+        },
+        "gem_seamless": {
+          "ratio": 1.305,
+          "r": 0.764,
+          "maeMm": 4.24,
+          "days": 703,
+          "weight": 0.793
+        },
+        "icon_seamless": {
+          "ratio": 1.253,
+          "r": 0.852,
+          "maeMm": 3.88,
+          "days": 709,
+          "weight": 0.986
+        },
+        "ukmo_seamless": {
+          "ratio": 1.566,
+          "r": 0.858,
+          "maeMm": 3.93,
+          "days": 725,
+          "weight": 1
+        }
+      },
+      "check": {
+        "wetDays": 403,
+        "rawPctOfObserved": 75,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 3.39,
+        "calibratedMaeMm": 3.42
       }
     },
     "vail": {
+      "updated": "2026-10-27",
       "stations": [
         "Vail Mountain"
       ],
@@ -197,7 +2180,470 @@
         "calibratedMaeMm": 3.27
       }
     },
-    "park-city": {
+    "winter-park": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Berthoud Summit"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.787,
+          "r": 0.739,
+          "maeMm": 4.52,
+          "days": 725,
+          "weight": 0.88,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.694,
+          "r": 0.788,
+          "maeMm": 3.84,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.899,
+          "r": 0.781,
+          "maeMm": 3.94,
+          "days": 725,
+          "weight": 0.982
+        },
+        "gfs_global": {
+          "ratio": 1.663,
+          "r": 0.744,
+          "maeMm": 4.15,
+          "days": 710,
+          "weight": 0.891
+        },
+        "gem_seamless": {
+          "ratio": 1.855,
+          "r": 0.633,
+          "maeMm": 4.54,
+          "days": 703,
+          "weight": 0.645
+        },
+        "icon_seamless": {
+          "ratio": 1.609,
+          "r": 0.764,
+          "maeMm": 3.94,
+          "days": 709,
+          "weight": 0.94
+        },
+        "ukmo_seamless": {
+          "ratio": 2,
+          "r": 0.704,
+          "maeMm": 4.5,
+          "days": 725,
+          "weight": 0.798
+        }
+      },
+      "check": {
+        "wetDays": 490,
+        "rawPctOfObserved": 55,
+        "calibratedPctOfObserved": 99,
+        "rawMaeMm": 3.46,
+        "calibratedMaeMm": 3.6
+      }
+    },
+    "wolf-creek": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Wolf Creek Summit"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.643,
+          "r": 0.829,
+          "maeMm": 6.84,
+          "days": 725,
+          "weight": 0.771,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.214,
+          "r": 0.944,
+          "maeMm": 3.86,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 2,
+          "r": 0.919,
+          "maeMm": 4.75,
+          "days": 725,
+          "weight": 0.948
+        },
+        "gfs_global": {
+          "ratio": 1.459,
+          "r": 0.909,
+          "maeMm": 4.86,
+          "days": 710,
+          "weight": 0.927
+        },
+        "gem_seamless": {
+          "ratio": 1.342,
+          "r": 0.872,
+          "maeMm": 5.18,
+          "days": 703,
+          "weight": 0.853
+        },
+        "icon_seamless": {
+          "ratio": 1.842,
+          "r": 0.884,
+          "maeMm": 5.62,
+          "days": 709,
+          "weight": 0.877
+        },
+        "ukmo_seamless": {
+          "ratio": 2,
+          "r": 0.725,
+          "maeMm": 7.23,
+          "days": 725,
+          "weight": 0.59
+        }
+      },
+      "check": {
+        "wetDays": 370,
+        "rawPctOfObserved": 56,
+        "calibratedPctOfObserved": 93,
+        "rawMaeMm": 5.06,
+        "calibratedMaeMm": 4.27
+      }
+    },
+    "alta": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Snowbird"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.636,
+          "r": 0.802,
+          "maeMm": 8.35,
+          "days": 725,
+          "weight": 0.823,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.171,
+          "r": 0.884,
+          "maeMm": 5.62,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.961,
+          "r": 0.782,
+          "maeMm": 7.65,
+          "days": 725,
+          "weight": 0.783
+        },
+        "gfs_global": {
+          "ratio": 1.624,
+          "r": 0.823,
+          "maeMm": 7.38,
+          "days": 710,
+          "weight": 0.867
+        },
+        "gem_seamless": {
+          "ratio": 1.384,
+          "r": 0.82,
+          "maeMm": 7.19,
+          "days": 703,
+          "weight": 0.86
+        },
+        "icon_seamless": {
+          "ratio": 1.738,
+          "r": 0.779,
+          "maeMm": 7.72,
+          "days": 709,
+          "weight": 0.777
+        },
+        "ukmo_seamless": {
+          "ratio": 1.939,
+          "r": 0.796,
+          "maeMm": 8.21,
+          "days": 725,
+          "weight": 0.811
+        }
+      },
+      "check": {
+        "wetDays": 415,
+        "rawPctOfObserved": 60,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 6.79,
+        "calibratedMaeMm": 6.26
+      }
+    },
+    "beaver-mountain": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Klondike Narrows"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.212,
+          "r": 0.879,
+          "maeMm": 5.39,
+          "days": 725,
+          "weight": 1,
+          "measuredRatio": 1.745
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.825,
+          "r": 0.873,
+          "maeMm": 4.45,
+          "days": 362,
+          "weight": 0.986
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.337,
+          "r": 0.85,
+          "maeMm": 4.87,
+          "days": 725,
+          "weight": 0.935
+        },
+        "gfs_global": {
+          "ratio": 1.167,
+          "r": 0.85,
+          "maeMm": 4.74,
+          "days": 710,
+          "weight": 0.935
+        },
+        "gem_seamless": {
+          "ratio": 1.781,
+          "r": 0.811,
+          "maeMm": 6.32,
+          "days": 703,
+          "weight": 0.851
+        },
+        "icon_seamless": {
+          "ratio": 1.09,
+          "r": 0.801,
+          "maeMm": 5.24,
+          "days": 709,
+          "weight": 0.83
+        },
+        "ukmo_seamless": {
+          "ratio": 1.07,
+          "r": 0.842,
+          "maeMm": 5.08,
+          "days": 725,
+          "weight": 0.918
+        }
+      },
+      "check": {
+        "wetDays": 349,
+        "rawPctOfObserved": 84,
+        "calibratedPctOfObserved": 101,
+        "rawMaeMm": 4.19,
+        "calibratedMaeMm": 4.06
+      }
+    },
+    "brian-head": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Brian Head"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.332,
+          "r": 0.827,
+          "maeMm": 5.96,
+          "days": 725,
+          "weight": 0.92,
+          "measuredRatio": 1.642
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.97,
+          "r": 0.862,
+          "maeMm": 3.77,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.461,
+          "r": 0.839,
+          "maeMm": 4.62,
+          "days": 725,
+          "weight": 0.947
+        },
+        "gfs_global": {
+          "ratio": 1.325,
+          "r": 0.836,
+          "maeMm": 4.87,
+          "days": 710,
+          "weight": 0.941
+        },
+        "gem_seamless": {
+          "ratio": 1.354,
+          "r": 0.694,
+          "maeMm": 6.06,
+          "days": 703,
+          "weight": 0.648
+        },
+        "icon_seamless": {
+          "ratio": 1.103,
+          "r": 0.82,
+          "maeMm": 4.5,
+          "days": 709,
+          "weight": 0.905
+        },
+        "ukmo_seamless": {
+          "ratio": 1.781,
+          "r": 0.759,
+          "maeMm": 6.15,
+          "days": 725,
+          "weight": 0.775
+        }
+      },
+      "check": {
+        "wetDays": 280,
+        "rawPctOfObserved": 75,
+        "calibratedPctOfObserved": 101,
+        "rawMaeMm": 4.04,
+        "calibratedMaeMm": 4
+      }
+    },
+    "brighton": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Brighton"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.242,
+          "r": 0.808,
+          "maeMm": 6.57,
+          "days": 725,
+          "weight": 0.834,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.986,
+          "r": 0.885,
+          "maeMm": 4.19,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.28,
+          "r": 0.789,
+          "maeMm": 5.35,
+          "days": 725,
+          "weight": 0.795
+        },
+        "gfs_global": {
+          "ratio": 1.152,
+          "r": 0.855,
+          "maeMm": 5.01,
+          "days": 710,
+          "weight": 0.933
+        },
+        "gem_seamless": {
+          "ratio": 1.641,
+          "r": 0.811,
+          "maeMm": 5.29,
+          "days": 703,
+          "weight": 0.84
+        },
+        "icon_seamless": {
+          "ratio": 1.126,
+          "r": 0.795,
+          "maeMm": 5.25,
+          "days": 709,
+          "weight": 0.807
+        },
+        "ukmo_seamless": {
+          "ratio": 1.265,
+          "r": 0.809,
+          "maeMm": 5.49,
+          "days": 725,
+          "weight": 0.836
+        }
+      },
+      "check": {
+        "wetDays": 379,
+        "rawPctOfObserved": 80,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 4.25,
+        "calibratedMaeMm": 4.31
+      }
+    },
+    "cherry-peak": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Klondike Narrows"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.212,
+          "r": 0.879,
+          "maeMm": 5.39,
+          "days": 725,
+          "weight": 1,
+          "measuredRatio": 1.745
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.825,
+          "r": 0.873,
+          "maeMm": 4.45,
+          "days": 362,
+          "weight": 0.986
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.337,
+          "r": 0.85,
+          "maeMm": 4.87,
+          "days": 725,
+          "weight": 0.935
+        },
+        "gfs_global": {
+          "ratio": 1.167,
+          "r": 0.85,
+          "maeMm": 4.74,
+          "days": 710,
+          "weight": 0.935
+        },
+        "gem_seamless": {
+          "ratio": 1.781,
+          "r": 0.811,
+          "maeMm": 6.32,
+          "days": 703,
+          "weight": 0.851
+        },
+        "icon_seamless": {
+          "ratio": 1.09,
+          "r": 0.801,
+          "maeMm": 5.24,
+          "days": 709,
+          "weight": 0.83
+        },
+        "ukmo_seamless": {
+          "ratio": 1.07,
+          "r": 0.842,
+          "maeMm": 5.08,
+          "days": 725,
+          "weight": 0.918
+        }
+      },
+      "check": {
+        "wetDays": 349,
+        "rawPctOfObserved": 84,
+        "calibratedPctOfObserved": 101,
+        "rawMaeMm": 4.19,
+        "calibratedMaeMm": 4.06
+      }
+    },
+    "deer-valley": {
+      "updated": "2026-10-27",
       "stations": [
         "Thaynes Canyon"
       ],
@@ -262,7 +2708,536 @@
         "calibratedMaeMm": 3.98
       }
     },
+    "eagle-point": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Big Flat"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.477,
+          "r": 0.872,
+          "maeMm": 5.42,
+          "days": 725,
+          "weight": 0.916,
+          "measuredRatio": 1.971
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.936,
+          "r": 0.911,
+          "maeMm": 3.44,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.5,
+          "r": 0.819,
+          "maeMm": 4.62,
+          "days": 725,
+          "weight": 0.808
+        },
+        "gfs_global": {
+          "ratio": 1.703,
+          "r": 0.837,
+          "maeMm": 5.08,
+          "days": 710,
+          "weight": 0.844
+        },
+        "gem_seamless": {
+          "ratio": 1.912,
+          "r": 0.768,
+          "maeMm": 5.63,
+          "days": 703,
+          "weight": 0.711
+        },
+        "icon_seamless": {
+          "ratio": 1.002,
+          "r": 0.816,
+          "maeMm": 4.52,
+          "days": 709,
+          "weight": 0.802
+        },
+        "ukmo_seamless": {
+          "ratio": 1.807,
+          "r": 0.84,
+          "maeMm": 5.08,
+          "days": 725,
+          "weight": 0.85
+        }
+      },
+      "check": {
+        "wetDays": 300,
+        "rawPctOfObserved": 68,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 4.01,
+        "calibratedMaeMm": 3.95
+      }
+    },
+    "nordic-valley": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Ben Lomond Trail"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.409,
+          "r": 0.823,
+          "maeMm": 8.25,
+          "days": 725,
+          "weight": 0.869,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.104,
+          "r": 0.883,
+          "maeMm": 4.58,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 2,
+          "r": 0.734,
+          "maeMm": 8.06,
+          "days": 725,
+          "weight": 0.691
+        },
+        "gfs_global": {
+          "ratio": 1.299,
+          "r": 0.835,
+          "maeMm": 6.53,
+          "days": 710,
+          "weight": 0.894
+        },
+        "gem_seamless": {
+          "ratio": 1.054,
+          "r": 0.837,
+          "maeMm": 6.31,
+          "days": 703,
+          "weight": 0.899
+        },
+        "icon_seamless": {
+          "ratio": 1.506,
+          "r": 0.84,
+          "maeMm": 6.26,
+          "days": 709,
+          "weight": 0.905
+        },
+        "ukmo_seamless": {
+          "ratio": 1.489,
+          "r": 0.786,
+          "maeMm": 7.15,
+          "days": 725,
+          "weight": 0.792
+        }
+      },
+      "check": {
+        "wetDays": 334,
+        "rawPctOfObserved": 71,
+        "calibratedPctOfObserved": 99,
+        "rawMaeMm": 5.92,
+        "calibratedMaeMm": 5.58
+      }
+    },
+    "park-city": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Thaynes Canyon"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.158,
+          "r": 0.802,
+          "maeMm": 6.02,
+          "days": 725,
+          "weight": 0.866,
+          "measuredRatio": 1.72
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.06,
+          "r": 0.862,
+          "maeMm": 3.69,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.116,
+          "r": 0.773,
+          "maeMm": 4.94,
+          "days": 725,
+          "weight": 0.804
+        },
+        "gfs_global": {
+          "ratio": 1.001,
+          "r": 0.852,
+          "maeMm": 4.33,
+          "days": 710,
+          "weight": 0.977
+        },
+        "gem_seamless": {
+          "ratio": 1.428,
+          "r": 0.808,
+          "maeMm": 4.67,
+          "days": 703,
+          "weight": 0.879
+        },
+        "icon_seamless": {
+          "ratio": 1.24,
+          "r": 0.815,
+          "maeMm": 4.71,
+          "days": 709,
+          "weight": 0.894
+        },
+        "ukmo_seamless": {
+          "ratio": 1.103,
+          "r": 0.784,
+          "maeMm": 5.15,
+          "days": 725,
+          "weight": 0.827
+        }
+      },
+      "check": {
+        "wetDays": 380,
+        "rawPctOfObserved": 86,
+        "calibratedPctOfObserved": 99,
+        "rawMaeMm": 3.88,
+        "calibratedMaeMm": 3.98
+      }
+    },
+    "powder-mountain": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Powder Mountain"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.416,
+          "r": 0.814,
+          "maeMm": 7.52,
+          "days": 725,
+          "weight": 0.781,
+          "measuredRatio": 1.774
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.113,
+          "r": 0.921,
+          "maeMm": 4.14,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.929,
+          "r": 0.865,
+          "maeMm": 5.81,
+          "days": 725,
+          "weight": 0.882
+        },
+        "gfs_global": {
+          "ratio": 1.251,
+          "r": 0.88,
+          "maeMm": 5.54,
+          "days": 710,
+          "weight": 0.913
+        },
+        "gem_seamless": {
+          "ratio": 1.193,
+          "r": 0.866,
+          "maeMm": 5.35,
+          "days": 703,
+          "weight": 0.884
+        },
+        "icon_seamless": {
+          "ratio": 1.258,
+          "r": 0.884,
+          "maeMm": 5.27,
+          "days": 709,
+          "weight": 0.921
+        },
+        "ukmo_seamless": {
+          "ratio": 1.751,
+          "r": 0.866,
+          "maeMm": 5.85,
+          "days": 725,
+          "weight": 0.884
+        }
+      },
+      "check": {
+        "wetDays": 343,
+        "rawPctOfObserved": 71,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 5.18,
+        "calibratedMaeMm": 4.45
+      }
+    },
+    "snowbasin": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Ben Lomond Peak"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.888,
+          "r": 0.814,
+          "maeMm": 10.04,
+          "days": 725,
+          "weight": 0.95,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.643,
+          "r": 0.835,
+          "maeMm": 7.22,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 2,
+          "r": 0.77,
+          "maeMm": 9.54,
+          "days": 725,
+          "weight": 0.85
+        },
+        "gfs_global": {
+          "ratio": 1.927,
+          "r": 0.807,
+          "maeMm": 9.14,
+          "days": 710,
+          "weight": 0.934
+        },
+        "gem_seamless": {
+          "ratio": 1.759,
+          "r": 0.807,
+          "maeMm": 9.08,
+          "days": 703,
+          "weight": 0.934
+        },
+        "icon_seamless": {
+          "ratio": 2,
+          "r": 0.817,
+          "maeMm": 9.02,
+          "days": 709,
+          "weight": 0.957
+        },
+        "ukmo_seamless": {
+          "ratio": 2,
+          "r": 0.781,
+          "maeMm": 9.4,
+          "days": 725,
+          "weight": 0.875
+        }
+      },
+      "check": {
+        "wetDays": 390,
+        "rawPctOfObserved": 47,
+        "calibratedPctOfObserved": 91,
+        "rawMaeMm": 9.37,
+        "calibratedMaeMm": 7.59
+      }
+    },
+    "snowbird": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Snowbird"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.636,
+          "r": 0.802,
+          "maeMm": 8.35,
+          "days": 725,
+          "weight": 0.823,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.171,
+          "r": 0.884,
+          "maeMm": 5.62,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.961,
+          "r": 0.782,
+          "maeMm": 7.65,
+          "days": 725,
+          "weight": 0.783
+        },
+        "gfs_global": {
+          "ratio": 1.624,
+          "r": 0.823,
+          "maeMm": 7.38,
+          "days": 710,
+          "weight": 0.867
+        },
+        "gem_seamless": {
+          "ratio": 1.384,
+          "r": 0.82,
+          "maeMm": 7.19,
+          "days": 703,
+          "weight": 0.86
+        },
+        "icon_seamless": {
+          "ratio": 1.738,
+          "r": 0.779,
+          "maeMm": 7.72,
+          "days": 709,
+          "weight": 0.777
+        },
+        "ukmo_seamless": {
+          "ratio": 1.939,
+          "r": 0.796,
+          "maeMm": 8.21,
+          "days": 725,
+          "weight": 0.811
+        }
+      },
+      "check": {
+        "wetDays": 415,
+        "rawPctOfObserved": 60,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 6.79,
+        "calibratedMaeMm": 6.26
+      }
+    },
+    "solitude": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Brighton"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.242,
+          "r": 0.808,
+          "maeMm": 6.57,
+          "days": 725,
+          "weight": 0.834,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.986,
+          "r": 0.885,
+          "maeMm": 4.19,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.28,
+          "r": 0.789,
+          "maeMm": 5.35,
+          "days": 725,
+          "weight": 0.795
+        },
+        "gfs_global": {
+          "ratio": 1.152,
+          "r": 0.855,
+          "maeMm": 5.01,
+          "days": 710,
+          "weight": 0.933
+        },
+        "gem_seamless": {
+          "ratio": 1.641,
+          "r": 0.811,
+          "maeMm": 5.29,
+          "days": 703,
+          "weight": 0.84
+        },
+        "icon_seamless": {
+          "ratio": 1.126,
+          "r": 0.795,
+          "maeMm": 5.25,
+          "days": 709,
+          "weight": 0.807
+        },
+        "ukmo_seamless": {
+          "ratio": 1.265,
+          "r": 0.809,
+          "maeMm": 5.49,
+          "days": 725,
+          "weight": 0.836
+        }
+      },
+      "check": {
+        "wetDays": 379,
+        "rawPctOfObserved": 80,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 4.25,
+        "calibratedMaeMm": 4.31
+      }
+    },
+    "sundance": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Timpanogos Divide"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.181,
+          "r": 0.783,
+          "maeMm": 8.29,
+          "days": 725,
+          "weight": 0.797,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.051,
+          "r": 0.816,
+          "maeMm": 5.04,
+          "days": 362,
+          "weight": 0.866
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.4,
+          "r": 0.765,
+          "maeMm": 6.73,
+          "days": 725,
+          "weight": 0.761
+        },
+        "gfs_global": {
+          "ratio": 1.122,
+          "r": 0.857,
+          "maeMm": 5.53,
+          "days": 710,
+          "weight": 0.955
+        },
+        "gem_seamless": {
+          "ratio": 0.85,
+          "r": 0.877,
+          "maeMm": 5.17,
+          "days": 703,
+          "weight": 1
+        },
+        "icon_seamless": {
+          "ratio": 1.297,
+          "r": 0.813,
+          "maeMm": 6.42,
+          "days": 709,
+          "weight": 0.859
+        },
+        "ukmo_seamless": {
+          "ratio": 1.369,
+          "r": 0.823,
+          "maeMm": 6.49,
+          "days": 725,
+          "weight": 0.881
+        }
+      },
+      "check": {
+        "wetDays": 331,
+        "rawPctOfObserved": 86,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 5.07,
+        "calibratedMaeMm": 5.15
+      }
+    },
     "whistler": {
+      "updated": "2026-10-27",
       "stations": [
         "Whistler Roundhouse"
       ],
@@ -326,6 +3301,274 @@
         "rawMaeMm": 6.66,
         "calibratedMaeMm": 6.23
       }
+    },
+    "snowmass": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Schofield Pass"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.51,
+          "r": 0.762,
+          "maeMm": 6.5,
+          "days": 725,
+          "weight": 0.774,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.349,
+          "r": 0.866,
+          "maeMm": 4.88,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.806,
+          "r": 0.808,
+          "maeMm": 5.51,
+          "days": 725,
+          "weight": 0.871
+        },
+        "gfs_global": {
+          "ratio": 1.625,
+          "r": 0.732,
+          "maeMm": 6.03,
+          "days": 710,
+          "weight": 0.714
+        },
+        "gem_seamless": {
+          "ratio": 1.123,
+          "r": 0.811,
+          "maeMm": 5.28,
+          "days": 703,
+          "weight": 0.877
+        },
+        "icon_seamless": {
+          "ratio": 1.364,
+          "r": 0.796,
+          "maeMm": 5.48,
+          "days": 709,
+          "weight": 0.845
+        },
+        "ukmo_seamless": {
+          "ratio": 1.795,
+          "r": 0.795,
+          "maeMm": 5.88,
+          "days": 725,
+          "weight": 0.843
+        }
+      },
+      "check": {
+        "wetDays": 502,
+        "rawPctOfObserved": 67,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 4.7,
+        "calibratedMaeMm": 4.94
+      }
+    },
+    "dodge-ridge": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Blue Lakes"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.044,
+          "r": 0.929,
+          "maeMm": 5.77,
+          "days": 725,
+          "weight": 0.998,
+          "measuredRatio": 0.956
+        },
+        "ncep_nbm_conus": {
+          "ratio": 0.665,
+          "r": 0.93,
+          "maeMm": 4.62,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.132,
+          "r": 0.915,
+          "maeMm": 5.76,
+          "days": 725,
+          "weight": 0.968
+        },
+        "gfs_global": {
+          "ratio": 0.845,
+          "r": 0.919,
+          "maeMm": 5.72,
+          "days": 710,
+          "weight": 0.976
+        },
+        "gem_seamless": {
+          "ratio": 1.069,
+          "r": 0.903,
+          "maeMm": 5.75,
+          "days": 703,
+          "weight": 0.943
+        },
+        "icon_seamless": {
+          "ratio": 0.998,
+          "r": 0.916,
+          "maeMm": 5.82,
+          "days": 709,
+          "weight": 0.97
+        },
+        "ukmo_seamless": {
+          "ratio": 1.558,
+          "r": 0.87,
+          "maeMm": 7.2,
+          "days": 725,
+          "weight": 0.875
+        }
+      },
+      "check": {
+        "wetDays": 338,
+        "rawPctOfObserved": 95,
+        "calibratedPctOfObserved": 99,
+        "rawMaeMm": 5.25,
+        "calibratedMaeMm": 5.26
+      },
+      "borrowedFrom": "Bear Valley"
+    },
+    "hesperus": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Spud Mountain",
+        "Cascade #2"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.291,
+          "r": 0.794,
+          "maeMm": 6.11,
+          "days": 1448,
+          "weight": 0.761,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.252,
+          "r": 0.91,
+          "maeMm": 3.75,
+          "days": 724,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.416,
+          "r": 0.894,
+          "maeMm": 4.09,
+          "days": 1448,
+          "weight": 0.965
+        },
+        "gfs_global": {
+          "ratio": 1.107,
+          "r": 0.858,
+          "maeMm": 4.4,
+          "days": 1418,
+          "weight": 0.889
+        },
+        "gem_seamless": {
+          "ratio": 1.154,
+          "r": 0.839,
+          "maeMm": 4.55,
+          "days": 1404,
+          "weight": 0.85
+        },
+        "icon_seamless": {
+          "ratio": 1.255,
+          "r": 0.845,
+          "maeMm": 4.69,
+          "days": 1416,
+          "weight": 0.862
+        },
+        "ukmo_seamless": {
+          "ratio": 1.56,
+          "r": 0.844,
+          "maeMm": 5.2,
+          "days": 1448,
+          "weight": 0.86
+        }
+      },
+      "check": {
+        "wetDays": 616,
+        "rawPctOfObserved": 78,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 3.94,
+        "calibratedMaeMm": 4.04
+      },
+      "borrowedFrom": "Purgatory"
+    },
+    "sunlight": {
+      "updated": "2026-10-27",
+      "stations": [
+        "Schofield Pass"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.51,
+          "r": 0.762,
+          "maeMm": 6.5,
+          "days": 725,
+          "weight": 0.774,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.349,
+          "r": 0.866,
+          "maeMm": 4.88,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.806,
+          "r": 0.808,
+          "maeMm": 5.51,
+          "days": 725,
+          "weight": 0.871
+        },
+        "gfs_global": {
+          "ratio": 1.625,
+          "r": 0.732,
+          "maeMm": 6.03,
+          "days": 710,
+          "weight": 0.714
+        },
+        "gem_seamless": {
+          "ratio": 1.123,
+          "r": 0.811,
+          "maeMm": 5.28,
+          "days": 703,
+          "weight": 0.877
+        },
+        "icon_seamless": {
+          "ratio": 1.364,
+          "r": 0.796,
+          "maeMm": 5.48,
+          "days": 709,
+          "weight": 0.845
+        },
+        "ukmo_seamless": {
+          "ratio": 1.795,
+          "r": 0.795,
+          "maeMm": 5.88,
+          "days": 725,
+          "weight": 0.843
+        }
+      },
+      "check": {
+        "wetDays": 502,
+        "rawPctOfObserved": 67,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 4.7,
+        "calibratedMaeMm": 4.94
+      },
+      "borrowedFrom": "Snowmass"
     }
   }
 }

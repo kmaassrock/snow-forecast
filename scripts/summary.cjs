@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Writes data/summary.json: a small snapshot of every mountain's mid-mountain
+// Writes data/summary.json: a small snapshot of selected mountains' mid-mountain
 // forecast for the iPhone widget (widget/snow-widget.js). Runs on each deploy.
+// Only the mountains in WIDGET_RESORTS are included, to stay within free API limits.
 //
 //   node scripts/summary.cjs
 
@@ -47,10 +48,12 @@ async function summarize(resort, calib) {
   };
 }
 
+const WIDGET_RESORTS = (process.env.WIDGET_RESORTS || 'purgatory,wolf-creek,vail,park-city,whistler').split(',').map((s) => s.trim());
+
 (async () => {
   const calibration = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'calibration.json'), 'utf8'));
   const out = { generated: new Date().toISOString(), resorts: [] };
-  for (const r of RESORTS) {
+  for (const r of WIDGET_RESORTS.map((id) => RESORTS.find((x) => x.id === id)).filter(Boolean)) {
     try {
       out.resorts.push(await summarize(r, calibration.resorts[r.id]));
     } catch (e) {
