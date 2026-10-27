@@ -284,5 +284,5 @@ async function getForecast(resort, elevM, calib) {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { MODELS, FORECAST_DAYS, getForecast, periodTotal, snowType, mmToIn, sum, addDays };
+  module.exports = { MODELS, FORECAST_DAYS, getForecast, periodTotal, snowType, mmToIn, sum, addDays, nowLocalHour };
 }
