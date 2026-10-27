@@ -7,7 +7,6 @@
   --muted: #93a4c0;
   --accent: #5fb3ff;
   --accent-2: #a9d6ff;
-  --range: rgba(95, 179, 255, 0.28);
   --warm: #ffb36b;
   --cold: #7fd0ff;
   --good: #7be0a8;
@@ -25,7 +24,6 @@
     --muted: #5a6b86;
     --accent: #1f7ae0;
     --accent-2: #0d4f9e;
-    --range: rgba(31, 122, 224, 0.2);
     --warm: #c56a12;
     --cold: #1a86c7;
     --good: #198a4f;
@@ -96,12 +94,12 @@ main { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; }
 .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-left: 8px; }
 .sw-night { background: var(--night); }
 .sw-day { background: var(--day); }
-.sw-range { background: var(--range); border: 1px solid var(--accent); }
+.sw-range { width: 2px; height: 14px; border-radius: 0; background: var(--muted); margin-left: 12px; margin-right: 4px; }
 
 .chart { overflow-x: auto; }
 .chart svg { width: 100%; min-width: 640px; height: auto; display: block; }
 .chart text { fill: var(--muted); font-size: 11px; }
-.chart .val { fill: var(--text); font-weight: 600; }
+.chart .val { fill: var(--text); font-weight: 700; font-size: 12px; stroke: var(--panel); stroke-width: 4px; stroke-linejoin: round; }
 .chart .grid { stroke: var(--line); stroke-width: 1; }
 .chart .bar { cursor: pointer; }
 .chart .bar .hit { fill: transparent; }
@@ -109,7 +107,10 @@ main { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; }
 .chart .bar .day { fill: var(--day); }
 .chart .bar.far { opacity: 0.55; }
 .chart .bar.past { opacity: 0.4; }
-.chart .rng { pointer-events: none; }
+.chart .whisker { stroke: var(--text); stroke-opacity: 0.45; stroke-width: 1.5; }
+.chart .whisker-arrow { fill: var(--text); fill-opacity: 0.45; }
+.chart .whisker-max { font-size: 10px; }
+.chart .today-lbl { fill: var(--text); font-weight: 700; }
 .chart .depth { fill: none; stroke: var(--accent); stroke-width: 2; }
 .chart .depth-prev { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 4 3; opacity: 0.7; }
 .chart .newsnow { fill: var(--night); }
@@ -119,8 +120,7 @@ main { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; }
 .split .sw { margin-left: 0; margin-right: 4px; width: 9px; height: 9px; vertical-align: -1px; }
 tr.sep td { text-align: left; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; padding-top: 10px; }
 tr.open td:first-child { box-shadow: inset 3px 0 0 var(--day); }
-.chart .rng { fill: var(--range); stroke: var(--accent); stroke-width: 1; stroke-opacity: 0.5; }
-.chart .today { fill: var(--panel-2); }
+.chart .today { fill: var(--accent); fill-opacity: 0.08; }
 
 .days { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
 .day {
