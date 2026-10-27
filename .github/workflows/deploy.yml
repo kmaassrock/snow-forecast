@@ -31,6 +31,8 @@ jobs:
           node-version: 20
       - name: Build widget summary
         run: node scripts/summary.cjs
+        env:
+          WIDGET_RESORTS: ${{ vars.WIDGET_RESORTS }}
         # A forecast outage shouldn't block publishing; the widget keeps its last copy.
         continue-on-error: true
       - uses: actions/configure-pages@v5

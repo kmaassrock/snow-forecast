@@ -6,7 +6,7 @@
 const CFG = typeof RESORTS !== 'undefined' ? { RESORTS, LIFTS_OPEN, LIFTS_CLOSE } : require('./resorts.js');
 
 const PAST_DAYS = 3;
-const FORECAST_DAYS = 14;
+const FORECAST_DAYS = 15;
 
 // weight(leadHours) is the prior; calibration multiplies it by measured skill.
 const MODELS = [

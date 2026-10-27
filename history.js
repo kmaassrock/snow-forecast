@@ -105,8 +105,13 @@ async function loadHistory(resort) {
 
   const st = resort.stations[0];
   const y = histState.season;
-  document.getElementById('history').innerHTML = '<p class="hint">Loading station history…</p>';
   document.getElementById('historyStats').innerHTML = '';
+  document.getElementById('historyNote').textContent = '';
+  if (!st) {
+    document.getElementById('history').innerHTML = `<p class="hint">There's no snow station near ${resort.name}, so no history is available.</p>`;
+    return;
+  }
+  document.getElementById('history').innerHTML = '<p class="hint">Loading station history…</p>';
   try {
     const depths = await stationDepths(st, `${y - 1}-09-30`, `${y + 1}-06-30`);
     if (seq !== histState.seq) return;

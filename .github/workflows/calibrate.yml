@@ -1,10 +1,11 @@
 name: Recalibrate models
 
-# Re-checks every model against station data so the corrections pick up each
-# new winter. Runs monthly; commits data/calibration.json if it changed.
+# Re-checks models against station data so the corrections pick up each new
+# winter. Weekly, 15 resorts at a time (stalest first) to stay within the free
+# Open-Meteo limits; every resort is refreshed about once a month.
 on:
   schedule:
-    - cron: '0 9 1 * *'
+    - cron: '0 9 * * 1'
   workflow_dispatch:
 
 permissions:
@@ -19,6 +20,8 @@ jobs:
         with:
           node-version: 20
       - run: node scripts/calibrate.cjs
+        env:
+          CALIBRATE_MAX: 15
       - run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
