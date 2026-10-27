@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Snow Forecast</title>
+  <meta name="theme-color" content="#0e1726">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Snow">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <nav class="resorts" id="resortNav" aria-label="Mountain"></nav>
+    <div class="title-row">
+      <div>
+        <h1 id="resortName">Snow Forecast</h1>
+        <p class="sub" id="resortSub"></p>
+      </div>
+      <div class="controls">
+        <div class="seg" id="elevSeg" role="group" aria-label="Elevation"></div>
+        <button id="refresh" class="ghost" title="Refresh" aria-label="Refresh">↻</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <p id="status" class="status">Loading forecast models…</p>
+
+    <section id="alertBanner" class="powder" hidden></section>
+
+    <section id="summary" class="summary"></section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Daily snowfall</h2>
+        <span class="legend">
+          <i class="sw sw-night"></i>Overnight (4p–9a)
+          <i class="sw sw-day"></i>Lifts open (9a–4p)
+          <i class="sw sw-range"></i>Likely range
+        </span>
+      </div>
+      <div id="chart" class="chart"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Day by day</h2><span class="hint">Each day runs 4 pm the day before to 4 pm. Tap for hourly detail.</span></div>
+      <div id="days" class="days"></div>
+    </section>
+
+    <section class="card" id="detailCard" hidden>
+      <div class="card-head"><h2 id="detailTitle">Hourly</h2><button class="ghost" id="closeDetail" aria-label="Close">✕</button></div>
+      <div id="detail"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Model comparison</h2><span class="hint">Calibrated snow (in) per day; blank = beyond that model's range</span></div>
+      <div id="models" class="table-wrap"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Snowfall history</h2>
+        <select id="seasonSel" aria-label="Season"></select>
+      </div>
+      <div id="historyStats" class="summary small"></div>
+      <div id="history" class="chart"></div>
+      <p class="hint" id="historyNote"></p>
+    </section>
+
+    <section class="card method">
+      <h2>How this forecast is built</h2>
+      <ul>
+        <li><b>Models:</b> HRRR (3 km, 0–48 h), NBM (2.5 km, ~11 days), ECMWF IFS (9 km, ~15 days), GFS, Canadian GEM, DWD ICON and UK Met Office. Each hour is a weighted average of the models that reach that far out.</li>
+        <li><b>Calibration:</b> each model's archived forecasts were checked against what the nearby station actually measured over the last three winters. Each model gets a correction for how much it typically under- or over-forecasts here, and a weight based on how well it tracked real storms.</li>
+        <li><b>Snow ratio:</b> snow water is turned into inches of snow using a temperature-based ratio (Kuchera method), reduced for strong winds.</li>
+        <li><b>Range:</b> 82 ensemble runs (GFS + ECMWF ensembles) give the 10th–90th percentile spread, scaled to the blend.</li>
+        <li><b>History:</b> station snow depth from NRCS SNOTEL (US) or Environment Canada (Whistler). New snow is estimated from depth gains, which runs a little low because fresh snow settles.</li>
+      </ul>
+      <div id="calib" class="table-wrap"></div>
+      <p class="hint">Forecast data: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>. These are computer model numbers, not a human forecaster's call.</p>
+    </section>
+  </main>
+
+  <script src="resorts.js"></script>
+  <script src="core.js"></script>
+  <script src="history.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
