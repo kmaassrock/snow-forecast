@@ -1,10 +1,19 @@
 // Page rendering. Forecast math lives in core.js; station history in history.js.
 
 const POWDER_DAY_IN = 6; // a ski day with at least this much is flagged
+const STALE_MS = 30 * 60e3; // refresh on reopen when the forecast is older than this
+const SAVED_FORECASTS = 6; // how many forecasts to keep for instant open
 
 const fmtIn = (x) => (x == null ? '–' : x < 0.05 ? '0"' : x < 1 ? `${x.toFixed(1)}"` : `${Math.round(x)}"`);
 const fmtRange = (lo, hi) => `${fmtIn(lo).replace('"', '')}–${fmtIn(hi)}`;
 const ftLabel = (m) => `${(Math.round(mToFt(m) / 10) * 10).toLocaleString()}′`;
+
+function ago(ms) {
+  const m = Math.round((Date.now() - ms) / 60e3);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m} min ago`;
+  return `${Math.round(m / 60)} hr ago`;
+}
 
 function dayLabel(dateStr, todayStr) {
   const d = new Date(dateStr + 'T12:00:00');
@@ -43,25 +52,55 @@ function loadFavorites() {
   try { return JSON.parse(store.get('favorites')) || [DEFAULT_RESORT]; } catch { return [DEFAULT_RESORT]; }
 }
 
+const hash = location.hash.slice(1);
 const state = {
-  // The app opens on Purgatory unless a link names a mountain (#vail).
-  resortId: location.hash.slice(1) || DEFAULT_RESORT,
+  // The app opens on Purgatory unless a link names a mountain (#vail) or the favorites list.
+  view: hash === 'favorites' ? 'favorites' : 'resort',
+  resortId: hash && hash !== 'favorites' ? hash : DEFAULT_RESORT,
   elev: store.get('elev') || 'mid',
   favorites: loadFavorites(),
   calibration: null,
   days: [], ens: {}, todayStr: '', selected: null,
+  fetchedAt: null, refreshing: false, hasEnsemble: true,
+  observed: null,
 };
 if (!RESORTS.some((r) => r.id === state.resortId)) state.resortId = DEFAULT_RESORT;
 const resort = () => RESORTS.find((r) => r.id === state.resortId);
 const todayIndex = () => state.days.findIndex((d) => d.date === state.todayStr);
 const upcoming = () => state.days.slice(Math.max(0, todayIndex()));
 
+// ---------- saved forecasts (instant open) ----------
+
+const savedKey = (id, elev) => `fc:${id}:${elev}`;
+
+function saveForecast(id, elev, f) {
+  store.set(savedKey(id, elev), JSON.stringify({ days: f.days, ens: f.ens, savedAt: Date.now() }));
+  try {
+    const keys = Object.keys(localStorage).filter((k) => k.startsWith('fc:'));
+    if (keys.length <= SAVED_FORECASTS) return;
+    keys.map((k) => [k, JSON.parse(localStorage.getItem(k)).savedAt])
+      .sort((a, b) => b[1] - a[1]).slice(SAVED_FORECASTS)
+      .forEach(([k]) => localStorage.removeItem(k));
+  } catch {}
+}
+
+// A saved forecast is only useful if it still covers today in the resort's time zone.
+function savedForecast(r, elev) {
+  try {
+    const f = JSON.parse(store.get(savedKey(r.id, elev)));
+    const todayStr = nowLocalHour(r.tz).slice(0, 10);
+    return f && f.days.some((d) => d.date === todayStr) ? { ...f, todayStr } : null;
+  } catch { return null; }
+}
+
 // ---------- header ----------
 
 function renderPicker() {
-  const opt = (r) => `<option value="${r.id}" ${r.id === state.resortId ? 'selected' : ''}>${r.name}</option>`;
+  const fav = state.view === 'favorites';
+  const opt = (r) => `<option value="${r.id}" ${!fav && r.id === state.resortId ? 'selected' : ''}>${r.name}</option>`;
   const favs = state.favorites.map((id) => RESORTS.find((r) => r.id === id)).filter(Boolean);
-  let html = favs.length ? `<optgroup label="★ Favorites">${favs.map(opt).join('')}</optgroup>` : '';
+  let html = `<option value="favorites" ${fav ? 'selected' : ''}>★ All favorites</option>`;
+  if (favs.length) html += `<optgroup label="★ Favorites">${favs.map(opt).join('')}</optgroup>`;
   for (const [code, label] of Object.entries(STATE_NAMES)) {
     const rs = RESORTS.filter((r) => r.state === code && !state.favorites.includes(r.id));
     if (rs.length) html += `<optgroup label="${label}">${rs.map(opt).join('')}</optgroup>`;
@@ -71,19 +110,71 @@ function renderPicker() {
 
 function renderHeader() {
   const r = resort();
-  document.title = `${r.name} Snow Forecast`;
-  $('resortName').textContent = r.name;
-  const fav = state.favorites.includes(r.id);
-  $('favBtn').textContent = fav ? '★' : '☆';
-  $('favBtn').classList.toggle('on', fav);
-  $('favBtn').setAttribute('aria-label', fav ? 'Remove from favorites' : 'Add to favorites');
-  $('resortSub').textContent = `${ftLabel(r.elevations.base)}–${ftLabel(r.elevations.summit)} · ${r.region}`;
+  const fav = state.view === 'favorites';
+  document.title = fav ? 'Favorites · Snow Forecast' : `${r.name} Snow Forecast`;
+  $('resortName').textContent = fav ? '★ Favorites' : r.name;
+  $('favBtn').hidden = fav;
+  const starred = state.favorites.includes(r.id);
+  $('favBtn').textContent = starred ? '★' : '☆';
+  $('favBtn').classList.toggle('on', starred);
+  $('favBtn').setAttribute('aria-label', starred ? 'Remove from favorites' : 'Add to favorites');
+  $('resortSub').textContent = fav
+    ? `${state.favorites.length} mountain${state.favorites.length === 1 ? '' : 's'} · tap one to open it`
+    : `${ftLabel(r.elevations.base)}–${ftLabel(r.elevations.summit)} · ${r.region}`;
   $('elevSeg').innerHTML = ['base', 'mid', 'summit'].map((k) =>
-    `<button data-elev="${k}" class="${k === state.elev ? 'on' : ''}" title="${ftLabel(r.elevations[k])}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('');
+    `<button data-elev="${k}" class="${k === state.elev ? 'on' : ''}" title="${fav ? '' : ftLabel(r.elevations[k])}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('');
   renderPicker();
 }
 
+function renderStatus() {
+  if (state.view !== 'resort' || !state.fetchedAt) return;
+  $('status').className = 'status';
+  $('status').textContent = `Updated ${ago(state.fetchedAt)}${state.refreshing ? ' · refreshing…' : ''}`
+    + ` · ${state.elev} mountain ${ftLabel(resort().elevations[state.elev])}${state.hasEnsemble ? '' : ' · range unavailable'}`;
+}
+
 // ---------- snow summary (OpenSnow style) ----------
+
+const QUALITY = { 't-wet': 'q-wet', 't-med': 'q-med', 't-light': 'q-light', 't-dry': 'q-dry' };
+
+// Period totals + one bar per day for the next 15 days. Bars are colored by snow
+// quality; powder days blend into orange at the top. Shared by the resort view
+// and the favorites cards (interactive = tappable day columns).
+function summaryHTML(days, ens, todayStr, { interactive = true, selected = null, barPx = 90 } = {}) {
+  const ti = days.findIndex((d) => d.date === todayStr);
+  const up = days.slice(Math.max(0, ti), Math.max(0, ti) + 15);
+  const periods = [[0, 4, 'Next 1–5 Days'], [5, 9, 'Next 6–10 Days'], [10, 14, 'Next 11–15 Days']].map(([a, b, label]) => {
+    const p = periodTotal(days, ens, ti + a, ti + b);
+    return `<div class="period" style="flex:${Math.max(1, Math.min(b, up.length - 1) - a + 1)}">
+      <div class="p-label">${label}</div>
+      <div class="p-total"><span>${p ? fmtIn(p.snow) : '–'}</span></div>
+      <div class="p-range">${p?.range ? `range ${fmtRange(p.range.lo, p.range.hi)}` : '&nbsp;'}</div>
+    </div>`;
+  }).join('');
+  const max = Math.max(3, ...up.map((d) => d.snow));
+  const tag = interactive ? 'button' : 'span';
+  const bars = up.map((d) => {
+    const lbl = dayLabel(d.date, todayStr);
+    // Bar height in px, leaving room in the track for the total that sits on top of it.
+    const h = d.snow < 0.05 ? 0 : Math.max(4, (d.snow / max) * barPx);
+    const powder = d.snow >= POWDER_DAY_IN;
+    const quality = d.slr ? QUALITY[snowType(d.slr).cls] : 'q-med';
+    const cls = d.snow < 0.05 ? 'none' : `${quality}${powder ? ' pow' : ''}`;
+    const type = d.slr && d.snow >= 0.5 ? `, ${snowType(d.slr).label.toLowerCase()}` : '';
+    return `<${tag} class="col ${d.date === selected ? 'sel' : ''}" data-date="${d.date}" aria-label="${lbl.long}: ${fmtIn(d.snow)}${type}">
+      <span class="b-track"><span class="b-val ${powder ? 'pow' : ''}">${d.snow >= 1 ? fmtIn(d.snow) : ''}</span><span class="b ${cls}" style="height:${h}px"></span></span>
+      <span class="b-wk ${lbl.weekend ? 'wknd' : ''}">${lbl.weekend ? lbl.wk.slice(0, 2) : lbl.wk[0]}</span>
+      <span class="b-dt ${lbl.weekend ? 'wknd' : ''} ${d.date === todayStr ? 'today' : ''}">${+d.date.slice(8)}</span>
+    </${tag}>`;
+  }).join('');
+  return `<div class="periods">${periods}</div><div class="bars">${bars}</div>`;
+}
+
+const QUALITY_LEGEND = `<div class="q-legend">
+  <span><i class="q q-wet"></i>Heavy, wet</span><span><i class="q q-med"></i>Medium</span>
+  <span><i class="q q-light"></i>Light</span><span><i class="q q-dry"></i>Dry powder</span>
+  <span><i class="q q-dry pow"></i>Orange top = ${POWDER_DAY_IN}"+ powder day</span>
+</div>`;
 
 function renderBanner() {
   const next = upcoming().slice(0, 3).filter((d) => d.snow >= POWDER_DAY_IN || d.overnight >= 4);
@@ -95,31 +186,13 @@ function renderBanner() {
 }
 
 function renderSnowSummary() {
-  const ti = todayIndex();
-  const days = upcoming().slice(0, 15);
-  const periods = [[0, 4, 'Next 1–5 Days'], [5, 9, 'Next 6–10 Days'], [10, 14, 'Next 11–15 Days']].map(([a, b, label]) => {
-    const p = periodTotal(state.days, state.ens, ti + a, ti + b);
-    return `<div class="period" style="flex:${Math.min(b, days.length - 1) - a + 1}">
-      <div class="p-label">${label}</div>
-      <div class="p-total"><span>${p ? fmtIn(p.snow) : '–'}</span></div>
-      <div class="p-range">${p?.range ? `range ${fmtRange(p.range.lo, p.range.hi)}` : '&nbsp;'}</div>
-    </div>`;
-  }).join('');
-  const max = Math.max(3, ...days.map((d) => d.snow));
-  const bars = days.map((d) => {
-    const lbl = dayLabel(d.date, state.todayStr);
-    // Bar height in px, leaving room in the track for the total that sits on top of it.
-    const h = d.snow < 0.05 ? 0 : Math.max(4, (d.snow / max) * 90);
-    const cls = d.snow >= POWDER_DAY_IN ? 'big' : d.snow < 0.05 ? 'none' : '';
-    return `<button class="col ${d.date === state.selected ? 'sel' : ''}" data-date="${d.date}" aria-label="${lbl.long}: ${fmtIn(d.snow)}">
-      <span class="b-track"><span class="b-val">${d.snow >= 1 ? fmtIn(d.snow) : ''}</span><span class="b ${cls}" style="height:${h}px"></span></span>
-      <span class="b-wk ${lbl.weekend ? 'wknd' : ''}">${lbl.weekend ? lbl.wk.slice(0, 2) : lbl.wk[0]}</span>
-      <span class="b-dt ${lbl.weekend ? 'wknd' : ''} ${d.date === state.todayStr ? 'today' : ''}">${+d.date.slice(8)}</span>
-    </button>`;
-  }).join('');
-  const past = state.days.filter((d) => d.past);
-  $('snowSummary').innerHTML = `<div class="periods">${periods}</div><div class="bars">${bars}</div>
-    <p class="hint">Past ${past.length} days (modeled): <b>${fmtIn(sum(past.map((d) => d.snow)))}</b> · Orange = powder day (${POWDER_DAY_IN}"+). Each day runs 4 pm the day before to 4 pm.</p>`;
+  const o = state.observed?.id === state.resortId ? state.observed : null;
+  const past = state.days.filter((d) => d.date < state.todayStr);
+  const recent = o
+    ? `<p class="measured">Measured at ${o.station} · last 24 hrs <b>${fmtIn(o.h24)}</b> · last 3 days <b>${fmtIn(o.h72)}</b></p>`
+    : past.length ? `<p class="measured">Past ${past.length} days (modeled): <b>${fmtIn(sum(past.map((d) => d.snow)))}</b></p>` : '';
+  $('snowSummary').innerHTML = recent + summaryHTML(state.days, state.ens, state.todayStr, { selected: state.selected })
+    + QUALITY_LEGEND + '<p class="hint">Each day runs 4 pm the day before to 4 pm.</p>';
   $('snowSummary').querySelectorAll('.col').forEach((b) => b.addEventListener('click', () => selectDay(b.dataset.date, true)));
 }
 
@@ -161,7 +234,6 @@ function dayDetail(d, lead) {
 }
 
 function renderDays() {
-  const ti = todayIndex();
   $('days').innerHTML = upcoming().map((d, i) => {
     const lbl = dayLabel(d.date, state.todayStr);
     const type = d.slr && d.snow >= 0.5 ? snowType(d.slr) : null;
@@ -193,6 +265,7 @@ function selectDay(date, scroll) {
 
 function renderChart() {
   const days = upcoming();
+  if (!days.length) { $('chart').innerHTML = ''; return; }
   const W = Math.max(720, days.length * 46), H = 250, padL = 30, padB = 40, padT = 30;
   // Scale to the bars, with headroom; taller range whiskers are clipped with an arrow.
   const maxV = Math.max(4, ...days.map((d) => d.snow * 1.6));
@@ -276,6 +349,66 @@ function renderCalibration() {
     <table><tr><th class="name">Model</th><th>Correction</th><th>Skill (r)</th><th>Weight</th></tr>${rows}</table>`;
 }
 
+function renderResort() {
+  renderBanner();
+  renderSnowSummary();
+  renderDays();
+  renderChart();
+  renderModels();
+}
+
+// ---------- favorites overview ----------
+
+function favCard(r, c) {
+  const body = c?.days ? summaryHTML(c.days, c.ens || {}, c.todayStr, { interactive: false, barPx: 62 })
+    : `<p class="hint">${c?.failed ? "Couldn't load this forecast." : 'Loading…'}</p>`;
+  const when = c?.failed ? "couldn't refresh" : c?.savedAt ? ago(c.savedAt) : '';
+  return `<div class="card fav-card" role="button" tabindex="0" data-id="${r.id}">
+    <div class="fc-head">
+      <span><b class="fc-name">${r.name}</b> <span class="muted">${ftLabel(r.elevations[state.elev])} · ${r.state}</span></span>
+      <span class="muted fc-when">${when}</span>
+    </div>
+    ${body}
+  </div>`;
+}
+
+let favSeq = 0;
+async function loadFavView() {
+  const seq = ++favSeq;
+  renderHeader();
+  const resorts = state.favorites.map((id) => RESORTS.find((r) => r.id === id)).filter(Boolean);
+  if (!resorts.length) {
+    $('favView').innerHTML = '<p class="card hint">No favorites yet. Open a mountain and tap ☆ next to its name.</p>';
+    return;
+  }
+  const cards = Object.fromEntries(resorts.map((r) => [r.id, savedForecast(r, state.elev)]));
+  const draw = () => {
+    if (seq !== favSeq) return;
+    $('favView').innerHTML = resorts.map((r) => favCard(r, cards[r.id])).join('') + `<div class="card">${QUALITY_LEGEND}</div>`;
+  };
+  draw();
+  // Each card refreshes on its own; ensembles are skipped to keep this light.
+  await Promise.all(resorts.map(async (r) => {
+    if (cards[r.id] && Date.now() - cards[r.id].savedAt < STALE_MS) return;
+    try {
+      const f = await getForecast(r, r.elevations[state.elev], state.calibration?.resorts?.[r.id], { ensemble: false });
+      if (seq !== favSeq) return;
+      saveForecast(r.id, state.elev, f);
+      cards[r.id] = { ...f, savedAt: Date.now() };
+    } catch (e) {
+      console.error(e);
+      cards[r.id] = { ...(cards[r.id] || {}), failed: true };
+    }
+    draw();
+  }));
+}
+
+function applyView() {
+  const fav = state.view === 'favorites';
+  document.body.classList.toggle('fav-mode', fav);
+  $('favView').hidden = !fav;
+}
+
 // ---------- loading ----------
 
 async function loadCalibration() {
@@ -284,43 +417,90 @@ async function loadCalibration() {
   catch (e) { console.warn('No calibration file', e); }
 }
 
+async function loadObserved() {
+  const r = resort();
+  state.observed = null;
+  try {
+    const o = await recentObserved(r);
+    if (o && r.id === state.resortId) {
+      state.observed = { ...o, id: r.id };
+      if (state.days.length) renderSnowSummary();
+    }
+  } catch (e) { console.warn('No recent station data', e); }
+}
+
+// Draw the last saved forecast for the current resort, if any (no network).
+function showSaved() {
+  const r = resort();
+  renderHeader();
+  renderCalibration();
+  const saved = savedForecast(r, state.elev);
+  if (saved) {
+    Object.assign(state, { days: saved.days, ens: saved.ens || {}, todayStr: saved.todayStr, fetchedAt: saved.savedAt, refreshing: true, hasEnsemble: !!Object.keys(saved.ens || {}).length });
+    renderResort();
+    renderStatus();
+  } else {
+    Object.assign(state, { days: [], ens: {}, fetchedAt: null, refreshing: true });
+    renderResort();
+    $('status').className = 'status';
+    $('status').textContent = 'Loading forecast models…';
+  }
+}
+
 let loadSeq = 0;
-async function load() {
+async function load({ redraw = true } = {}) {
   const seq = ++loadSeq;
   const r = resort();
   const elevM = r.elevations[state.elev];
-  renderHeader();
-  renderCalibration();
-  $('status').className = 'status';
-  $('status').textContent = 'Loading forecast models…';
+  if (redraw) showSaved();
+  else { renderCalibration(); state.refreshing = true; renderStatus(); }
   try {
     const f = await getForecast(r, elevM, state.calibration?.resorts?.[r.id]);
     if (seq !== loadSeq) return; // a newer request replaced this one
-    Object.assign(state, { days: f.days, ens: f.ens, todayStr: f.todayStr });
-    renderBanner();
-    renderSnowSummary();
-    renderDays();
-    renderChart();
-    renderModels();
-    const t = new Date().toLocaleString('en-US', { timeZone: r.tz, weekday: 'short', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
-    $('status').textContent = `Updated ${t} · ${state.elev} mountain ${ftLabel(elevM)}${f.hasEnsemble ? '' : ' · range unavailable'}`;
+    saveForecast(r.id, state.elev, f);
+    Object.assign(state, { days: f.days, ens: f.ens, todayStr: f.todayStr, fetchedAt: Date.now(), refreshing: false, hasEnsemble: f.hasEnsemble });
+    renderResort();
+    renderStatus();
   } catch (e) {
+    if (seq !== loadSeq) return;
     console.error(e);
+    state.refreshing = false;
     $('status').className = 'status err';
-    $('status').textContent = `Couldn't load the forecast: ${e.message}`;
+    $('status').textContent = state.fetchedAt
+      ? `Showing the forecast from ${ago(state.fetchedAt)}; couldn't refresh (${e.message})`
+      : `Couldn't load the forecast: ${e.message}`;
   }
 }
 
 function switchResort(id) {
-  if (!id || id === state.resortId) return;
+  if (id === 'favorites') {
+    state.view = 'favorites';
+    history.replaceState(null, '', '#favorites');
+    applyView();
+    loadFavView();
+    return;
+  }
+  if (!id || (id === state.resortId && state.view === 'resort')) return;
+  state.view = 'resort';
   state.resortId = id;
   state.selected = null;
   history.replaceState(null, '', id === DEFAULT_RESORT ? location.pathname : '#' + id);
+  applyView();
+  window.scrollTo(0, 0);
   load();
   loadHistory(resort());
+  loadObserved();
 }
 
 $('resortSel').addEventListener('change', (e) => switchResort(e.target.value));
+$('favView').addEventListener('click', (e) => {
+  const card = e.target.closest('.fav-card');
+  if (card) switchResort(card.dataset.id);
+});
+$('favView').addEventListener('keydown', (e) => {
+  const card = e.target.closest('.fav-card');
+  if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); switchResort(card.dataset.id); }
+});
 $('favBtn').addEventListener('click', () => {
   const id = state.resortId;
   state.favorites = state.favorites.includes(id) ? state.favorites.filter((x) => x !== id) : [...state.favorites, id];
@@ -332,11 +512,25 @@ $('elevSeg').addEventListener('click', (e) => {
   if (!k) return;
   state.elev = k;
   store.set('elev', k);
-  load();
+  if (state.view === 'favorites') loadFavView(); else load();
 });
 $('refresh').addEventListener('click', load);
 
-loadCalibration().then(load);
-loadHistory(resort());
+// Reopening the app later (it stays in memory on iPhone) refreshes a stale forecast.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  if (state.view === 'favorites') loadFavView();
+  else if (!state.fetchedAt || Date.now() - state.fetchedAt > STALE_MS) { load(); loadObserved(); }
+});
+setInterval(renderStatus, 60e3);
+
+applyView();
+// Saved forecast first so the app opens instantly; calibration and fresh data follow.
+if (state.view === 'resort') showSaved();
+loadCalibration().then(() => (state.view === 'favorites' ? loadFavView() : load({ redraw: false })));
+if (state.view === 'resort') {
+  loadHistory(resort());
+  loadObserved();
+}
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});

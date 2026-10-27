@@ -13,6 +13,11 @@
   --good: #7be0a8;
   --night: #3d7fd6;
   --day: #9fd2ff;
+  /* Snow quality, wettest to driest */
+  --q-wet: #8796ad;
+  --q-med: #3b82f6;
+  --q-light: #38bdf8;
+  --q-dry: #a78bfa;
 }
 
 @media (prefers-color-scheme: light) {
@@ -31,6 +36,10 @@
     --good: #198a4f;
     --night: #1f5fb8;
     --day: #7cb9f2;
+    --q-wet: #7b8aa3;
+    --q-med: #2f6fe0;
+    --q-light: #0ea5e9;
+    --q-dry: #8b5cf6;
   }
 }
 
@@ -102,9 +111,31 @@ main { max-width: 900px; margin: 0 auto; padding: 0 16px 40px; }
 .col.sel { background: var(--panel-2); }
 .b-track { height: 112px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
 .b-val { font-size: 0.68rem; font-weight: 700; line-height: 1; margin-bottom: 3px; white-space: nowrap; }
-.b { width: 82%; max-width: 30px; background: var(--bar); border-radius: 4px 4px 1px 1px; }
-.b.big { background: var(--big); }
+.b-val.pow { color: var(--big); }
+.b { --q: var(--q-med); width: 82%; max-width: 30px; background: var(--q); border-radius: 4px 4px 1px 1px; }
+.q-wet { --q: var(--q-wet); }
+.q-med { --q: var(--q-med); }
+.q-light { --q: var(--q-light); }
+.q-dry { --q: var(--q-dry); }
+/* Powder days keep their snow-quality color and blend into orange at the top. */
+.b.pow { background: linear-gradient(to top, var(--q) 0 50%, var(--big) 100%); }
 .b.none { height: 2px !important; background: var(--line); }
+.q-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 10px; font-size: 0.75rem; color: var(--muted); }
+.q-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.q { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--q); }
+.q.pow { height: 14px; background: linear-gradient(to top, var(--q) 0 50%, var(--big) 100%); }
+.measured { margin: 0 0 10px; font-size: 0.85rem; color: var(--muted); }
+.measured b { color: var(--text); }
+
+/* ---------- favorites overview ---------- */
+.fav-mode .resort-only { display: none !important; }
+.fav-card { cursor: pointer; }
+.fav-card:hover, .fav-card:focus-visible { border-color: var(--accent); outline: none; }
+.fc-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.fc-name { font-size: 1.1rem; }
+.fc-when { font-size: 0.75rem; white-space: nowrap; }
+.fav-card .b-track { height: 80px; }
+.fav-card .q-legend { margin: 0; }
 .b-wk, .b-dt { font-size: 0.8rem; color: var(--muted); line-height: 1.3; }
 .b-wk { margin-top: 4px; }
 .wknd { color: var(--text); font-weight: 700; }

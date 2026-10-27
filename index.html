@@ -31,9 +31,11 @@
   </header>
 
   <main>
-    <section id="alertBanner" class="powder" hidden></section>
+    <section id="favView" class="fav-view" hidden></section>
 
-    <section class="card summary-card">
+    <section id="alertBanner" class="powder resort-only" hidden></section>
+
+    <section class="card resort-only summary-card">
       <div class="card-head">
         <h2>Snow Summary</h2>
         <button id="refresh" class="ghost small" aria-label="Refresh">↻</button>
@@ -42,12 +44,12 @@
       <p id="status" class="status">Loading forecast models…</p>
     </section>
 
-    <section class="card">
+    <section class="card resort-only">
       <div class="card-head"><h2>Daily forecast</h2><span class="hint">Tap a day for details</span></div>
       <div id="days" class="day-list"></div>
     </section>
 
-    <section class="card">
+    <section class="card resort-only">
       <div class="card-head">
         <h2>Before &amp; during lift hours</h2>
         <span class="legend">
@@ -59,7 +61,7 @@
       <div id="chart" class="chart"></div>
     </section>
 
-    <section class="card">
+    <section class="card resort-only">
       <div class="card-head">
         <h2>Snowfall history</h2>
         <select id="seasonSel" aria-label="Season"></select>
@@ -69,13 +71,13 @@
       <p class="hint" id="historyNote"></p>
     </section>
 
-    <details class="card fold">
+    <details class="card fold resort-only">
       <summary><h2>Model comparison</h2></summary>
       <p class="hint">Calibrated snow (in) per day; blank = beyond that model's range.</p>
       <div id="models" class="table-wrap"></div>
     </details>
 
-    <details class="card fold method">
+    <details class="card fold resort-only method">
       <summary><h2>How this forecast is built</h2></summary>
       <ul>
         <li><b>Models:</b> HRRR (3 km, 0–48 h), NBM (2.5 km, ~11 days), ECMWF IFS (9 km, ~15 days), GFS, Canadian GEM, DWD ICON and UK Met Office. Each hour is a weighted average of the models that reach that far out.</li>

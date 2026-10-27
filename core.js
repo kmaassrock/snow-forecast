@@ -269,11 +269,12 @@ function periodTotal(days, ens, from, to) {
   return { snow, range: scaledRange(snow, members), first: ds[0].date, last: ds[ds.length - 1].date };
 }
 
-// Full forecast for one resort and elevation.
-async function getForecast(resort, elevM, calib) {
+// Full forecast for one resort and elevation. { ensemble: false } skips the
+// ensemble request (no uncertainty ranges) for lightweight overviews.
+async function getForecast(resort, elevM, calib, { ensemble = true } = {}) {
   const [det, ensRaw] = await Promise.all([
     fetchDeterministic(resort, elevM),
-    fetchEnsemble(resort, elevM).catch((e) => { console.warn('Ensemble failed', e); return null; }),
+    ensemble ? fetchEnsemble(resort, elevM).catch((e) => { console.warn('Ensemble failed', e); return null; }) : null,
   ]);
   const nowKey = nowLocalHour(resort.tz);
   const todayStr = nowKey.slice(0, 10);

@@ -30,6 +30,30 @@ async function stationDepths(st, from, to) {
   return out;
 }
 
+// New snow measured at the resort's station over the last 24 hours and 3 days,
+// from hourly SNOTEL depth. Null when there's no station or no recent reading.
+async function recentObserved(resort) {
+  const st = resort.stations[0];
+  if (!st || st.source !== 'snotel') return null; // Environment Canada lags about a month
+  const H = 3600e3, now = Date.now();
+  // SNOTEL timestamps are local standard time (no daylight saving).
+  const offset = resort.tz === 'America/Los_Angeles' ? -8 : -7;
+  const stamp = (ms) => new Date(ms + offset * H).toISOString().slice(0, 16).replace('T', ' ');
+  const toMs = (s) => Date.parse(s.replace(' ', 'T') + ':00Z') - offset * H;
+  const q = new URLSearchParams({ stationTriplets: st.id, elements: 'SNWD', duration: 'HOURLY', beginDate: stamp(now - 80 * H), endDate: stamp(now) });
+  const r = await fetch(`https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1/data?${q}`);
+  if (!r.ok) return null;
+  const vals = ((await r.json())[0]?.data?.[0]?.values || []).filter((v) => v.value != null);
+  const last = vals[vals.length - 1];
+  if (!last || now - toMs(last.date) > 8 * H) return null;
+  const gain = (hours) => {
+    const from = vals.find((v) => toMs(v.date) >= toMs(last.date) - hours * H);
+    const g = from ? last.value - from.value : 0;
+    return g >= 1 ? g : 0; // depth sensors jitter by about an inch
+  };
+  return { station: st.name, h24: gain(24), h72: gain(72) };
+}
+
 // One entry per day of the season; values are end-of-day readings.
 function seasonSeries(depths, startYear) {
   const start = `${startYear}-10-01`, end = `${startYear + 1}-06-30`;
