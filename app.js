@@ -91,31 +91,41 @@ function renderSummary() {
 
 function renderChart() {
   const days = state.days;
-  const W = Math.max(720, days.length * 46), H = 240, padL = 30, padB = 40, padT = 22;
-  const maxV = Math.max(4, ...days.map((d) => Math.max(d.snow, d.range?.hi ?? 0)));
+  const W = Math.max(720, days.length * 46), H = 250, padL = 30, padB = 40, padT = 30;
+  // Scale to the bars, with headroom; taller range whiskers are clipped with an arrow.
+  const maxV = Math.max(4, ...days.map((d) => d.snow * 1.6));
   const step = maxV > 24 ? 6 : maxV > 12 ? 4 : maxV > 6 ? 2 : 1;
   const top = Math.ceil(maxV / step) * step;
-  const y = (v) => padT + (H - padT - padB) * (1 - v / top);
+  const y = (v) => padT + (H - padT - padB) * (1 - Math.min(v, top) / top);
   const bw = (W - padL - 10) / days.length;
   const ti = todayIndex();
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily snowfall chart">`;
+  if (ti >= 0) s += `<rect class="today" x="${padL + ti * bw}" y="${padT - 26}" width="${bw}" height="${H - padT - padB + 60}" rx="6"/>`;
   for (let v = 0; v <= top; v += step) {
     s += `<line class="grid" x1="${padL}" x2="${W - 5}" y1="${y(v)}" y2="${y(v)}"/><text x="${padL - 6}" y="${y(v) + 4}" text-anchor="end">${v}"</text>`;
   }
   days.forEach((d, i) => {
     const x = padL + i * bw, cx = x + bw / 2;
-    if (i === ti) s += `<rect class="today" x="${x}" y="${padT - 18}" width="${bw}" height="${H - padT - padB + 18}" rx="6"/>`;
-    if (d.range && !d.past && d.range.hi - d.range.lo > 0.1) {
-      s += `<rect class="rng" x="${x + bw * 0.12}" y="${y(d.range.hi)}" width="${bw * 0.76}" height="${Math.max(1, y(d.range.lo) - y(d.range.hi))}" rx="3"/>`;
-    }
     const cls = d.past ? 'past' : i - ti > 9 ? 'far' : '';
-    const bx = x + bw * 0.3, bwid = bw * 0.4;
-    s += `<g class="bar ${cls}" data-date="${d.date}"><title>${d.date}: ${fmtIn(d.overnight)} overnight + ${fmtIn(d.lifts)} lifts open</title>`;
+    const bx = x + bw * 0.28, bwid = bw * 0.44;
+    const r = !d.past && d.range && d.range.hi - d.range.lo > 0.1 ? d.range : null;
+    const tip = `${d.date}: ${fmtIn(d.snow)} total · ${fmtIn(d.overnight)} before lifts open, ${fmtIn(d.lifts)} while open${r ? ` · could be ${fmtRange(r.lo, r.hi)}` : ''}`;
+    s += `<g class="bar ${cls}" data-date="${d.date}"><title>${tip}</title>`;
     s += `<rect class="hit" x="${x}" y="${padT}" width="${bw}" height="${H - padT - padB}"/>`;
+    if (r) {
+      // Whisker behind the bar: thin line from low to high with end caps.
+      const clipped = r.hi > top;
+      s += `<line class="whisker" x1="${cx}" x2="${cx}" y1="${y(r.lo)}" y2="${y(r.hi)}"/>`;
+      s += `<line class="whisker" x1="${cx - 5}" x2="${cx + 5}" y1="${y(r.lo)}" y2="${y(r.lo)}"/>`;
+      s += clipped
+        ? `<path class="whisker-arrow" d="M${cx - 4},${y(top) + 5} L${cx},${y(top) - 1} L${cx + 4},${y(top) + 5} Z"/><text class="whisker-max" x="${cx}" y="${y(top) - 5}" text-anchor="middle">${fmtIn(r.hi)}</text>`
+        : `<line class="whisker" x1="${cx - 5}" x2="${cx + 5}" y1="${y(r.hi)}" y2="${y(r.hi)}"/>`;
+    }
     s += `<rect class="night" x="${bx}" y="${y(d.overnight)}" width="${bwid}" height="${Math.max(0, y(0) - y(d.overnight))}"/>`;
     s += `<rect class="day" x="${bx}" y="${y(d.snow)}" width="${bwid}" height="${Math.max(0, y(d.overnight) - y(d.snow))}"/></g>`;
-    if (d.snow >= 0.1) s += `<text class="val" x="${cx}" y="${y(Math.max(d.snow, d.past ? 0 : d.range?.hi ?? 0)) - 5}" text-anchor="middle">${fmtIn(d.snow)}</text>`;
-    s += `<text x="${cx}" y="${H - padB + 16}" text-anchor="middle">${dayLabel(d.date, state.todayStr).short}</text>`;
+    // Total sits on the bar; its halo (see .val in CSS) keeps the whisker from crossing the number.
+    if (d.snow >= 0.1) s += `<text class="val" x="${cx}" y="${y(d.snow) - 5}" text-anchor="middle" paint-order="stroke">${fmtIn(d.snow)}</text>`;
+    s += `<text class="${i === ti ? 'today-lbl' : ''}" x="${cx}" y="${H - padB + 16}" text-anchor="middle">${dayLabel(d.date, state.todayStr).short}</text>`;
     s += `<text x="${cx}" y="${H - padB + 30}" text-anchor="middle">${d.date.slice(5).replace('-', '/')}</text>`;
   });
   $('chart').innerHTML = s + '</svg>';
