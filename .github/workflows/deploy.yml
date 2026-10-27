@@ -35,6 +35,10 @@ jobs:
           WIDGET_RESORTS: ${{ vars.WIDGET_RESORTS }}
         # A forecast outage shouldn't block publishing; the widget keeps its last copy.
         continue-on-error: true
+      # Stamp asset links with this commit so a browser never pairs a new page
+      # with older cached scripts or styles.
+      - name: Version asset URLs
+        run: sed -i "s/__V__/${GITHUB_SHA::7}/g" index.html widget.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
