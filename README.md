@@ -41,3 +41,9 @@ or the 3-day total is ≥ 12". `.github/workflows/powder-alerts.yml` runs it eve
    and thresholds `OVERNIGHT_IN`, `DAY_IN`, `STORM_IN` can be set as env in the workflow.
 
 `.github/workflows/calibrate.yml` re-runs calibration monthly so it learns from each new winter.
+
+## iPhone widget
+
+`widget/snow-widget.js` is a [Scriptable](https://scriptable.app) widget. Setup steps and a
+copy button are on the site at `widget.html`. It reads `data/summary.json`, which
+`scripts/summary.cjs` builds during each deploy (`.github/workflows/deploy.yml`, every 3 hours).

@@ -1,0 +1,41 @@
+name: Deploy site
+
+# Publishes the site to GitHub Pages on every push, and every 3 hours rebuilds
+# data/summary.json (the forecast snapshot the iPhone widget reads).
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '15 */3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build widget summary
+        run: node scripts/summary.cjs
+        # A forecast outage shouldn't block publishing; the widget keeps its last copy.
+        continue-on-error: true
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deploy
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Snow Widget Setup</title>
+  <meta name="theme-color" content="#0e1726">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .steps { padding-left: 20px; margin: 0; }
+    .steps li { margin-bottom: 12px; }
+    .copy { background: var(--accent); color: #fff; border: 0; border-radius: 10px; padding: 10px 16px; font: inherit; font-weight: 600; cursor: pointer; }
+    code { background: var(--panel-2); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; font-size: 0.88em; }
+    pre { background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px; max-height: 180px; overflow: auto; font-size: 0.72rem; white-space: pre-wrap; }
+    #copied { color: var(--good); margin-left: 10px; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="title-row">
+      <div>
+        <h1>Home Screen widget</h1>
+        <p class="sub"><a href="./">← Back to the forecast</a></p>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section class="card">
+      <ol class="steps">
+        <li>Install <a href="https://apps.apple.com/app/scriptable/id1405459188" target="_blank" rel="noopener"><b>Scriptable</b></a> from the App Store (free).</li>
+        <li><button class="copy" id="copy">Copy widget script</button><span id="copied"></span></li>
+        <li>Open Scriptable, tap <b>+</b>, paste, then tap the title at the top and name it <code>Snow</code>. Tap <b>Done</b>.</li>
+        <li>On your Home Screen, long-press an empty spot → <b>Edit</b> → <b>Add Widget</b> → <b>Scriptable</b>. Pick a size and tap <b>Add Widget</b>.</li>
+        <li>Long-press the new widget → <b>Edit Widget</b>:
+          <ul>
+            <li><b>Script:</b> Snow</li>
+            <li><b>Parameter:</b> <code>purgatory</code>, <code>wolf-creek</code>, <code>vail</code>, <code>park-city</code>, <code>whistler</code>, or <code>all</code> for every mountain. Blank means Purgatory.</li>
+            <li>Leave <b>When Interacting</b> on <b>Run Script</b>: tapping the widget opens this site.</li>
+          </ul>
+        </li>
+      </ol>
+      <p class="hint">The widget refreshes about every 30 minutes (iOS decides the exact timing); the forecast behind it updates every 3 hours. Add more widgets with different parameters to track several mountains.</p>
+    </section>
+    <section class="card">
+      <h2>Script</h2>
+      <p class="hint">If the copy button doesn't work, press and hold in the box below → Select All → Copy.</p>
+      <pre id="code">Loading…</pre>
+    </section>
+  </main>
+  <script>
+    // Fetch up front: Safari only allows clipboard writes directly inside the tap.
+    let code = '';
+    fetch('widget/snow-widget.js').then((r) => r.text()).then((t) => { code = t; document.getElementById('code').textContent = t; });
+    document.getElementById('copy').addEventListener('click', () => {
+      const msg = document.getElementById('copied');
+      navigator.clipboard.writeText(code).then(() => { msg.textContent = 'Copied ✓'; }, () => { msg.textContent = 'Copy failed: use the box below'; });
+    });
+  </script>
+</body>
+</html>
