@@ -100,8 +100,8 @@ main { max-width: 900px; margin: 0 auto; padding: 0 16px 40px; }
   background: none; border: 0; padding: 0; cursor: pointer; border-radius: 8px;
 }
 .col.sel { background: var(--panel-2); }
-.b-val { font-size: 0.68rem; font-weight: 700; height: 14px; }
-.b-track { height: 110px; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.b-track { height: 112px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+.b-val { font-size: 0.68rem; font-weight: 700; line-height: 1; margin-bottom: 3px; white-space: nowrap; }
 .b { width: 82%; max-width: 30px; background: var(--bar); border-radius: 4px 4px 1px 1px; }
 .b.big { background: var(--big); }
 .b.none { height: 2px !important; background: var(--line); }

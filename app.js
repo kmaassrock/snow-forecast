@@ -13,7 +13,7 @@ function dayLabel(dateStr, todayStr) {
   const md = d.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
   const weekend = d.getDay() === 0 || d.getDay() === 6;
   if (diff === 0) return { short: 'Today', long: `Today ${md}`, wk, md, weekend };
-  if (diff === 1) return { short: 'Tmrw', long: `Tomorrow ${md}`, wk, md, weekend };
+  if (diff === 1) return { short: 'Tmw', long: `Tomorrow ${md}`, wk, md, weekend };
   return { short: wk, long: `${wk} ${md}`, wk, md, weekend };
 }
 
@@ -108,12 +108,12 @@ function renderSnowSummary() {
   const max = Math.max(3, ...days.map((d) => d.snow));
   const bars = days.map((d) => {
     const lbl = dayLabel(d.date, state.todayStr);
-    const h = d.snow < 0.05 ? 0 : Math.max(4, (d.snow / max) * 100);
+    // Bar height in px, leaving room in the track for the total that sits on top of it.
+    const h = d.snow < 0.05 ? 0 : Math.max(4, (d.snow / max) * 90);
     const cls = d.snow >= POWDER_DAY_IN ? 'big' : d.snow < 0.05 ? 'none' : '';
     return `<button class="col ${d.date === state.selected ? 'sel' : ''}" data-date="${d.date}" aria-label="${lbl.long}: ${fmtIn(d.snow)}">
-      <span class="b-val">${d.snow >= 1 ? fmtIn(d.snow) : ''}</span>
-      <span class="b-track"><span class="b ${cls}" style="height:${h}%"></span></span>
-      <span class="b-wk ${lbl.weekend ? 'wknd' : ''}">${lbl.wk[0]}</span>
+      <span class="b-track"><span class="b-val">${d.snow >= 1 ? fmtIn(d.snow) : ''}</span><span class="b ${cls}" style="height:${h}px"></span></span>
+      <span class="b-wk ${lbl.weekend ? 'wknd' : ''}">${lbl.weekend ? lbl.wk.slice(0, 2) : lbl.wk[0]}</span>
       <span class="b-dt ${lbl.weekend ? 'wknd' : ''} ${d.date === state.todayStr ? 'today' : ''}">${+d.date.slice(8)}</span>
     </button>`;
   }).join('');
@@ -168,7 +168,7 @@ function renderDays() {
     const open = state.selected === d.date;
     return `<div class="drow ${open ? 'open' : ''}" data-date="${d.date}">
       <button class="dmain" aria-expanded="${open}">
-        <span class="d-day"><b>${lbl.short === 'Today' || lbl.short === 'Tmrw' ? lbl.short : lbl.wk}</b><small>${lbl.md}</small></span>
+        <span class="d-day"><b>${lbl.short === 'Today' || lbl.short === 'Tmw' ? lbl.short : lbl.wk}</b><small>${lbl.md}</small></span>
         <span class="d-icon">${icon(d)}</span>
         <span class="d-snow ${d.snow >= POWDER_DAY_IN ? 'big' : ''}">${fmtIn(d.snow)}</span>
         <span class="d-type">${type ? `<span class="${type.cls}">${type.label}</span>` : d.rainIn >= 0.05 ? '<span class="t-wet">Rain</span>' : ''}</span>
