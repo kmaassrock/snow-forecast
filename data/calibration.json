@@ -1,0 +1,331 @@
+{
+  "generated": "2026-10-27",
+  "resorts": {
+    "purgatory": {
+      "stations": [
+        "Spud Mountain",
+        "Cascade #2"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.291,
+          "r": 0.794,
+          "maeMm": 6.11,
+          "days": 1448,
+          "weight": 0.761,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.252,
+          "r": 0.91,
+          "maeMm": 3.75,
+          "days": 724,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.416,
+          "r": 0.894,
+          "maeMm": 4.09,
+          "days": 1448,
+          "weight": 0.965
+        },
+        "gfs_global": {
+          "ratio": 1.107,
+          "r": 0.858,
+          "maeMm": 4.4,
+          "days": 1418,
+          "weight": 0.889
+        },
+        "gem_seamless": {
+          "ratio": 1.154,
+          "r": 0.839,
+          "maeMm": 4.55,
+          "days": 1404,
+          "weight": 0.85
+        },
+        "icon_seamless": {
+          "ratio": 1.255,
+          "r": 0.845,
+          "maeMm": 4.69,
+          "days": 1416,
+          "weight": 0.862
+        },
+        "ukmo_seamless": {
+          "ratio": 1.56,
+          "r": 0.844,
+          "maeMm": 5.2,
+          "days": 1448,
+          "weight": 0.86
+        }
+      },
+      "check": {
+        "wetDays": 616,
+        "rawPctOfObserved": 78,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 3.94,
+        "calibratedMaeMm": 4.04
+      }
+    },
+    "wolf-creek": {
+      "stations": [
+        "Wolf Creek Summit"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.643,
+          "r": 0.829,
+          "maeMm": 6.84,
+          "days": 725,
+          "weight": 0.771,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.214,
+          "r": 0.944,
+          "maeMm": 3.86,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 2,
+          "r": 0.919,
+          "maeMm": 4.75,
+          "days": 725,
+          "weight": 0.948
+        },
+        "gfs_global": {
+          "ratio": 1.459,
+          "r": 0.909,
+          "maeMm": 4.86,
+          "days": 710,
+          "weight": 0.927
+        },
+        "gem_seamless": {
+          "ratio": 1.342,
+          "r": 0.872,
+          "maeMm": 5.18,
+          "days": 703,
+          "weight": 0.853
+        },
+        "icon_seamless": {
+          "ratio": 1.842,
+          "r": 0.884,
+          "maeMm": 5.62,
+          "days": 709,
+          "weight": 0.877
+        },
+        "ukmo_seamless": {
+          "ratio": 2,
+          "r": 0.725,
+          "maeMm": 7.23,
+          "days": 725,
+          "weight": 0.59
+        }
+      },
+      "check": {
+        "wetDays": 370,
+        "rawPctOfObserved": 56,
+        "calibratedPctOfObserved": 93,
+        "rawMaeMm": 5.06,
+        "calibratedMaeMm": 4.27
+      }
+    },
+    "vail": {
+      "stations": [
+        "Vail Mountain"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.369,
+          "r": 0.654,
+          "maeMm": 4.78,
+          "days": 725,
+          "weight": 0.633,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.451,
+          "r": 0.822,
+          "maeMm": 3.15,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.357,
+          "r": 0.719,
+          "maeMm": 3.42,
+          "days": 725,
+          "weight": 0.765
+        },
+        "gfs_global": {
+          "ratio": 1.302,
+          "r": 0.717,
+          "maeMm": 3.66,
+          "days": 710,
+          "weight": 0.761
+        },
+        "gem_seamless": {
+          "ratio": 1.151,
+          "r": 0.685,
+          "maeMm": 3.74,
+          "days": 703,
+          "weight": 0.694
+        },
+        "icon_seamless": {
+          "ratio": 1.508,
+          "r": 0.634,
+          "maeMm": 4.2,
+          "days": 709,
+          "weight": 0.595
+        },
+        "ukmo_seamless": {
+          "ratio": 1.445,
+          "r": 0.697,
+          "maeMm": 4.08,
+          "days": 725,
+          "weight": 0.719
+        }
+      },
+      "check": {
+        "wetDays": 437,
+        "rawPctOfObserved": 74,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 2.98,
+        "calibratedMaeMm": 3.27
+      }
+    },
+    "park-city": {
+      "stations": [
+        "Thaynes Canyon"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.158,
+          "r": 0.802,
+          "maeMm": 6.02,
+          "days": 725,
+          "weight": 0.866,
+          "measuredRatio": 1.72
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.06,
+          "r": 0.862,
+          "maeMm": 3.69,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.116,
+          "r": 0.773,
+          "maeMm": 4.94,
+          "days": 725,
+          "weight": 0.804
+        },
+        "gfs_global": {
+          "ratio": 1.001,
+          "r": 0.852,
+          "maeMm": 4.33,
+          "days": 710,
+          "weight": 0.977
+        },
+        "gem_seamless": {
+          "ratio": 1.428,
+          "r": 0.808,
+          "maeMm": 4.67,
+          "days": 703,
+          "weight": 0.879
+        },
+        "icon_seamless": {
+          "ratio": 1.24,
+          "r": 0.815,
+          "maeMm": 4.71,
+          "days": 709,
+          "weight": 0.894
+        },
+        "ukmo_seamless": {
+          "ratio": 1.103,
+          "r": 0.784,
+          "maeMm": 5.15,
+          "days": 725,
+          "weight": 0.827
+        }
+      },
+      "check": {
+        "wetDays": 380,
+        "rawPctOfObserved": 86,
+        "calibratedPctOfObserved": 99,
+        "rawMaeMm": 3.88,
+        "calibratedMaeMm": 3.98
+      }
+    },
+    "whistler": {
+      "stations": [
+        "Whistler Roundhouse"
+      ],
+      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 0.966,
+          "r": 0.674,
+          "maeMm": 8.39,
+          "days": 616,
+          "weight": 0.805,
+          "measuredRatio": 1.652
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.166,
+          "r": 0.751,
+          "maeMm": 7,
+          "days": 308,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 0.958,
+          "r": 0.748,
+          "maeMm": 6.44,
+          "days": 616,
+          "weight": 0.992
+        },
+        "gfs_global": {
+          "ratio": 0.725,
+          "r": 0.749,
+          "maeMm": 6.34,
+          "days": 601,
+          "weight": 0.995
+        },
+        "gem_seamless": {
+          "ratio": 1.125,
+          "r": 0.702,
+          "maeMm": 7.26,
+          "days": 615,
+          "weight": 0.874
+        },
+        "icon_seamless": {
+          "ratio": 0.606,
+          "r": 0.747,
+          "maeMm": 6.21,
+          "days": 616,
+          "weight": 0.989
+        },
+        "ukmo_seamless": {
+          "ratio": 1.218,
+          "r": 0.737,
+          "maeMm": 7.28,
+          "days": 616,
+          "weight": 0.963
+        }
+      },
+      "check": {
+        "wetDays": 397,
+        "rawPctOfObserved": 112,
+        "calibratedPctOfObserved": 99,
+        "rawMaeMm": 6.66,
+        "calibratedMaeMm": 6.23
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+name: Powder alerts
+
+on:
+  schedule:
+    # 01:00 UTC = 6 pm MST / 7 pm MDT, after the afternoon model runs
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/alerts.cjs
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          ALERT_RESORTS: ${{ vars.ALERT_RESORTS }}
