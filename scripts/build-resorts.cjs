@@ -3,7 +3,11 @@
 // and matches each resort to its best nearby NRCS SNOTEL station.
 //
 //   curl -o /tmp/ski_areas.geojson https://tiles.openskimap.org/geojson/ski_areas.geojson
-//   node scripts/build-resorts.cjs /tmp/ski_areas.geojson
+//   curl -o /tmp/lifts.geojson https://tiles.openskimap.org/geojson/lifts.geojson
+//   node scripts/build-resorts.cjs /tmp/ski_areas.geojson /tmp/lifts.geojson
+//
+// Each resort gets a `base` [lat, lon] (its main base area, used for drive times;
+// the ski-area center can sit on the mountain and snap to a back road).
 
 const fs = require('fs');
 const path = require('path');
@@ -39,7 +43,7 @@ const OVERRIDES = {
 
 const WHISTLER = {
   id: 'whistler', name: 'Whistler', region: 'Whistler, BC', state: 'BC',
-  lat: 50.067, lon: -122.947, tz: 'America/Vancouver',
+  lat: 50.067, lon: -122.947, base: [50.115, -122.948], tz: 'America/Vancouver',
   elevations: { base: 675, mid: 1850, summit: 2182 },
   stations: [{ source: 'eccc', id: '1108906', name: 'Whistler Roundhouse', lat: 50.0678, lon: -122.9472, elev: 1835 }],
 };
@@ -54,6 +58,32 @@ function centroid(geom) {
   const rings = geom.type === 'Polygon' ? [geom.coordinates[0]] : geom.coordinates.map((p) => p[0]);
   const pts = rings.flat();
   return [pts.reduce((s, p) => s + p[0], 0) / pts.length, pts.reduce((s, p) => s + p[1], 0) / pts.length];
+}
+
+// Bottom station of each lift (the lower end), grouped by ski area id.
+function liftBottoms(path) {
+  const out = {};
+  if (!path) return out;
+  for (const f of JSON.parse(fs.readFileSync(path, 'utf8')).features) {
+    if (f.geometry?.type !== 'LineString' || f.properties.status !== 'operating') continue;
+    const c = f.geometry.coordinates, a = c[0], b = c[c.length - 1];
+    const bottom = (a[2] ?? 0) <= (b[2] ?? 0) ? a : b;
+    for (const sa of f.properties.skiAreas || []) (out[sa.properties.id] ||= []).push(bottom);
+  }
+  return out;
+}
+
+// Main base area: among lift bottoms within 150 m (elevation) of the lowest one,
+// the one with the most other lift bottoms within 500 m (the base village),
+// rather than a lone lift at the back of the mountain.
+function baseArea(bottoms) {
+  if (!bottoms?.length) return null;
+  const minZ = Math.min(...bottoms.map((p) => p[2] ?? 0));
+  const near = (p) => bottoms.filter((q) => km(p[1], p[0], q[1], q[0]) <= 0.5).length;
+  const best = bottoms.filter((p) => (p[2] ?? 0) <= minZ + 150)
+    .map((p) => ({ p, n: near(p) }))
+    .sort((x, y) => y.n - x.n || (x.p[2] ?? 0) - (y.p[2] ?? 0))[0].p;
+  return [r4(best[1]), r4(best[0])];
 }
 
 async function snotelStations() {
@@ -83,6 +113,7 @@ function bestStation(r, stations) {
 
 (async () => {
   const geo = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+  const bottoms = liftBottoms(process.argv[3]);
   const stations = await snotelStations();
   const resorts = [];
   for (const f of geo.features) {
@@ -100,7 +131,7 @@ function bestStation(r, stations) {
     const locality = place.localized?.en?.locality;
     const r = {
       id: slug(name), name, region: o.region || (locality ? `${locality}, ${st}` : STATES[st]), state: st,
-      lat: r4(lat), lon: r4(lon), tz: TZ[st],
+      lat: r4(lat), lon: r4(lon), base: baseArea(bottoms[p.id]) || [r4(lat), r4(lon)], tz: TZ[st],
       elevations: o.elevations || { base: Math.round(s.minElevation), mid: Math.round((s.minElevation + s.maxElevation) / 2), summit: Math.round(s.maxElevation) },
     };
     r.stations = o.stations || bestStation(r, stations);
