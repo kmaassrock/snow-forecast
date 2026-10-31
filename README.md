@@ -50,3 +50,22 @@ refreshed about monthly while staying inside Open-Meteo's free limits.
 `widget/snow-widget.js` is a [Scriptable](https://scriptable.app) widget. Setup steps and a
 copy button are on the site at `widget.html`. It reads `data/summary.json`, which
 `scripts/summary.cjs` builds during each deploy for the mountains in `WIDGET_RESORTS` (`.github/workflows/deploy.yml`, every 3 hours).
+
+## Resort snow reports
+
+`scripts/reports.cjs` reads official snow reports (last 24 hours, base, season, terrain open) from resort
+websites that allow automated access and writes `data/reports.json` on each deploy. It currently covers
+Wolf Creek. Other resorts use their nearest SNOTEL station for measured snow. Sites that block bots
+(for example Purgatory's) are not read.
+
+## Webcams
+
+`cams.js` lists each resort's cameras (Brown Rice snapshot stills; tapping opens the live view).
+Purgatory and Wolf Creek are set up. To add one, find the camera ids on the resort's webcam page
+(`player.brownrice.com/embed/<id>`) and add them there.
+
+## Models
+
+The blend uses HRRR, NBM, ECMWF, GFS, Canadian, ICON and UKMO. ECMWF AIFS and NOAA AIGFS are fetched and
+shown for reference (model table, forecast range) but kept out of the blend: in a backtest against SNOTEL
+(AIFS since Feb 2025, AIGFS since Jan 2026) adding them made errors slightly worse.

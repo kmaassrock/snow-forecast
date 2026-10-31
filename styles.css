@@ -1,11 +1,38 @@
+/* Light is the default; dark (charcoal) follows the phone's setting unless the
+   viewer picks one with the theme button (html[data-theme]). */
 :root {
-  --bg: #0b1220;
-  --panel: #141d2e;
-  --panel-2: #1b263b;
-  --line: #26334d;
-  --text: #eef2f8;
-  --muted: #8d9bb3;
-  --accent: #4b9dff;
+  color-scheme: light;
+  --bg: #f2f4f7;
+  --panel: #ffffff;
+  --panel-2: #f5f7fa;
+  --line: #e1e6ed;
+  --text: #121826;
+  --muted: #5f6b7d;
+  --accent: #1f6fe0;
+  --bar: #2f6fe0;
+  --big: #e07a12;
+  --warm: #c25e00;
+  --cold: #0b7fbf;
+  --good: #16824a;
+  --night: #1f5fb8;
+  --day: #7cb9f2;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 8px rgba(16, 24, 40, 0.04);
+  /* Snow quality, wettest to driest */
+  --q-wet: #7b8aa3;
+  --q-med: #2f6fe0;
+  --q-light: #0ea5e9;
+  --q-dry: #8b5cf6;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e0e10;
+  --panel: #1b1b1e;
+  --panel-2: #242428;
+  --line: #313137;
+  --text: #f2f2f4;
+  --muted: #9b9ba5;
+  --accent: #5aa2ff;
   --bar: #3b82f6;
   --big: #f28c28;
   --warm: #ffb36b;
@@ -13,33 +40,35 @@
   --good: #7be0a8;
   --night: #3d7fd6;
   --day: #9fd2ff;
-  /* Snow quality, wettest to driest */
-  --q-wet: #8796ad;
+  --shadow: none;
+  --q-wet: #8f99ab;
   --q-med: #3b82f6;
   --q-light: #38bdf8;
   --q-dry: #a78bfa;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #eef2f7;
-    --panel: #ffffff;
-    --panel-2: #f4f7fb;
-    --line: #dbe3ee;
-    --text: #111c2e;
-    --muted: #5b6a82;
-    --accent: #1f6fe0;
-    --bar: #2f6fe0;
-    --big: #e07a12;
-    --warm: #c56a12;
-    --cold: #1a86c7;
-    --good: #198a4f;
-    --night: #1f5fb8;
-    --day: #7cb9f2;
-    --q-wet: #7b8aa3;
-    --q-med: #2f6fe0;
-    --q-light: #0ea5e9;
-    --q-dry: #8b5cf6;
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e0e10;
+    --panel: #1b1b1e;
+    --panel-2: #242428;
+    --line: #313137;
+    --text: #f2f2f4;
+    --muted: #9b9ba5;
+    --accent: #5aa2ff;
+    --bar: #3b82f6;
+    --big: #f28c28;
+    --warm: #ffb36b;
+    --cold: #7fd0ff;
+    --good: #7be0a8;
+    --night: #3d7fd6;
+    --day: #9fd2ff;
+    --shadow: none;
+    --q-wet: #8f99ab;
+    --q-med: #3b82f6;
+    --q-light: #38bdf8;
+    --q-dry: #a78bfa;
   }
 }
 
@@ -85,7 +114,7 @@ select {
 
 /* ---------- layout ---------- */
 main { max-width: 900px; margin: 0 auto; padding: 0 16px 40px; }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 14px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 14px; box-shadow: var(--shadow); }
 .card-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
 .hint, .legend { color: var(--muted); font-size: 0.8rem; }
 .status { color: var(--muted); font-size: 0.75rem; margin: 8px 0 0; }
@@ -228,3 +257,124 @@ tr.open td:first-child { box-shadow: inset 3px 0 0 var(--day); }
   .dmain { grid-template-columns: 50px 26px 46px 1fr 62px 14px; }
   .d-wind { display: none; }
 }
+
+/* ---------- theme button ---------- */
+.picker-row { justify-content: flex-start; }
+.theme-btn { margin-left: auto; font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
+
+/* ---------- outlook + past/now/forecast strip ---------- */
+.outlook { margin: 0 0 12px; font-size: 0.95rem; line-height: 1.5; }
+.strip-wrap { position: relative; overflow-x: auto; scrollbar-width: thin; padding-bottom: 4px; }
+.strip { display: flex; gap: 12px; align-items: stretch; min-width: 100%; width: max-content; }
+.strip-part { flex: 1 1 0; min-width: 270px; }
+.now-box {
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; text-align: center;
+  display: flex; flex-direction: column; justify-content: center; padding: 10px 8px;
+}
+.now-box.inline { flex: 0 0 108px; }
+.nb-label { font-size: 0.78rem; font-weight: 700; }
+.nb-val { font-size: 2rem; font-weight: 800; color: var(--q-dry); line-height: 1.15; margin: 4px 0; }
+.nb-src { font-size: 0.7rem; color: var(--muted); }
+.nb-sep { display: none; }
+.now-box.banner { display: none; }
+.phone-only { display: none; }
+.measured-total { color: var(--q-dry); }
+.b.b-measured { background: color-mix(in srgb, var(--q-dry) 55%, var(--muted)); }
+.strip-part.past .b-val { color: var(--muted); font-weight: 600; }
+
+/* ---------- snow report ---------- */
+.report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; text-align: center; }
+.rp { background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 10px 6px; }
+.rp-v { font-size: 1.6rem; font-weight: 800; }
+.rp-k { font-size: 0.85rem; }
+.rp-s { font-size: 0.7rem; color: var(--muted); }
+
+/* ---------- hourly charts ---------- */
+.chart .lift-hrs { fill: var(--accent); fill-opacity: 0.06; }
+.chart .hr-snow { fill: var(--q-med); }
+.chart .hr-temp { fill: none; stroke: var(--warm); stroke-width: 2; }
+.chart .hr-wind { fill: none; stroke: var(--muted); stroke-width: 1.8; }
+.chart .hr-gust { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 3 3; opacity: 0.8; }
+.chart .freeze { stroke: var(--cold); stroke-dasharray: 4 4; stroke-width: 1; opacity: 0.7; }
+.chart .freeze-lbl { fill: var(--cold); font-size: 10px; }
+.chart .day-lbl { fill: var(--text); font-weight: 600; font-size: 11px; }
+.sw-snow { background: var(--q-med); }
+.sw-temp { background: var(--warm); height: 3px; }
+.sw-wind { background: var(--muted); height: 3px; }
+.sw-gust { height: 0; border-top: 2px dashed var(--muted); background: none; }
+.sw-lift { background: var(--accent); opacity: 0.25; }
+.hour-table { margin-top: 8px; font-size: 0.85rem; }
+.hour-table summary { cursor: pointer; color: var(--accent); }
+
+/* ---------- avalanche + map ---------- */
+.avy { display: flex; align-items: center; gap: 12px; }
+.avy-level { padding: 6px 12px; border-radius: 8px; font-weight: 700; white-space: nowrap; }
+.avy-advice { font-size: 0.88rem; margin: 10px 0 0; }
+.trail-map { height: 380px; border-radius: 12px; overflow: hidden; background: var(--panel-2); }
+
+@media (max-width: 620px) {
+  .now-box.inline { display: none; }
+  .phone-only { display: inline; }
+  .now-box.banner {
+    display: flex; flex-direction: row; align-items: center; gap: 10px; text-align: left; margin-bottom: 10px; padding: 8px 12px;
+  }
+  .now-box.banner .nb-val { font-size: 1.5rem; margin: 0; }
+  .now-box.banner .nb-sep { display: inline; }
+  .now-box.banner .nb-br { display: none; }
+  .strip-part { min-width: calc(100vw - 64px); }
+  .theme-btn { padding: 2px 6px; }
+}
+.chart.hourly svg { min-width: 520px; }
+
+/* ---------- right now + snow report side by side ---------- */
+.duo { display: grid; grid-template-columns: 1fr; gap: 0 14px; }
+@media (min-width: 760px) { .duo { grid-template-columns: 1fr 1.4fr; } }
+.rn-main { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.rn-icon { font-size: 2.2rem; }
+.rn-temp { font-size: 2.4rem; font-weight: 800; line-height: 1; }
+.rn-desc { font-size: 0.9rem; }
+.rn-list { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin: 0; font-size: 0.86rem; }
+.rn-list dt { color: var(--muted); }
+.rn-list dd { margin: 0; text-align: right; }
+
+/* ---------- powder quality ---------- */
+.pq { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; background: transparent; }
+.pq-excellent { background: var(--big); }
+.pq-good { background: var(--good); }
+.pq-okay { background: var(--muted); }
+.q-legend .pq { margin-top: 0; }
+
+/* ---------- forecast range ---------- */
+.chart .rng-band { fill: var(--accent); fill-opacity: 0.12; }
+.chart .m-line { fill: none; stroke-width: 1.6; opacity: 0.85; }
+.chart .m-line.ref { stroke-dasharray: 4 3; opacity: 0.6; }
+.chart .blend-line { fill: none; stroke: var(--text); stroke-width: 3; }
+.chart .blend-lbl { fill: var(--text); font-weight: 700; }
+
+/* ---------- precipitation by model ---------- */
+.ptools { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.switch { font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.ptable td.pcell { font-size: 0.75rem; min-width: 30px; border-radius: 0; }
+.ptable tr.ref td { opacity: 0.6; }
+.ptable .up { color: var(--good); font-weight: 700; }
+.ptable .down { color: var(--warm); font-weight: 700; }
+.mdot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
+.p-rain { background: color-mix(in srgb, #22c55e 30%, transparent); }
+.p-mix { background: color-mix(in srgb, #a855f7 30%, transparent); }
+.p-snow { background: color-mix(in srgb, #3b82f6 35%, transparent); }
+.p-heavy { background: color-mix(in srgb, #f28c28 45%, transparent); }
+.q.p-rain, .q.p-mix, .q.p-snow, .q.p-heavy { --q: transparent; }
+
+/* ---------- webcams ---------- */
+.cams { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.cam { position: relative; display: block; border-radius: 12px; overflow: hidden; background: var(--panel-2); aspect-ratio: 16 / 9; }
+.cam img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cam span {
+  position: absolute; left: 8px; bottom: 8px; background: rgba(0, 0, 0, 0.6); color: #fff;
+  font-size: 0.75rem; padding: 2px 8px; border-radius: 6px;
+}
+.fav-mode #camsCard { display: none; }
+.chart.range-chart svg { min-width: 520px; }
+.mline { display: inline-block; width: 16px; border-top: 2px solid var(--muted); vertical-align: middle; }
+.mline.ref { border-top-style: dashed; }
+.mline.blend { border-top: 3px solid var(--text); }

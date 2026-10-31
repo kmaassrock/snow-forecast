@@ -120,7 +120,8 @@ async function calibrateResort(resort) {
   // precipitation, so its measured ratio is too low. Use the other models' average instead.
   const hrrr = models.ncep_hrrr_conus;
   if (hrrr) {
-    const others = Object.entries(models).filter(([id]) => id !== 'ncep_hrrr_conus').map(([, x]) => x.ratio);
+    const refs = MODELS.filter((m) => m.ref).map((m) => m.id);
+    const others = Object.entries(models).filter(([id]) => id !== 'ncep_hrrr_conus' && !refs.includes(id)).map(([, x]) => x.ratio);
     hrrr.measuredRatio = hrrr.ratio;
     hrrr.ratio = +(others.reduce((s, x) => s + x, 0) / others.length).toFixed(3);
   }
@@ -133,7 +134,7 @@ async function calibrateResort(resort) {
 
 // Daily error of a plain equal-weight average of raw models vs the calibrated weighted blend.
 function blendCheck(rows, models) {
-  const ids = Object.keys(models).filter((id) => id !== 'ncep_hrrr_conus');
+  const ids = Object.keys(models).filter((id) => id !== 'ncep_hrrr_conus' && !MODELS.find((m) => m.id === id)?.ref);
   let n = 0, obsSum = 0, rawSum = 0, calSum = 0, rawErr = 0, calErr = 0;
   for (const r of rows) {
     const have = ids.filter((id) => id in r.mod);

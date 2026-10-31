@@ -37,6 +37,9 @@ jobs:
         continue-on-error: true
       # Stamp asset links with this commit so a browser never pairs a new page
       # with older cached scripts or styles.
+      - name: Read resort snow reports
+        run: node scripts/reports.cjs
+        continue-on-error: true
       - name: Version asset URLs
         run: sed -i "s/__V__/${GITHUB_SHA::7}/g" index.html widget.html
       - uses: actions/configure-pages@v5

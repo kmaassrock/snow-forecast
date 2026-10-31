@@ -30,28 +30,63 @@ async function stationDepths(st, from, to) {
   return out;
 }
 
-// New snow measured at the resort's station over the last 24 hours and 3 days,
-// from hourly SNOTEL depth. Null when there's no station or no recent reading.
-async function recentObserved(resort) {
+// Measured snapshot from the resort's SNOTEL station: new snow for each of the
+// past 15 days, the last 24 hours, current depth, season total, and snowpack
+// (snow water) vs. the 1991–2020 normal. Null when there's no SNOTEL station
+// (Environment Canada data lags about a month).
+async function stationReport(resort) {
   const st = resort.stations[0];
-  if (!st || st.source !== 'snotel') return null; // Environment Canada lags about a month
+  if (!st || st.source !== 'snotel') return null;
   const H = 3600e3, now = Date.now();
   // SNOTEL timestamps are local standard time (no daylight saving).
   const offset = resort.tz === 'America/Los_Angeles' ? -8 : -7;
   const stamp = (ms) => new Date(ms + offset * H).toISOString().slice(0, 16).replace('T', ' ');
   const toMs = (s) => Date.parse(s.replace(' ', 'T') + ':00Z') - offset * H;
-  const q = new URLSearchParams({ stationTriplets: st.id, elements: 'SNWD', duration: 'HOURLY', beginDate: stamp(now - 80 * H), endDate: stamp(now) });
-  const r = await fetch(`https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1/data?${q}`);
-  if (!r.ok) return null;
-  const vals = ((await r.json())[0]?.data?.[0]?.values || []).filter((v) => v.value != null);
-  const last = vals[vals.length - 1];
-  if (!last || now - toMs(last.date) > 8 * H) return null;
-  const gain = (hours) => {
-    const from = vals.find((v) => toMs(v.date) >= toMs(last.date) - hours * H);
-    const g = from ? last.value - from.value : 0;
-    return g >= 1 ? g : 0; // depth sensors jitter by about an inch
+  const today = stamp(now).slice(0, 10);
+  const seasonStart = `${currentSeason()}-10-01`;
+  const from = [addDays(seasonStart, -1), addDays(today, -17)].sort()[0];
+  const api = 'https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1/data?';
+  const [daily, hourly] = await Promise.all([
+    fetch(api + new URLSearchParams({ stationTriplets: st.id, elements: 'SNWD,WTEQ', duration: 'DAILY', beginDate: from, endDate: today, centralTendencyType: 'MEDIAN' })),
+    fetch(api + new URLSearchParams({ stationTriplets: st.id, elements: 'SNWD,TOBS', duration: 'HOURLY', beginDate: stamp(now - 30 * H), endDate: stamp(now) })),
+  ].map((p) => p.then((r) => (r.ok ? r.json() : null)).catch(() => null)));
+  if (!daily) return null;
+
+  const series = {};
+  for (const el of daily[0]?.data || []) series[el.stationElement.elementCode] = el.values.filter((v) => v.value != null);
+  const depthByDate = Object.fromEntries((series.SNWD || []).map((v) => [v.date, v.value]));
+  // Daily values are end-of-day readings; jitter under 1" and jumps over 36" are ignored.
+  const newSnow = (d) => {
+    const a = depthByDate[addDays(d, -1)], b = depthByDate[d];
+    const g = a != null && b != null ? b - a : 0;
+    return g >= 1 && g <= 36 ? g : 0;
   };
-  return { station: st.name, h24: gain(24), h72: gain(72) };
+  const past = Array.from({ length: 15 }, (_, i) => addDays(today, i - 15)).map((date) => ({ date, newSnow: newSnow(date), known: date in depthByDate }));
+  let season = 0;
+  for (let d = seasonStart; d <= today; d = addDays(d, 1)) season += newSnow(d);
+
+  const hourlyEl = (code) => (hourly?.[0]?.data || []).find((e) => e.stationElement.elementCode === code)?.values.filter((v) => v.value != null) || [];
+  const hours = hourlyEl('SNWD');
+  const temp = hourlyEl('TOBS').at(-1);
+  const last = hours[hours.length - 1];
+  const fresh = last && now - toMs(last.date) < 8 * H;
+  let h24 = null;
+  if (fresh) {
+    const start = hours.find((v) => toMs(v.date) >= toMs(last.date) - 24 * H);
+    const g = start ? last.value - start.value : 0;
+    h24 = g >= 1 ? g : 0;
+  }
+  const swe = (series.WTEQ || []).at(-1);
+  return {
+    station: st.name,
+    past,
+    h24,
+    asOf: fresh ? toMs(last.date) : null,
+    depth: fresh ? last.value : (series.SNWD || []).at(-1)?.value ?? null,
+    season,
+    pctNormal: swe?.median > 0.1 ? Math.round((100 * swe.value) / swe.median) : null,
+    tempF: temp && now - toMs(temp.date) < 3 * H ? temp.value : null, // air temperature, °F
+  };
 }
 
 // One entry per day of the season; values are end-of-day readings.
