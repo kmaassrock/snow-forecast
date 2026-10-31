@@ -66,6 +66,23 @@ async function stationSeason() {
   return out;
 }
 
+// Network hiccups on the build server are common; retry a few times before giving up.
+async function withRetry(fn, tries = 3) {
+  for (let i = 1; ; i++) {
+    try { return await fn(); } catch (e) {
+      if (i >= tries) throw e;
+      await new Promise((ok) => setTimeout(ok, 2000 * i));
+    }
+  }
+}
+
+// The currently published file, used for any resort whose forecast still fails.
+async function publishedUpcoming() {
+  const site = process.env.SITE_URL;
+  if (!site) return {};
+  try { return (await (await fetch(`${site.replace(/\/$/, '')}/data/upcoming.json`)).json()).resorts || {}; } catch { return {}; }
+}
+
 async function inBatches(items, size, fn) {
   const results = [];
   for (let i = 0; i < items.length; i += size) results.push(...(await Promise.all(items.slice(i, i + size).map(fn))));
@@ -75,13 +92,14 @@ async function inBatches(items, size, fn) {
 (async () => {
   const calibration = readJSON('calibration.json')?.resorts || {};
   const reports = readJSON('reports.json')?.resorts || {};
-  const [stations, seasons] = await Promise.all([
-    stationSnow().catch((e) => { console.error(e.message); return {}; }),
-    stationSeason().catch((e) => { console.error(e.message); return {}; }),
+  const [stations, seasons, previous] = await Promise.all([
+    withRetry(stationSnow).catch((e) => { console.error(e.message); return {}; }),
+    withRetry(stationSeason).catch((e) => { console.error(e.message); return {}; }),
+    publishedUpcoming(),
   ]);
   const out = { generated: new Date().toISOString(), resorts: {} };
 
-  await inBatches(RESORTS, 4, async (r) => {
+  await inBatches(RESORTS, 3, async (r) => {
     const entry = {};
     const rep = reports[r.id], st = r.stations[0];
     if (rep?.new48 != null) entry.recent48 = { inches: rep.new48, source: 'resort report' };
@@ -93,7 +111,7 @@ async function inBatches(items, size, fn) {
     else if (ss?.depth != null) entry.depth = { inches: ss.depth, source: `${st.name} station` };
     if (ss?.pctNormal != null) entry.pctNormal = ss.pctNormal;
     try {
-      const f = await getForecast(r, r.elevations.mid, calibration[r.id], { ensemble: false, lean: true });
+      const f = await withRetry(() => getForecast(r, r.elevations.mid, calibration[r.id], { ensemble: false, lean: true }));
       const ti = f.days.findIndex((d) => d.date === f.todayStr);
       const days = f.days.slice(ti, ti + 7);
       entry.days = days.map((d) => ({ date: d.date, snow: r1(d.snow), q: d.slr && d.snow >= 0.5 ? snowType(d.slr).cls : null }));
@@ -102,6 +120,8 @@ async function inBatches(items, size, fn) {
       entry.todayStr = f.todayStr;
     } catch (e) {
       console.error(`${r.name}: ${e.message.split('\n')[0]}`);
+      const old = previous[r.id];
+      if (old?.days) Object.assign(entry, { days: old.days, next7: old.next7, tomorrowBy9: old.tomorrowBy9, todayStr: old.todayStr, stale: true });
     }
     out.resorts[r.id] = entry;
   });
@@ -109,5 +129,6 @@ async function inBatches(items, size, fn) {
   const ok = Object.values(out.resorts).filter((e) => e.days).length;
   if (!ok) throw new Error('No forecasts');
   fs.writeFileSync(path.join(DATA, 'upcoming.json'), JSON.stringify(out) + '\n');
-  console.log(`Wrote data/upcoming.json: ${ok} forecasts, ${Object.values(out.resorts).filter((e) => e.recent48).length} with recent snow data`);
+  const stale = Object.values(out.resorts).filter((e) => e.stale).length;
+  console.log(`Wrote data/upcoming.json: ${ok} forecasts (${stale} reused from the last run), ${Object.values(out.resorts).filter((e) => e.recent48).length} with recent snow data`);
 })().catch((e) => { console.error(e); process.exit(1); });

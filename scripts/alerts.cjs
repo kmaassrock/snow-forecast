@@ -21,7 +21,14 @@ const fmt = (x) => `${x < 1 ? x.toFixed(1) : Math.round(x)}"`;
 const weekday = (d) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
 
 async function check(resort, calib) {
-  const f = await getForecast(resort, resort.elevations.mid, calib);
+  // Retry network hiccups so a blip on the build server doesn't skip an alert.
+  let f;
+  for (let i = 1; !f; i++) {
+    try { f = await getForecast(resort, resort.elevations.mid, calib); } catch (e) {
+      if (i >= 3) throw e;
+      await new Promise((ok) => setTimeout(ok, 3000 * i));
+    }
+  }
   const tomorrow = addDays(f.todayStr, 1);
   const next3 = f.days.filter((d) => d.date >= tomorrow).slice(0, 3);
   const total = next3.reduce((s, d) => s + d.snow, 0);
