@@ -951,7 +951,7 @@ function loadUpcoming(force) {
 // Saved on this device only: { lat, lon, at, times: { resortId: seconds } }.
 state.drive = (() => {
   try {
-    const d = JSON.parse(store.get('drive'));
+    const d = JSON.parse(store.get('drive2'));
     return d && Date.now() - d.at < 30 * 86400e3 ? d : null;
   } catch { return null; }
 })();
@@ -965,16 +965,47 @@ const driveTo = (id) => state.drive?.times?.[id] ?? null;
 
 // Ask for the location (rounded to ~1 km), then get driving times to every resort
 // in one request from the public OSRM router. Estimates ignore winter road closures.
-async function locateAndRoute() {
-  const pos = await new Promise((ok, fail) => navigator.geolocation.getCurrentPosition(ok, fail, { timeout: 15000, maximumAge: 3600e3 }));
-  const lat = +pos.coords.latitude.toFixed(2), lon = +pos.coords.longitude.toFixed(2);
-  const coords = [[lon, lat], ...RESORTS.map((r) => [r.lon, r.lat])].map(([x, y]) => `${x},${y}`).join(';');
+async function routeFrom(lat, lon, label, accuracy) {
+  lat = +lat.toFixed(2); lon = +lon.toFixed(2);
+  // Route to each resort's base area, not the ski-area center (which can snap to a back road).
+  const coords = [[lon, lat], ...RESORTS.map((r) => (r.base ? [r.base[1], r.base[0]] : [r.lon, r.lat]))].map(([x, y]) => `${x},${y}`).join(';');
   const res = await fetch(`https://router.project-osrm.org/table/v1/driving/${coords}?sources=0&annotations=duration`);
   const data = await res.json();
   if (data.code !== 'Ok') throw new Error(data.message || 'routing failed');
   const times = Object.fromEntries(RESORTS.map((r, i) => [r.id, data.durations[0][i + 1]]));
-  state.drive = { lat, lon, at: Date.now(), times };
-  store.set('drive', JSON.stringify(state.drive));
+  state.drive = { lat, lon, label, accuracy, at: Date.now(), times };
+  // 'drive2': times to base areas (older 'drive' saves routed to ski-area centers).
+  store.set('drive2', JSON.stringify(state.drive));
+}
+
+// Device location. Laptops often locate by Wi-Fi or internet provider, which can be
+// miles off, so we keep the reported accuracy and show the place it resolved to.
+async function locateAndRoute() {
+  const pos = await new Promise((ok, fail) => navigator.geolocation.getCurrentPosition(ok, fail, { enableHighAccuracy: true, timeout: 15000, maximumAge: 600e3 }));
+  const { latitude: lat, longitude: lon, accuracy } = pos.coords;
+  let label = `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+  try {
+    const r = await (await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&zoom=12&lat=${lat.toFixed(3)}&lon=${lon.toFixed(3)}`)).json();
+    const a = r.address || {};
+    const place = a.city || a.town || a.village || a.hamlet || a.suburb || a.county;
+    if (place) label = `${place}${a['ISO3166-2-lvl4'] ? `, ${a['ISO3166-2-lvl4'].split('-')[1]}` : ''}`;
+  } catch {}
+  await routeFrom(lat, lon, label, accuracy);
+}
+
+// Typed town or ZIP code (Open-Meteo geocoding). Returns the candidate places.
+// Matches are ranked toward ski country: western US states, then the rest of the US,
+// then Canada, then elsewhere.
+const WEST = ['Colorado', 'Utah', 'California', 'New Mexico', 'Arizona', 'Wyoming', 'Nevada', 'Idaho', 'Montana', 'Oregon', 'Washington'];
+async function findPlaces(query) {
+  const q = new URLSearchParams({ name: query.trim(), count: 30, language: 'en' });
+  const d = await (await fetch(`https://geocoding-api.open-meteo.com/v1/search?${q}`)).json();
+  const rank = (p) => (p.country_code === 'US' ? (WEST.includes(p.admin1) ? 0 : 1) : p.country_code === 'CA' ? 2 : 3);
+  return (d.results || []).map((p, i) => ({ p, i })).sort((a, b) => rank(a.p) - rank(b.p) || a.i - b.i).slice(0, 6).map(({ p }) => ({
+    rank: rank(p),
+    lat: p.latitude, lon: p.longitude,
+    label: `${p.name}${p.admin1 ? `, ${p.admin1}` : ''}${p.country_code && p.country_code !== 'US' ? ` (${p.country_code})` : ''}`,
+  }));
 }
 
 // ---------- storm tracker ----------
@@ -1057,9 +1088,21 @@ function renderUpcoming() {
     .map(([k, v]) => `<option value="${k}" ${state.upSort === k ? 'selected' : ''}>${v.label}</option>`).join('');
   const drive = state.drive
     ? `<label class="up-sort">🚗 Within <select id="upDrive">${[[0, 'any time'], [1, '1 hour'], [2, '2 hours'], [3, '3 hours'], [5, '5 hours'], [8, '8 hours']]
-      .map(([h, l]) => `<option value="${h}" ${state.upDrive === h ? 'selected' : ''}>${l}</option>`).join('')}</select>
-      <button class="link-btn" id="relocate" title="Update my location">↻</button></label>`
-    : '<button class="loc-btn" id="locate">📍 Use my location for drive times</button>';
+      .map(([h, l]) => `<option value="${h}" ${state.upDrive === h ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`
+    : '';
+  const approx = state.drive?.accuracy > 3000;
+  const from = state.drive
+    ? `<div class="drive-from ${approx ? 'warn' : ''}">🚗 Drive times from <b>${state.drive.label || 'your location'}</b>${state.drive.accuracy ? ` (±${state.drive.accuracy >= 1000 ? `${Math.round(state.drive.accuracy / 1000)} km` : `${Math.round(state.drive.accuracy)} m`})` : ''}
+        ${approx ? ' · your device only knows your location roughly, so type your town for better times.' : ''}
+        <button class="link-btn" id="changeLoc">Change</button></div>`
+    : '';
+  const locForm = `<form class="loc-form" id="locForm" ${state.drive && !state.locEditing ? 'hidden' : ''}>
+      <button type="button" class="loc-btn" id="locate">📍 Use my location</button>
+      <span class="muted">or</span>
+      <input id="locQuery" type="text" inputmode="search" placeholder="Town or ZIP code" autocomplete="postal-code" value="">
+      <button type="submit" class="loc-btn">Set</button>
+      <span id="locResults" class="chips"></span>
+    </form>`;
   const rows = upcomingRows();
   const ids = rows.map((x) => x.r.id);
 
@@ -1104,6 +1147,7 @@ function renderUpcoming() {
   }
 
   $('upcomingView').innerHTML = stormsHTML(ids) + `<section class="card">
+    ${from}${locForm}
     <div class="up-tools">
       <div class="chips">${regions}</div>
       <div class="seg mode-seg"><button data-mode="list" class="${state.upMode === 'list' ? 'on' : ''}">List</button><button data-mode="map" class="${state.upMode === 'map' ? 'on' : ''}">Map</button></div>
@@ -1287,19 +1331,51 @@ $('upcomingView').addEventListener('click', async (e) => {
   if (b.dataset.filter) { state.upFilter = b.dataset.filter; renderUpcoming(); return; }
   if (b.dataset.pass) { state.upPass = b.dataset.pass; renderUpcoming(); return; }
   if (b.dataset.mode) { state.upMode = b.dataset.mode; renderUpcoming(); return; }
-  if (b.id === 'locate' || b.id === 'relocate') {
+  if (b.id === 'changeLoc') { state.locEditing = true; renderUpcoming(); $('locQuery')?.focus(); return; }
+  if (b.id === 'locate') {
     b.disabled = true;
     b.textContent = 'Finding drive times…';
     try {
       await locateAndRoute();
-      if (state.upSort === 'next7' && b.id === 'locate') state.upDrive = 0;
+      state.locEditing = false;
     } catch (err) {
-      alert(err.code === 1 ? 'Location permission was denied, so drive times are unavailable.' : `Couldn't get drive times: ${err.message}`);
+      alert(err.code === 1 ? 'Location permission was denied. You can type your town or ZIP code instead.' : `Couldn't get drive times: ${err.message}`);
     }
     renderUpcoming();
     return;
   }
+  if (b.dataset.place) {
+    const p = JSON.parse(b.dataset.place);
+    b.disabled = true;
+    try { await routeFrom(p.lat, p.lon, p.label, null); state.locEditing = false; } catch (err) { alert(`Couldn't get drive times: ${err.message}`); }
+    renderUpcoming();
+    return;
+  }
   if (b.classList.contains('up-row')) switchResort(b.dataset.id);
+});
+// Typed town / ZIP: one match routes straight away; several show as choices.
+$('upcomingView').addEventListener('submit', async (e) => {
+  if (e.target.id !== 'locForm') return;
+  e.preventDefault();
+  const q = $('locQuery').value;
+  if (!q.trim()) return;
+  const out = $('locResults');
+  out.textContent = 'Searching…';
+  try {
+    const places = await findPlaces(q);
+    if (!places.length) { out.textContent = 'No match. Try a town name or 5-digit ZIP.'; return; }
+    // A US ZIP, a single match, or a single western-US match needs no choosing.
+    const zip = /^\d{5}$/.test(q.trim()) && places.find((p) => p.rank <= 1);
+    const west = places.filter((p) => p.rank === 0);
+    const pick = zip || (places.length === 1 ? places[0] : west.length === 1 ? west[0] : null);
+    if (pick) {
+      await routeFrom(pick.lat, pick.lon, pick.label, null);
+      state.locEditing = false;
+      renderUpcoming();
+      return;
+    }
+    out.innerHTML = places.map((p) => `<button type="button" data-place='${JSON.stringify(p).replace(/'/g, '&#39;')}'>${p.label}</button>`).join('');
+  } catch (err) { out.textContent = `Search failed: ${err.message}`; }
 });
 $('upcomingView').addEventListener('change', (e) => {
   if (e.target.id === 'upSort') { state.upSort = e.target.value; renderUpcoming(); }
