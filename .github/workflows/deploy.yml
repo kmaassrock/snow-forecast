@@ -41,6 +41,8 @@ jobs:
         continue-on-error: true
       - name: Rank upcoming snow at every resort
         run: node scripts/upcoming.cjs
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
         continue-on-error: true
       # Stamp asset links with this commit so a browser never pairs a new page
       # with older cached scripts or styles.
