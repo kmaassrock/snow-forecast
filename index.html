@@ -4,10 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Snow Forecast</title>
-  <meta name="theme-color" content="#0b1220">
+  <meta name="theme-color" content="#f2f4f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0e0e10" media="(prefers-color-scheme: dark)">
+  <script>
+    // Apply a saved Light/Dark choice before the page draws (Auto = follow the phone).
+    try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}
+  </script>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Snow">
   <link rel="manifest" href="manifest.webmanifest?v=__V__">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
@@ -23,6 +28,7 @@
         <select id="resortSel" aria-label="Choose mountain"></select>
       </label>
       <button id="favBtn" class="fav" aria-label="Favorite">☆</button>
+      <button id="themeBtn" class="ghost small theme-btn" aria-label="Theme">◐ Auto</button>
     </div>
     <div class="meta-row">
       <p class="sub" id="resortSub"></p>
@@ -44,9 +50,32 @@
       <p id="status" class="status">Loading forecast models…</p>
     </section>
 
+    <section class="card resort-only" id="camsCard" hidden>
+      <div class="card-head"><h2>Cams</h2><span class="hint">Tap for the live view</span></div>
+      <div id="cams" class="cams"></div>
+    </section>
+
+    <div class="duo resort-only">
+      <section class="card">
+        <div class="card-head"><h2>Right Now</h2></div>
+        <div id="rightNow"></div>
+      </section>
+      <section class="card">
+        <div class="card-head"><h2>Snow Report</h2></div>
+        <div id="snowReport"></div>
+      </section>
+    </div>
+
     <section class="card resort-only">
       <div class="card-head"><h2>Daily forecast</h2><span class="hint">Tap a day for details</span></div>
       <div id="days" class="day-list"></div>
+    </section>
+
+    <section class="card resort-only">
+      <div class="card-head"><h2>Next 3 days, hour by hour</h2></div>
+      <div id="hourly" class="chart hourly"></div>
+      <p class="legend"><i class="sw sw-snow"></i>Snow per hour <i class="sw sw-temp"></i>Temperature
+        <i class="sw sw-wind"></i>Wind <i class="sw sw-gust"></i>Gusts <i class="sw sw-lift"></i>Lift hours</p>
     </section>
 
     <section class="card resort-only">
@@ -62,6 +91,21 @@
     </section>
 
     <section class="card resort-only">
+      <div class="card-head"><h2>Forecast range</h2><span class="hint">Running snow total by model · shaded = likely range</span></div>
+      <div id="range" class="chart range-chart"></div>
+    </section>
+
+    <section class="card resort-only">
+      <div class="card-head"><h2>Avalanche danger</h2></div>
+      <div id="avalanche"><p class="hint">Loading…</p></div>
+    </section>
+
+    <details class="card fold resort-only" id="mapCard">
+      <summary><h2>Trail map</h2></summary>
+      <div id="trailMap" class="trail-map"></div>
+    </details>
+
+    <section class="card resort-only">
       <div class="card-head">
         <h2>Snowfall history</h2>
         <select id="seasonSel" aria-label="Season"></select>
@@ -71,10 +115,14 @@
       <p class="hint" id="historyNote"></p>
     </section>
 
-    <details class="card fold resort-only">
-      <summary><h2>Model comparison</h2></summary>
-      <p class="hint">Calibrated snow (in) per day; blank = beyond that model's range.</p>
+    <details class="card fold resort-only" id="modelsCard">
+      <summary><h2>Precipitation by model</h2></summary>
+      <div class="ptools">
+        <span class="hint">Calibrated snow (in) per 12 hours. Night = 4 pm–4 am, day = 4 am–4 pm.</span>
+        <label class="switch"><input type="checkbox" id="stormToggle"> Storm totals</label>
+      </div>
       <div id="models" class="table-wrap"></div>
+      <div class="q-legend"><span><i class="q p-rain"></i>Rain</span><span><i class="q p-mix"></i>Mix</span><span><i class="q p-snow"></i>Snow</span><span><i class="q p-heavy"></i>6"+ snow</span><span class="muted">Gray rows: AI models, shown for reference, not in the blend.</span></div>
     </details>
 
     <details class="card fold resort-only method">
@@ -94,6 +142,7 @@
   </main>
 
   <script src="resorts.js?v=__V__"></script>
+  <script src="cams.js?v=__V__"></script>
   <script src="core.js?v=__V__"></script>
   <script src="history.js?v=__V__"></script>
   <script src="app.js?v=__V__"></script>

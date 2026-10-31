@@ -17,6 +17,10 @@ const MODELS = [
   { id: 'gem_seamless', name: 'Canadian', note: '2.5–15 km · 10 days', weight: () => 1 },
   { id: 'icon_seamless', name: 'ICON', note: '13 km · 7 days', weight: () => 1 },
   { id: 'ukmo_seamless', name: 'UKMO', note: '10 km · 7 days', weight: () => 1 },
+  // AI models: shown for reference but left out of the blend, because adding them
+  // made backtested errors slightly worse (AIFS since Feb 2025, AIGFS since Jan 2026).
+  { id: 'ecmwf_aifs025_single', name: 'ECMWF AI', note: 'AIFS · reference only', weight: () => 0, ref: true },
+  { id: 'ncep_aigfs025', name: 'NOAA AI', note: 'AIGFS · reference only', weight: () => 0, ref: true },
 ];
 
 // Ensemble members borrow the calibration of their parent model.
@@ -24,7 +28,8 @@ const ENSEMBLE_PARENT = { ncep_gefs_seamless: 'gfs_global', ecmwf_ifs025_ensembl
 
 const HOURLY_VARS = [
   'temperature_2m', 'precipitation', 'snowfall', 'temperature_700hPa', 'freezing_level_height',
-  'cloud_cover', 'wind_speed_10m', 'wind_gusts_10m', 'wind_direction_10m',
+  'cloud_cover', 'wind_speed_10m', 'wind_gusts_10m', 'wind_direction_10m', 'apparent_temperature',
+  'relative_humidity_2m',
 ];
 
 // ---------- snow physics ----------
@@ -112,8 +117,8 @@ function processModels(data, nowKey, calib) {
 
   return times.map((t, i) => {
     const lead = Math.max(0, i - nowIdx);
-    const perModel = {};
-    const acc = { w: 0, snow: 0, swe: 0, rain: 0, temp: 0, wind: 0, gust: 0, cloud: 0, u: 0, v: 0 };
+    const perModel = {}, perRain = {};
+    const acc = { w: 0, snow: 0, swe: 0, rain: 0, temp: 0, feels: 0, rh: 0, wind: 0, gust: 0, cloud: 0, u: 0, v: 0 };
     const fl = [];
     for (const m of MODELS) {
       const precipRaw = get('precipitation', m.id, i);
@@ -129,6 +134,8 @@ function processModels(data, nowKey, calib) {
       const slr = snowRatio(t7 == null ? t2 : Math.max(t2, t7), wind);
       const snow = mmToIn(swe) * slr;
       perModel[m.id] = snow;
+      perRain[m.id] = mmToIn(Math.max(0, precip - swe));
+      if (m.ref) continue; // reference-only models don't feed the blend
 
       const w = m.weight(lead) * (cal?.weight ?? 1);
       acc.w += w;
@@ -136,6 +143,8 @@ function processModels(data, nowKey, calib) {
       acc.swe += w * swe;
       acc.rain += w * Math.max(0, precip - swe);
       acc.temp += w * t2;
+      acc.feels += w * (get('apparent_temperature', m.id, i) ?? t2);
+      acc.rh += w * (get('relative_humidity_2m', m.id, i) ?? 0);
       acc.wind += w * wind;
       acc.gust += w * (get('wind_gusts_10m', m.id, i) ?? wind);
       acc.cloud += w * (get('cloud_cover', m.id, i) ?? 0);
@@ -147,11 +156,12 @@ function processModels(data, nowKey, calib) {
       const f = get('freezing_level_height', m.id, i);
       if (f != null) fl.push(f);
     }
-    const base = { time: t, date: t.slice(0, 10), skiDate: skiDate(t), hour: +t.slice(11, 13), past: i < nowIdx, perModel };
+    const base = { time: t, date: t.slice(0, 10), skiDate: skiDate(t), hour: +t.slice(11, 13), past: i < nowIdx, perModel, perRain };
     if (!acc.w) return { ...base, empty: true };
     const W = acc.w;
     return {
-      ...base, nModels: Object.keys(perModel).length,
+      ...base, nModels: MODELS.filter((m) => !m.ref && m.id in perModel).length,
+      feelsF: cToF(acc.feels / W), rh: acc.rh / W,
       snow: acc.snow / W, swe: acc.swe / W, rain: acc.rain / W,
       tempF: cToF(acc.temp / W), wind: acc.wind / W, gust: acc.gust / W, cloud: acc.cloud / W,
       dir: ((Math.atan2(acc.u, acc.v) * 180) / Math.PI + 360) % 360,
@@ -184,6 +194,28 @@ function processEnsemble(data, calib) {
     }
   }
   return out;
+}
+
+// Chance of precipitation from the ensemble: share of members with measurable
+// precipitation in each hour (≥ 0.1 mm) and in each ski day (≥ 0.25 mm, i.e. 0.01").
+function ensembleChance(data) {
+  const h = data.hourly;
+  const members = Object.keys(h).filter((k) => /^precipitation(_member\d+)?_/.test(k));
+  const hour = {}, day = {};
+  h.time.forEach((t, i) => {
+    const vals = members.map((k) => h[k][i]).filter((v) => v != null);
+    if (vals.length >= 10) hour[t] = Math.round((100 * vals.filter((v) => v >= 0.1).length) / vals.length);
+  });
+  const totals = members.map((k) => {
+    const byDay = {};
+    h.time.forEach((t, i) => { if (h[k][i] != null) byDay[skiDate(t)] = (byDay[skiDate(t)] || 0) + h[k][i]; });
+    return byDay;
+  });
+  for (const d of new Set(h.time.map(skiDate))) {
+    const vals = totals.map((b) => b[d]).filter((v) => v != null);
+    if (vals.length >= 10) day[d] = Math.round((100 * vals.filter((v) => v >= 0.25).length) / vals.length);
+  }
+  return { hour, day };
 }
 
 // The spread around the median is stretched by blend/median (capped) and centred on the blend.
@@ -229,12 +261,14 @@ function buildDays(hours, ens, todayStr) {
       const vals = hs.map((h) => h.perModel[m.id]).filter((x) => x != null);
       if (vals.length >= 18) perModel[m.id] = sum(vals);
     }
-    const mv = Object.values(perModel);
+    const mv = MODELS.filter((m) => !m.ref && m.id in perModel).map((m) => perModel[m.id]);
 
     days.push({
       date, hours: hs, past: date < todayStr, snow, swe, rainIn, slr,
       overnight: sum(overnight.map((h) => h.snow)), lifts: sum(lifts.map((h) => h.snow)),
       hi: Math.max(...temps), lo: Math.min(...temps),
+      feelsHi: Math.max(...cal.map((h) => h.feelsF)), feelsLo: Math.min(...cal.map((h) => h.feelsF)),
+      rh: avg(open.map((h) => h.rh)) ?? avg(cal.map((h) => h.rh)),
       wind: avg(open.map((h) => h.wind)) ?? avg(cal.map((h) => h.wind)),
       gust: Math.max(...cal.map((h) => h.gust)),
       dir: avg(open.map((h) => h.dir)) ?? avg(cal.map((h) => h.dir)),
@@ -280,7 +314,10 @@ async function getForecast(resort, elevM, calib, { ensemble = true } = {}) {
   const todayStr = nowKey.slice(0, 10);
   const hours = processModels(det, nowKey, calib);
   const ens = ensRaw ? processEnsemble(ensRaw, calib) : {};
+  const chance = ensRaw ? ensembleChance(ensRaw) : { hour: {}, day: {} };
+  for (const h of hours) h.pop = chance.hour[h.time] ?? null;
   const days = buildDays(hours, ens, todayStr);
+  for (const d of days) d.pop = chance.day[d.date] ?? null;
   return { days, ens, todayStr, hasEnsemble: !!ensRaw };
 }
 

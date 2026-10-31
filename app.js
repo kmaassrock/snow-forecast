@@ -62,7 +62,8 @@ const state = {
   calibration: null,
   days: [], ens: {}, todayStr: '', selected: null,
   fetchedAt: null, refreshing: false, hasEnsemble: true,
-  observed: null,
+  station: null, // measured snapshot from the resort's SNOTEL station (stationReport)
+  reports: null, // resort snow reports (data/reports.json)
 };
 if (!RESORTS.some((r) => r.id === state.resortId)) state.resortId = DEFAULT_RESORT;
 const resort = () => RESORTS.find((r) => r.id === state.resortId);
@@ -71,12 +72,15 @@ const upcoming = () => state.days.slice(Math.max(0, todayIndex()));
 
 // ---------- saved forecasts (instant open) ----------
 
-const savedKey = (id, elev) => `fc:${id}:${elev}`;
+// Bump SAVED_VERSION when the forecast's shape changes, so older saves are ignored.
+const SAVED_VERSION = 2;
+const savedKey = (id, elev) => `fc${SAVED_VERSION}:${id}:${elev}`;
 
 function saveForecast(id, elev, f) {
   store.set(savedKey(id, elev), JSON.stringify({ days: f.days, ens: f.ens, savedAt: Date.now() }));
   try {
-    const keys = Object.keys(localStorage).filter((k) => k.startsWith('fc:'));
+    Object.keys(localStorage).filter((k) => /^fc\d*:/.test(k) && !k.startsWith(`fc${SAVED_VERSION}:`)).forEach((k) => localStorage.removeItem(k));
+    const keys = Object.keys(localStorage).filter((k) => k.startsWith(`fc${SAVED_VERSION}:`));
     if (keys.length <= SAVED_FORECASTS) return;
     keys.map((k) => [k, JSON.parse(localStorage.getItem(k)).savedAt])
       .sort((a, b) => b[1] - a[1]).slice(SAVED_FORECASTS)
@@ -165,6 +169,7 @@ function summaryHTML(days, ens, todayStr, { interactive = true, selected = null,
       <span class="b-track"><span class="b-val ${powder ? 'pow' : ''}">${d.snow >= 1 ? fmtIn(d.snow) : ''}</span><span class="b ${cls}" style="height:${h}px"></span></span>
       <span class="b-wk ${lbl.weekend ? 'wknd' : ''}">${lbl.weekend ? lbl.wk.slice(0, 2) : lbl.wk[0]}</span>
       <span class="b-dt ${lbl.weekend ? 'wknd' : ''} ${d.date === todayStr ? 'today' : ''}">${+d.date.slice(8)}</span>
+      <span class="pq ${powderQuality(d) ? `pq-${powderQuality(d).key}` : ''}" title="${powderQuality(d)?.label || ''}"></span>
     </${tag}>`;
   }).join('');
   return `<div class="periods">${periods}</div><div class="bars">${bars}</div>`;
@@ -174,7 +179,23 @@ const QUALITY_LEGEND = `<div class="q-legend">
   <span><i class="q q-wet"></i>Heavy, wet</span><span><i class="q q-med"></i>Medium</span>
   <span><i class="q q-light"></i>Light</span><span><i class="q q-dry"></i>Dry powder</span>
   <span><i class="q q-dry pow"></i>Orange top = ${POWDER_DAY_IN}"+ powder day</span>
+</div>
+<div class="q-legend">Powder quality:
+  <span><i class="pq pq-excellent"></i>Excellent</span><span><i class="pq pq-good"></i>Good</span><span><i class="pq pq-okay"></i>Okay</span>
 </div>`;
+
+// Powder quality for a ski day: snow by first chair counts most, drier snow scores
+// higher, strong wind (wind-packed snow) scores lower.
+function powderQuality(d) {
+  if (!d || d.snow < 1) return null;
+  const dryness = !d.slr ? 1 : d.slr >= 15 ? 1.25 : d.slr >= 11.5 ? 1.1 : d.slr >= 8 ? 1 : 0.7;
+  const wind = d.gust >= 40 ? 0.7 : d.gust >= 30 ? 0.85 : 1;
+  const score = (d.overnight + 0.5 * d.lifts) * dryness * wind;
+  if (score >= 6) return { key: 'excellent', label: 'Excellent' };
+  if (score >= 3) return { key: 'good', label: 'Good' };
+  if (score >= 1) return { key: 'okay', label: 'Okay' };
+  return null;
+}
 
 function renderBanner() {
   const next = upcoming().slice(0, 3).filter((d) => d.snow >= POWDER_DAY_IN || d.overnight >= 4);
@@ -185,15 +206,265 @@ function renderBanner() {
     `${dayLabel(d.date, state.todayStr).long}: ${fmtIn(d.snow)} (${fmtIn(d.overnight)} by 9 am)`).join(' · ');
 }
 
+// The resort's own report, if read within the last 36 hours (data/reports.json).
+function currentReport() {
+  const rep = state.reports?.resorts?.[state.resortId];
+  return rep && Date.now() - Date.parse(rep.fetchedAt) < 36 * 3600e3 ? rep : null;
+}
+const currentStation = () => (state.station?.id === state.resortId ? state.station : null);
+const fmtWhen = (ms) => new Date(ms).toLocaleString('en-US', { timeZone: resort().tz, weekday: 'short', hour: 'numeric', minute: '2-digit' });
+
+// Measured new snow for the past 15 days, same layout as the forecast bars.
+function pastHTML(past) {
+  const periods = [[0, 4, 'Prev 11–15 Days'], [5, 9, 'Prev 6–10 Days'], [10, 14, 'Prev 1–5 Days']].map(([a, b, label]) =>
+    `<div class="period" style="flex:5"><div class="p-label">${label}</div>
+      <div class="p-total measured-total"><span>${fmtIn(sum(past.slice(a, b + 1).map((d) => d.newSnow)))}</span></div>
+      <div class="p-range">&nbsp;</div></div>`).join('');
+  const max = Math.max(3, ...past.map((d) => d.newSnow));
+  const bars = past.map((d) => {
+    const lbl = dayLabel(d.date, state.todayStr);
+    const h = d.newSnow < 0.05 ? 0 : Math.max(4, (d.newSnow / max) * 90);
+    return `<span class="col" aria-label="${lbl.long}: ${fmtIn(d.newSnow)} measured">
+      <span class="b-track"><span class="b-val">${d.known ? fmtIn(d.newSnow).replace('"', '') : ''}</span><span class="b ${h ? 'b-measured' : 'none'}" style="height:${h}px"></span></span>
+      <span class="b-wk ${lbl.weekend ? 'wknd' : ''}">${lbl.weekend ? lbl.wk.slice(0, 2) : lbl.wk[0]}</span>
+      <span class="b-dt ${lbl.weekend ? 'wknd' : ''}">${+d.date.slice(8)}</span>
+    </span>`;
+  }).join('');
+  return `<div class="periods">${periods}</div><div class="bars">${bars}</div>`;
+}
+
+// "Last 24 Hours": the resort's report when we have one, otherwise the station.
+function nowBoxHTML(kind) {
+  const rep = currentReport(), st = currentStation();
+  let v = null, src = 'No recent measurement', when = '';
+  if (rep?.new24 != null) { v = rep.new24; src = 'Resort report'; when = `checked ${fmtWhen(Date.parse(rep.fetchedAt))}`; }
+  else if (st?.h24 != null) { v = st.h24; src = `${st.station} station`; when = fmtWhen(st.asOf); }
+  return `<div class="now-box ${kind}"><div class="nb-label">Last 24 Hours</div><div class="nb-val">${v == null ? '–' : fmtIn(v)}</div>
+    <div class="nb-src">${src}${when ? `<span class="nb-sep"> · </span><br class="nb-br">${when}` : ''}</div></div>`;
+}
+
+// A short written outlook built from the forecast (no AI, no cost).
+function outlookHTML() {
+  const up = upcoming();
+  if (!up.length) return '';
+  const dayName = (d) => {
+    const l = dayLabel(d.date, state.todayStr);
+    return l.short === 'Today' ? 'today' : l.short === 'Tmw' ? 'tomorrow' : new Date(d.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long' });
+  };
+  const win = up.slice(0, 10);
+  const storms = [];
+  win.forEach((d, i) => {
+    if (d.snow < 1) return;
+    const last = storms[storms.length - 1];
+    if (last && last.end === i - 1) { last.end = i; last.days.push(d); } else storms.push({ start: i, end: i, days: [d] });
+  });
+  const parts = [];
+  if (!storms.length) {
+    const later = sum(up.slice(10, 15).map((d) => d.snow));
+    parts.push(`No significant snow in the next 10 days${later >= 1 ? `; about ${fmtIn(later)} possible after that` : ''}.`);
+  } else {
+    const s = storms[0];
+    if (s.start >= 2) parts.push(`Dry through ${dayName(win[s.start - 1])}.`);
+    const total = sum(s.days.map((d) => d.snow));
+    // Range over the whole storm from ensemble members (adding daily extremes would overstate it).
+    const ti = todayIndex();
+    const pr = periodTotal(state.days, state.ens, ti + s.start, ti + s.end)?.range;
+    const lo = pr?.lo ?? total, hi = pr?.hi ?? total;
+    const swe = sum(s.days.map((d) => d.swe));
+    const quality = swe > 0.25 ? snowType(total / mmToIn(swe)).label.toLowerCase() : null;
+    const span = s.days.length === 1 ? dayName(s.days[0]) : `${dayName(s.days[0])} through ${dayName(s.days[s.days.length - 1])}`;
+    parts.push(`Snow ${span}: about ${fmtIn(total)}${hi - lo >= 1 ? ` (${fmtRange(lo, hi)})` : ''}${quality ? `, ${quality}` : ''}.`);
+    const best = s.days.reduce((a, d) => (d.overnight > a.overnight ? d : a));
+    if (best.overnight >= 2) parts.push(`Best powder: ${dayName(best)} morning, ${fmtIn(best.overnight)} by 9 am.`);
+    if (storms[1]) parts.push(`Another round ${dayName(storms[1].days[0])}, about ${fmtIn(sum(storms[1].days.map((d) => d.snow)))}.`);
+  }
+  const next3 = up.slice(0, 3);
+  const his = next3.map((d) => Math.round(d.hi));
+  const windy = next3.reduce((a, d) => (d.gust > a.gust ? d : a));
+  parts.push(`Highs ${Math.min(...his)}–${Math.max(...his)}°F the next 3 days${windy.gust >= 35 ? `, gusts to ${Math.round(windy.gust)} mph ${dayName(windy)}` : ''}.`);
+  return `<p class="outlook">${parts.join(' ')}</p>`;
+}
+
+// Where the past/forecast strip was scrolled, kept across re-renders of the same resort
+// (only once its measured days are in place, so the first auto-scroll lands correctly).
+let stripScroll = { resort: null, left: 0 };
+
 function renderSnowSummary() {
-  const o = state.observed?.id === state.resortId ? state.observed : null;
-  const past = state.days.filter((d) => d.date < state.todayStr);
-  const recent = o
-    ? `<p class="measured">Measured at ${o.station} · last 24 hrs <b>${fmtIn(o.h24)}</b> · last 3 days <b>${fmtIn(o.h72)}</b></p>`
-    : past.length ? `<p class="measured">Past ${past.length} days (modeled): <b>${fmtIn(sum(past.map((d) => d.snow)))}</b></p>` : '';
-  $('snowSummary').innerHTML = recent + summaryHTML(state.days, state.ens, state.todayStr, { selected: state.selected })
-    + QUALITY_LEGEND + '<p class="hint">Each day runs 4 pm the day before to 4 pm.</p>';
-  $('snowSummary').querySelectorAll('.col').forEach((b) => b.addEventListener('click', () => selectDay(b.dataset.date, true)));
+  const st = currentStation();
+  const keep = stripScroll.resort === state.resortId ? stripScroll.left : null;
+  const past = st ? `<div class="strip-part past">${pastHTML(st.past)}</div>` : '';
+  // The box sits between past and forecast on wide screens; phones show it as a banner above.
+  $('snowSummary').innerHTML = outlookHTML() + nowBoxHTML('banner')
+    + `<div class="strip-wrap" data-resort="${state.resortId}"><div class="strip">${past}${nowBoxHTML('inline')}
+        <div class="strip-part future">${summaryHTML(state.days, state.ens, state.todayStr, { selected: state.selected })}</div></div></div>`
+    + QUALITY_LEGEND
+    + `<p class="hint">${st ? `<span class="phone-only">Swipe the bars right for the past 15 days. </span>Past days measured at ${st.station} station. ` : ''}Each forecast day runs 4 pm the day before to 4 pm.</p>`;
+  $('snowSummary').querySelectorAll('button.col').forEach((b) => b.addEventListener('click', () => selectDay(b.dataset.date, true)));
+  // On narrow screens the strip scrolls sideways; start at the forecast (past days are a swipe left).
+  const wrap = $('snowSummary').querySelector('.strip-wrap');
+  wrap.addEventListener('scroll', () => {
+    if (wrap.querySelector('.past')) stripScroll = { resort: state.resortId, left: wrap.scrollLeft };
+  }, { passive: true });
+  if (keep != null) wrap.scrollLeft = keep;
+  else if (wrap.scrollWidth > wrap.clientWidth) {
+    const target = getComputedStyle(wrap.querySelector('.now-box.inline')).display === 'none'
+      ? wrap.querySelector('.future') : wrap.querySelector('.now-box.inline');
+    wrap.scrollLeft = target.offsetLeft - 2; // .strip-wrap is position: relative
+  }
+}
+
+// Snow Report: last 24 hours, base, season, snowpack vs. normal, terrain open.
+function renderSnowReport() {
+  const rep = currentReport(), st = currentStation(), r = resort();
+  const cell = (v, label, src) => `<div class="rp"><div class="rp-v">${v}</div><div class="rp-k">${label}</div><div class="rp-s">${src}</div></div>`;
+  const cells = [];
+  if (rep?.new24 != null) cells.push(cell(fmtIn(rep.new24), 'Last 24 hours', 'resort report'));
+  else if (st?.h24 != null) cells.push(cell(fmtIn(st.h24), 'Last 24 hours', 'station'));
+  if (rep?.baseDepth != null) cells.push(cell(fmtIn(rep.baseDepth), 'Base depth', 'resort · mid-mountain'));
+  else if (st?.depth != null) cells.push(cell(fmtIn(st.depth), 'Snow depth', 'station'));
+  if (rep?.season != null) cells.push(cell(fmtIn(rep.season), 'Season snowfall', 'resort report'));
+  else if (st) cells.push(cell(fmtIn(st.season), 'Season snowfall', 'station, since Oct 1'));
+  if (st?.pctNormal != null) cells.push(cell(`${st.pctNormal}%`, 'Snowpack vs. normal', 'snow water, 1991–2020'));
+  if (rep?.pctOpen != null) cells.push(cell(`${rep.pctOpen}%`, 'Terrain open', rep.liftsOpen != null ? `${rep.liftsOpen} lifts` : 'resort report'));
+  const notes = [];
+  if (rep) notes.push(`<a href="${rep.source}" target="_blank" rel="noopener">${r.name} snow report</a>, checked ${fmtWhen(Date.parse(rep.fetchedAt))}`);
+  if (st) notes.push(`${st.station} SNOTEL station (${Math.round(mToFt(r.stations[0].elev)).toLocaleString()} ft)`);
+  $('snowReport').innerHTML = cells.length
+    ? `<div class="report-grid">${cells.join('')}</div><p class="hint">Sources: ${notes.join(' · ')}.</p>`
+    : `<p class="hint">${r.stations[0]?.source === 'eccc'
+      ? `${r.stations[0].name} (Environment Canada) publishes about a month late, so there's no current report. Its season history is below.`
+      : `No snow report or nearby snow station for ${r.name}.`}</p>`;
+}
+
+// ---------- hourly charts ----------
+
+// Snowfall bars with a temperature line on top, wind and gusts below.
+function hourlyChart(hours) {
+  if (!hours.length) return '';
+  const W = Math.max(640, hours.length * 9), padL = 34, padR = 38, top = 18, h1 = 120, gap = 30, h2 = 64;
+  const H = top + h1 + gap + h2 + 30;
+  const n = hours.length, step = (W - padL - padR) / n;
+  const x = (i) => padL + step * (i + 0.5);
+  const snowMax = Math.max(0.3, ...hours.map((h) => h.snow));
+  const temps = hours.map((h) => h.tempF);
+  const tMin = Math.floor(Math.min(...temps) / 5) * 5 - 5, tMax = Math.ceil(Math.max(...temps) / 5) * 5 + 5;
+  const ys = (v) => top + h1 * (1 - v / snowMax);
+  const yt = (v) => top + h1 * (1 - (v - tMin) / (tMax - tMin));
+  const wMax = Math.max(20, ...hours.map((h) => h.gust));
+  const yw = (v) => top + h1 + gap + h2 * (1 - v / wMax);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Hourly snowfall, temperature and wind">`;
+  hours.forEach((h, i) => {
+    if (h.hour >= LIFTS_OPEN && h.hour < LIFTS_CLOSE) s += `<rect class="lift-hrs" x="${x(i) - step / 2}" y="${top}" width="${step}" height="${h1 + gap + h2}"/>`;
+    if (h.hour === 0 && i > 0) s += `<line class="grid" x1="${x(i) - step / 2}" x2="${x(i) - step / 2}" y1="${top - 6}" y2="${top + h1 + gap + h2}"/>`;
+    if (h.hour === 0 || i === 0) s += `<text class="day-lbl" x="${x(i) - step / 2 + 4}" y="${top - 6}">${dayLabel(h.date, state.todayStr).long}</text>`;
+    if (h.snow >= 0.02) s += `<rect class="hr-snow" x="${x(i) - step * 0.4}" y="${ys(h.snow)}" width="${step * 0.8}" height="${ys(0) - ys(h.snow)}"><title>${h.time.slice(11)} ${h.snow.toFixed(2)}"</title></rect>`;
+    if (h.hour % 6 === 0) s += `<text x="${x(i)}" y="${H - 8}" text-anchor="middle">${h.hour === 0 ? '12a' : h.hour === 12 ? '12p' : h.hour < 12 ? `${h.hour}a` : `${h.hour - 12}p`}</text>`;
+  });
+  if (tMin < 32 && tMax > 32) s += `<line class="freeze" x1="${padL}" x2="${W - padR}" y1="${yt(32)}" y2="${yt(32)}"/><text class="freeze-lbl" x="${W - padR + 4}" y="${yt(32) + 4}">32°</text>`;
+  const path = (vals, y) => vals.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('');
+  s += `<path class="hr-temp" d="${path(temps, yt)}"/>`;
+  s += `<path class="hr-gust" d="${path(hours.map((h) => h.gust), yw)}"/><path class="hr-wind" d="${path(hours.map((h) => h.wind), yw)}"/>`;
+  s += `<text x="${padL - 6}" y="${top + 8}" text-anchor="end">${snowMax.toFixed(1)}"</text><text x="${padL - 6}" y="${top + h1}" text-anchor="end">0</text>`;
+  s += `<text x="${W - padR + 4}" y="${yt(tMax) + 8}">${tMax}°</text><text x="${W - padR + 4}" y="${yt(tMin)}">${tMin}°</text>`;
+  s += `<text x="${padL - 6}" y="${yw(wMax) + 8}" text-anchor="end">${Math.round(wMax)}</text><text x="${padL - 6}" y="${yw(0)}" text-anchor="end">0</text>`;
+  s += `<text class="day-lbl" x="${padL}" y="${top + h1 + gap - 8}">Wind &amp; gusts (mph)</text>`;
+  return s + '</svg>';
+}
+
+function renderHourly() {
+  const now = nowLocalHour(resort().tz);
+  const hours = upcoming().flatMap((d) => d.hours).filter((h) => h.time >= now).slice(0, 72);
+  $('hourly').innerHTML = hours.length ? hourlyChart(hours) : '';
+}
+
+// ---------- avalanche danger ----------
+
+let avyLayer = null;
+function insidePolygon(lon, lat, geom) {
+  const polys = geom.type === 'Polygon' ? [geom.coordinates] : geom.type === 'MultiPolygon' ? geom.coordinates : [];
+  const inRing = (ring) => {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [xi, yi] = ring[i], [xj, yj] = ring[j];
+      if ((yi > lat) !== (yj > lat) && lon < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  };
+  return polys.some((p) => inRing(p[0]) && !p.slice(1).some(inRing));
+}
+// Distance (deg²) to the nearest zone vertex, for resorts just outside a zone's edge.
+function nearZone(lon, lat, geom) {
+  const pts = (geom.type === 'Polygon' ? [geom.coordinates] : geom.coordinates).flat(2);
+  return Math.min(...pts.map(([x, y]) => (x - lon) ** 2 + (y - lat) ** 2));
+}
+
+async function loadAvalanche() {
+  const r = resort();
+  const el = $('avalanche');
+  try {
+    avyLayer ||= await (await fetch('https://api.avalanche.org/v2/public/products/map-layer')).json();
+    if (r.id !== state.resortId) return;
+    let zone = avyLayer.features.find((f) => insidePolygon(r.lon, r.lat, f.geometry));
+    if (!zone) {
+      const near = avyLayer.features.map((f) => [f, nearZone(r.lon, r.lat, f.geometry)]).sort((a, b) => a[1] - b[1])[0];
+      if (near && near[1] < 0.3 ** 2) zone = near[0];
+    }
+    if (!zone) {
+      el.innerHTML = r.state === 'BC'
+        ? '<p class="hint">Avalanche Canada covers Whistler: <a href="https://avalanche.ca/map" target="_blank" rel="noopener">avalanche.ca</a>.</p>'
+        : '<p class="hint">No avalanche forecast zone found near this resort.</p>';
+      return;
+    }
+    const p = zone.properties;
+    const names = { 1: 'Low', 2: 'Moderate', 3: 'Considerable', 4: 'High', 5: 'Extreme' };
+    const level = p.danger_level >= 1 ? `${p.danger_level} – ${names[p.danger_level]}` : p.off_season ? 'Off season' : 'No rating';
+    el.innerHTML = `<div class="avy"><span class="avy-level" style="background:${p.color};color:${p.font_color}">${level}</span>
+      <span><b>${p.name}</b><br><small class="muted">${p.center}</small></span></div>
+      ${p.travel_advice ? `<p class="avy-advice">${p.travel_advice}</p>` : ''}
+      <p class="hint"><a href="${p.link}" target="_blank" rel="noopener">Full forecast</a> · Backcountry and sidecountry only; inbounds terrain is managed by ski patrol.</p>`;
+  } catch (e) {
+    console.warn('Avalanche data unavailable', e);
+    el.innerHTML = '<p class="hint">Avalanche danger is unavailable right now.</p>';
+  }
+}
+
+// ---------- trail map ----------
+
+let trailMap = null;
+function loadLeaflet() {
+  if (window.L) return Promise.resolve();
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+  document.head.append(css);
+  return new Promise((ok, fail) => {
+    const js = document.createElement('script');
+    js.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+    js.onload = ok;
+    js.onerror = fail;
+    document.head.append(js);
+  });
+}
+
+async function showTrailMap() {
+  if (!$('mapCard').open) return;
+  const r = resort();
+  try {
+    await loadLeaflet();
+    if (!trailMap) {
+      trailMap = L.map('trailMap', { scrollWheelZoom: false });
+      L.tileLayer('https://tile.opentopomap.org/{z}/{x}/{y}.png', {
+        maxZoom: 17, attribution: '© OpenStreetMap contributors, SRTM · © OpenTopoMap (CC-BY-SA)',
+      }).addTo(trailMap);
+      L.tileLayer('https://tiles.opensnowmap.org/pistes/{z}/{x}/{y}.png', {
+        maxZoom: 18, attribution: 'Runs & lifts © OpenSnowMap.org (CC-BY-SA)',
+      }).addTo(trailMap);
+    }
+    trailMap.setView([r.lat, r.lon], 14);
+    setTimeout(() => trailMap.invalidateSize(), 50);
+  } catch (e) {
+    $('trailMap').innerHTML = '<p class="hint">The map couldn\'t load.</p>';
+  }
 }
 
 // ---------- daily list ----------
@@ -201,35 +472,43 @@ function renderSnowSummary() {
 function dayDetail(d, lead) {
   const conf = confidence(d, lead);
   const r = d.range && !d.past ? d.range : null;
-  const models = MODELS.filter((m) => d.perModel[m.id] != null).map((m) => `${m.name} <b>${fmtIn(d.perModel[m.id])}</b>`).join(' · ');
+  const models = MODELS.filter((m) => d.perModel[m.id] != null).map((m) => `${m.name}${m.ref ? ' (ref)' : ''} <b>${fmtIn(d.perModel[m.id])}</b>`).join(' · ');
   const rows = d.hours.map((h) => {
     const slr = h.swe > 0.05 ? h.snow / mmToIn(h.swe) : null;
     const hr = new Date(`${h.time}:00`).toLocaleTimeString('en-US', { hour: 'numeric' });
     const open = h.date === d.date && h.hour >= LIFTS_OPEN && h.hour < LIFTS_CLOSE;
     const sep = h.date === d.date && (h.hour === 0 || h.hour === LIFTS_OPEN)
-      ? `<tr class="sep"><td colspan="9">${h.hour === 0 ? dayLabel(d.date, state.todayStr).long : 'Lifts open'}</td></tr>` : '';
+      ? `<tr class="sep"><td colspan="12">${h.hour === 0 ? dayLabel(d.date, state.todayStr).long : 'Lifts open'}</td></tr>` : '';
     return `${sep}<tr class="${open ? 'open' : ''}"><td>${hr}</td><td>${icon({ snow: h.snow * 6, rainIn: mmToIn(h.rain) * 6, cloud: h.cloud })}</td>
       <td class="heat" ${heat(h.snow * 6)}>${h.snow >= 0.05 ? h.snow.toFixed(1) + '"' : ''}</td>
       <td>${slr ? Math.round(slr) + ':1' : ''}</td>
-      <td>${Math.round(h.tempF)}°</td><td>${compass(h.dir)} ${Math.round(h.wind)}</td><td>${Math.round(h.gust)}</td>
-      <td>${Math.round(h.cloud)}%</td><td>${h.freezeFt ? (Math.round((h.freezeFt - 1000) / 100) * 100).toLocaleString() : ''}</td></tr>`;
+      <td>${h.pop != null ? h.pop + '%' : ''}</td>
+      <td>${Math.round(h.tempF)}°</td><td>${Math.round(h.feelsF)}°</td><td>${compass(h.dir)} ${Math.round(h.wind)}</td><td>${Math.round(h.gust)}</td>
+      <td>${Math.round(h.rh)}%</td><td>${Math.round(h.cloud)}%</td><td>${h.freezeFt ? (Math.round((h.freezeFt - 1000) / 100) * 100).toLocaleString() : ''}</td></tr>`;
   }).join('');
   return `<div class="detail">
     <dl>
       <dt>Before lifts open</dt><dd>${fmtIn(d.overnight)}</dd>
       <dt>While lifts open</dt><dd>${fmtIn(d.lifts)}</dd>
       ${r ? `<dt>Could be</dt><dd>${fmtRange(r.lo, r.hi)}${conf ? ` · ${conf.toLowerCase()} confidence` : ''}</dd>` : ''}
+      ${powderQuality(d) ? `<dt>Powder quality</dt><dd>${powderQuality(d).label}</dd>` : ''}
+      ${d.pop != null ? `<dt>Chance of precip</dt><dd>${d.pop}%</dd>` : ''}
       <dt>Snow water</dt><dd>${mmToIn(d.swe).toFixed(2)}"</dd>
       ${d.rainIn >= 0.05 ? `<dt>Rain</dt><dd>${d.rainIn.toFixed(2)}"</dd>` : ''}
       <dt>Wind (lift hours)</dt><dd>${compass(d.dir)} ${Math.round(d.wind)} mph, gusts ${Math.round(d.gust)}</dd>
+      <dt>Feels like</dt><dd>${Math.round(d.feelsLo)}° to ${Math.round(d.feelsHi)}°F</dd>
+      <dt>Humidity (lift hours)</dt><dd>${Math.round(d.rh)}%</dd>
       <dt>Cloud cover</dt><dd>${Math.round(d.cloud)}%</dd>
       ${d.snowLevel != null ? `<dt>Snow level</dt><dd>${(Math.round(d.snowLevel / 100) * 100).toLocaleString()} ft</dd>` : ''}
     </dl>
     <p class="hint">${models}</p>
-    <div class="table-wrap"><table>
-      <tr><th>Time</th><th></th><th>Snow</th><th>Ratio</th><th>Temp</th><th>Wind</th><th>Gust</th><th>Cloud</th><th>Snow lvl</th></tr>
-      <tr class="sep"><td colspan="9">From 4 pm the day before</td></tr>${rows}
-    </table></div>
+    <div class="chart hourly">${hourlyChart(d.hours)}</div>
+    <details class="hour-table"><summary>Hourly table</summary>
+      <div class="table-wrap"><table>
+        <tr><th>Time</th><th></th><th>Snow</th><th>Ratio</th><th>Precip</th><th>Temp</th><th>Feels</th><th>Wind</th><th>Gust</th><th>RH</th><th>Cloud</th><th>Snow lvl</th></tr>
+        <tr class="sep"><td colspan="12">From 4 pm the day before</td></tr>${rows}
+      </table></div>
+    </details>
   </div>`;
 }
 
@@ -311,19 +590,171 @@ function heat(v) {
   return `style="background: rgba(95,179,255,${Math.min(0.85, 0.12 + v / 14).toFixed(2)})"`;
 }
 
+// ---------- precipitation by model (12-hour blocks) ----------
+
+const MODEL_COLORS = {
+  ncep_hrrr_conus: '#e11d48', ncep_nbm_conus: '#16a34a', ecmwf_ifs: '#2563eb', gfs_global: '#f59e0b',
+  gem_seamless: '#dc2626', icon_seamless: '#0891b2', ukmo_seamless: '#9333ea',
+  ecmwf_aifs025_single: '#64748b', ncep_aigfs025: '#a16207',
+};
+let stormTotals = false; // table shows running totals instead of per-block amounts
+let runTrend = null; // { resortId, elev, delta: { modelId: inches } } from the previous-runs API
+
+// Each ski day splits into two 12-hour blocks: night (4 pm–4 am) and day (4 am–4 pm).
+function blocks() {
+  return upcoming().flatMap((d) => [
+    { label: dayLabel(d.date, state.todayStr), part: 'Night', hours: d.hours.filter((h) => h.date !== d.date || h.hour < 4) },
+    { label: dayLabel(d.date, state.todayStr), part: 'Day', hours: d.hours.filter((h) => h.date === d.date && h.hour >= 4) },
+  ]).filter((b) => b.hours.length);
+}
+
+// Rain / mix / snow / heavy snow, from how much of the water fell as rain.
+function precipClass(snowIn, rainIn) {
+  if (snowIn < 0.05 && rainIn < 0.01) return '';
+  const rainShare = rainIn / (rainIn + snowIn / 10);
+  if (rainShare > 0.7) return 'p-rain';
+  if (rainShare > 0.25) return 'p-mix';
+  return snowIn >= 6 ? 'p-heavy' : 'p-snow';
+}
+
 function renderModels() {
-  const fut = upcoming();
-  const head = `<tr><th class="name">Model</th>${fut.map((d) => `<th>${dayLabel(d.date, state.todayStr).short}<br>${d.date.slice(5).replace('-', '/')}</th>`).join('')}<th>Total</th></tr>`;
-  const row = (name, note, vals, cls = '') => {
-    const known = vals.filter((v) => v != null);
-    return `<tr class="${cls}"><td class="name">${name}${note ? `<br><small class="muted">${note}</small>` : ''}</td>${vals.map((v) => `<td class="heat" ${heat(v)}>${v == null ? '' : fmtIn(v)}</td>`).join('')}<td><b>${fmtIn(sum(known))}</b></td></tr>`;
+  const bl = blocks();
+  const head = `<tr><th class="name">Model</th>${bl.map((b) => `<th>${b.label.short}<br><small>${b.part === 'Night' ? 'night' : 'day'}</small></th>`).join('')}<th>Total</th><th title="Change in each model's next-7-day snow since its run 24 hours earlier">vs. yesterday</th></tr>`;
+  const row = (name, note, cells, cls, trend) => {
+    let run = 0;
+    const tds = cells.map((c) => {
+      if (!c) return '<td></td>';
+      run += c.snow;
+      const v = stormTotals ? run : c.snow;
+      return `<td class="pcell ${precipClass(c.snow, c.rain)}" title="${fmtIn(c.snow)} snow, ${c.rain.toFixed(2)}&quot; rain">${v >= 0.05 ? v.toFixed(1) : c.rain >= 0.01 ? '0' : ''}</td>`;
+    }).join('');
+    const total = sum(cells.filter(Boolean).map((c) => c.snow));
+    const t = trend == null ? '' : `<span class="${trend >= 0.5 ? 'up' : trend <= -0.5 ? 'down' : 'muted'}">${trend > 0 ? '+' : ''}${trend.toFixed(1)}"</span>`;
+    return `<tr class="${cls}"><td class="name">${name}${note ? `<br><small class="muted">${note}</small>` : ''}</td>${tds}<td><b>${fmtIn(total)}</b></td><td>${t}</td></tr>`;
   };
+  const blendCells = bl.map((b) => ({ snow: sum(b.hours.map((h) => h.snow)), rain: mmToIn(sum(b.hours.map((h) => h.rain))) }));
+  const modelCells = (id) => bl.map((b) => {
+    const hs = b.hours.filter((h) => h.perModel[id] != null);
+    return hs.length >= 6 ? { snow: sum(hs.map((h) => h.perModel[id])), rain: sum(hs.map((h) => h.perRain?.[id] ?? 0)) } : null;
+  });
+  const trend = runTrend?.resortId === state.resortId && runTrend.elev === state.elev ? runTrend.delta : {};
   const rows = [
-    row('Blend', 'weighted', fut.map((d) => d.snow), 'blend'),
-    row('Ensemble median', '82 runs', fut.map((d) => d.range?.p50 ?? null)),
-    ...MODELS.map((m) => row(m.name, m.note, fut.map((d) => d.perModel[m.id] ?? null))),
+    row('Blend', 'weighted', blendCells, 'blend', null),
+    ...MODELS.map((m) => row(`<i class="mdot" style="background:${MODEL_COLORS[m.id]}"></i>${m.name}`, m.note, modelCells(m.id), m.ref ? 'ref' : '', trend[m.id] ?? null)),
   ];
-  $('models').innerHTML = `<table>${head}${rows.join('')}</table>`;
+  $('models').innerHTML = `<table class="ptable">${head}${rows.join('')}</table>`;
+}
+
+// How each model's next-7-day snow changed since its run 24 hours earlier. The
+// previous-runs API reports raw model snowfall, so the change is scaled into our
+// calibrated inches using each model's current calibrated/raw ratio.
+async function loadRunTrend() {
+  if (!$('modelsCard').open) return;
+  const r = resort(), elev = state.elev;
+  if (runTrend?.resortId === r.id && runTrend.elev === elev) return;
+  const ids = MODELS.map((m) => m.id);
+  const q = new URLSearchParams({
+    latitude: r.lat, longitude: r.lon, elevation: r.elevations[elev], hourly: 'snowfall,snowfall_previous_day1',
+    models: ids.join(','), forecast_days: 7, timezone: r.tz,
+  });
+  try {
+    const data = await (await fetch(`https://previous-runs-api.open-meteo.com/v1/forecast?${q}`)).json();
+    const h = data.hourly, now = nowLocalHour(r.tz);
+    const ours = Object.fromEntries(upcoming().flatMap((d) => d.hours).map((x) => [x.time, x]));
+    const delta = {};
+    for (const id of ids) {
+      const cur = h[`snowfall_${id}`], prev = h[`snowfall_previous_day1_${id}`];
+      if (!cur || !prev) continue;
+      let curRaw = 0, prevRaw = 0, ourTotal = 0, n = 0;
+      h.time.forEach((t, i) => {
+        if (t < now || cur[i] == null || prev[i] == null) return;
+        curRaw += cur[i]; prevRaw += prev[i]; ourTotal += ours[t]?.perModel[id] ?? 0; n++;
+      });
+      if (n < 24) continue;
+      // Raw cm → our inches: use this model's own ratio when it has snow, else Open-Meteo's 7:1 → ~10:1.
+      const f = curRaw >= 0.5 ? ourTotal / curRaw : (10 / 7) / 2.54;
+      delta[id] = ourTotal - prevRaw * f;
+    }
+    if (r.id !== state.resortId) return;
+    runTrend = { resortId: r.id, elev, delta };
+    renderModels();
+  } catch (e) { console.warn('Previous runs unavailable', e); }
+}
+
+// ---------- forecast range (cumulative snowfall by model) ----------
+
+function renderRange() {
+  const up = upcoming().slice(0, 15);
+  if (!up.length) { $('range').innerHTML = ''; return; }
+  const W = 720, H = 240, padL = 34, padR = 12, top = 14, bottom = 30;
+  const x = (i) => padL + ((W - padL - padR) * (i + 1)) / up.length;
+  const cum = (vals) => { let t = 0; return vals.map((v) => (v == null ? null : (t += v))); };
+  const blend = cum(up.map((d) => d.snow));
+  const lines = MODELS.map((m) => {
+    const vals = [];
+    for (const d of up) { if (d.perModel[m.id] == null) break; vals.push(d.perModel[m.id]); }
+    return { m, pts: cum(vals) };
+  }).filter((l) => l.pts.length);
+  // Likely range of the running total, from ensemble members that cover every day so far.
+  const band = up.map((d, i) => {
+    const days = up.slice(0, i + 1).map((x) => state.ens[x.date] || {});
+    const keys = Object.keys(days[0]).filter((k) => days.every((e) => k in e));
+    return scaledRangeOf(blend[i], Object.fromEntries(keys.map((k) => [k, sum(days.map((e) => e[k]))])));
+  });
+  const top_ = Math.max(4, ...blend, ...lines.flatMap((l) => l.pts), ...band.map((b) => b?.hi ?? 0));
+  const step = top_ > 48 ? 12 : top_ > 24 ? 6 : top_ > 12 ? 4 : 2;
+  const yMax = Math.ceil(top_ / step) * step;
+  const y = (v) => top + (H - top - bottom) * (1 - v / yMax);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cumulative snowfall by model">`;
+  for (let v = 0; v <= yMax; v += step) s += `<line class="grid" x1="${padL}" x2="${W - padR}" y1="${y(v)}" y2="${y(v)}"/><text x="${padL - 6}" y="${y(v) + 4}" text-anchor="end">${v}"</text>`;
+  up.forEach((d, i) => { if (i % 2 === 0) s += `<text x="${x(i)}" y="${H - 12}" text-anchor="middle">${dayLabel(d.date, state.todayStr).short}</text>`; });
+  const pts = band.map((b, i) => (b ? [x(i), b] : null)).filter(Boolean);
+  if (pts.length > 1) s += `<path class="rng-band" d="M${pts.map(([px, b]) => `${px},${y(b.hi)}`).join('L')}L${pts.slice().reverse().map(([px, b]) => `${px},${y(b.lo)}`).join('L')}Z"/>`;
+  const path = (vals) => vals.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('');
+  for (const l of lines) s += `<path class="m-line ${l.m.ref ? 'ref' : ''}" style="stroke:${MODEL_COLORS[l.m.id]}" d="${path(l.pts)}"><title>${l.m.name}: ${fmtIn(l.pts.at(-1))}</title></path>`;
+  s += `<path class="blend-line" d="${path(blend)}"/>`;
+  // Legend under the chart, biggest total first.
+  const legend = [{ name: 'Blend', v: blend.at(-1), cls: 'blend' }, ...lines.map((l) => ({ name: l.m.name, v: l.pts.at(-1), color: MODEL_COLORS[l.m.id], ref: l.m.ref }))]
+    .sort((a, b) => b.v - a.v)
+    .map((l) => `<span class="${l.ref ? 'muted' : ''}"><i class="mline ${l.cls || ''} ${l.ref ? 'ref' : ''}" ${l.color ? `style="border-color:${l.color}"` : ''}></i>${l.name} <b>${fmtIn(l.v)}</b></span>`).join('');
+  $('range').innerHTML = s + `</svg><div class="q-legend range-legend">${legend}</div>`;
+}
+
+// scaledRange (core.js) for any total and its members.
+const scaledRangeOf = (total, members) => (Object.keys(members).length >= 10 ? scaledRange(total, members) : null);
+
+// ---------- webcams ----------
+
+function renderCams() {
+  const cams = CAMS[state.resortId];
+  $('camsCard').hidden = !cams;
+  if (!cams) return;
+  const t = Math.floor(Date.now() / 300e3); // new image every 5 minutes, cached in between
+  $('cams').innerHTML = cams.map((c) => `<a class="cam" href="${c.live}" target="_blank" rel="noopener">
+      <img src="${c.img}?t=${t}" alt="${c.name} webcam" loading="lazy"><span>${c.name}</span></a>`).join('');
+}
+
+// ---------- right now ----------
+
+function renderRightNow() {
+  const now = nowLocalHour(resort().tz);
+  const h = state.days.flatMap((d) => d.hours).find((x) => x.time === now);
+  const st = currentStation();
+  if (!h) { $('rightNow').innerHTML = '<p class="hint">Loading…</p>'; return; }
+  const sky = h.snow >= 0.05 ? 'Snowing' : h.rain >= 0.1 ? 'Rain' : h.cloud < 20 ? 'Clear' : h.cloud < 45 ? 'Mostly sunny' : h.cloud < 75 ? 'Partly cloudy' : 'Cloudy';
+  $('rightNow').innerHTML = `<div class="rn-main">
+      <span class="rn-icon">${icon({ snow: h.snow * 6, rainIn: mmToIn(h.rain) * 6, cloud: h.cloud })}</span>
+      <span class="rn-temp">${Math.round(h.tempF)}°</span>
+      <span class="rn-desc"><b>${sky}</b><br><span class="muted">Feels like ${Math.round(h.feelsF)}°</span></span>
+    </div>
+    <dl class="rn-list">
+      <dt>Wind</dt><dd>${compass(h.dir)} ${Math.round(h.wind)} mph, gusts ${Math.round(h.gust)}</dd>
+      <dt>Humidity</dt><dd>${Math.round(h.rh)}%</dd>
+      ${h.freezeFt ? `<dt>Snow level</dt><dd>${(Math.round((h.freezeFt - 1000) / 100) * 100).toLocaleString()} ft</dd>` : ''}
+      ${h.pop != null ? `<dt>Precip chance</dt><dd>${h.pop}% this hour</dd>` : ''}
+      ${st?.tempF != null ? `<dt>Measured</dt><dd>${Math.round(st.tempF)}°F at ${st.station}</dd>` : ''}
+    </dl>
+    <p class="hint">Model blend at ${ftLabel(resort().elevations[state.elev])} for ${new Date(`${now}:00`).toLocaleTimeString('en-US', { hour: 'numeric' })}.</p>`;
 }
 
 function renderCalibration() {
@@ -352,8 +783,12 @@ function renderCalibration() {
 function renderResort() {
   renderBanner();
   renderSnowSummary();
+  renderRightNow();
+  renderSnowReport();
   renderDays();
+  renderHourly();
   renderChart();
+  renderRange();
   renderModels();
 }
 
@@ -417,16 +852,32 @@ async function loadCalibration() {
   catch (e) { console.warn('No calibration file', e); }
 }
 
-async function loadObserved() {
+async function loadStation() {
   const r = resort();
-  state.observed = null;
+  state.station = null;
   try {
-    const o = await recentObserved(r);
-    if (o && r.id === state.resortId) {
-      state.observed = { ...o, id: r.id };
-      if (state.days.length) renderSnowSummary();
-    }
-  } catch (e) { console.warn('No recent station data', e); }
+    const st = await stationReport(r);
+    if (r.id !== state.resortId) return;
+    state.station = st && { ...st, id: r.id };
+    renderSnowReport();
+    renderRightNow();
+    if (state.days.length) renderSnowSummary();
+  } catch (e) { console.warn('No station data', e); }
+}
+
+async function loadReports() {
+  try { state.reports = await (await fetch('data/reports.json', { cache: 'no-cache' })).json(); }
+  catch (e) { console.warn('No resort reports', e); }
+}
+
+// Everything about the current resort that isn't the model forecast.
+function loadResortExtras() {
+  renderCams();
+  loadHistory(resort());
+  loadStation();
+  loadAvalanche();
+  showTrailMap();
+  loadRunTrend();
 }
 
 // Draw the last saved forecast for the current resort, if any (no network).
@@ -488,8 +939,7 @@ function switchResort(id) {
   applyView();
   window.scrollTo(0, 0);
   load();
-  loadHistory(resort());
-  loadObserved();
+  loadResortExtras();
 }
 
 $('resortSel').addEventListener('change', (e) => switchResort(e.target.value));
@@ -512,6 +962,7 @@ $('elevSeg').addEventListener('click', (e) => {
   if (!k) return;
   state.elev = k;
   store.set('elev', k);
+  loadRunTrend();
   if (state.view === 'favorites') loadFavView(); else load();
 });
 $('refresh').addEventListener('click', load);
@@ -520,17 +971,39 @@ $('refresh').addEventListener('click', load);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState !== 'visible') return;
   if (state.view === 'favorites') loadFavView();
-  else if (!state.fetchedAt || Date.now() - state.fetchedAt > STALE_MS) { load(); loadObserved(); }
+  else if (!state.fetchedAt || Date.now() - state.fetchedAt > STALE_MS) { load(); loadStation(); }
 });
 setInterval(renderStatus, 60e3);
 
 applyView();
+// Theme: Auto follows the phone's light/dark setting; the button cycles Auto → Light → Dark.
+const THEMES = { auto: '◐ Auto', light: '☀︎ Light', dark: '☾ Dark' };
+let theme = store.get('theme') || 'auto';
+function applyTheme() {
+  if (theme === 'auto') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = theme;
+  $('themeBtn').textContent = THEMES[theme];
+  const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+  document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {
+    if (theme === 'auto') m.content = m.media.includes('dark') ? '#0e0e10' : '#f2f4f7';
+    else m.content = bg;
+  });
+}
+$('themeBtn').addEventListener('click', () => {
+  const keys = Object.keys(THEMES);
+  theme = keys[(keys.indexOf(theme) + 1) % keys.length];
+  store.set('theme', theme);
+  applyTheme();
+});
+$('mapCard').addEventListener('toggle', showTrailMap);
+$('modelsCard').addEventListener('toggle', loadRunTrend);
+$('stormToggle').addEventListener('change', (e) => { stormTotals = e.target.checked; renderModels(); });
+applyTheme();
+
 // Saved forecast first so the app opens instantly; calibration and fresh data follow.
 if (state.view === 'resort') showSaved();
 loadCalibration().then(() => (state.view === 'favorites' ? loadFavView() : load({ redraw: false })));
-if (state.view === 'resort') {
-  loadHistory(resort());
-  loadObserved();
-}
+loadReports().then(() => { if (state.view === 'resort') { renderSnowReport(); if (state.days.length) renderSnowSummary(); } });
+if (state.view === 'resort') loadResortExtras();
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
