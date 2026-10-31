@@ -18,9 +18,11 @@ const MODELS = [
   { id: 'icon_seamless', name: 'ICON', note: '13 km · 7 days', weight: () => 1 },
   { id: 'ukmo_seamless', name: 'UKMO', note: '10 km · 7 days', weight: () => 1 },
   // AI models: shown for reference but left out of the blend, because adding them
-  // made backtested errors slightly worse (AIFS since Feb 2025, AIGFS since Jan 2026).
+  // didn't improve backtested errors (AIFS since Feb 2025, AIGFS since Jan 2026).
+  // AIGFS is hidden at Whistler: it has too little history to calibrate, and there it
+  // runs ~2x wetter than the corrected models. Retest after the 2026–27 winter.
   { id: 'ecmwf_aifs025_single', name: 'ECMWF AI', note: 'AIFS · reference only', weight: () => 0, ref: true },
-  { id: 'ncep_aigfs025', name: 'NOAA AI', note: 'AIGFS · reference only', weight: () => 0, ref: true },
+  { id: 'ncep_aigfs025', name: 'NOAA AI', note: 'AIGFS · reference only', weight: () => 0, ref: true, hideAt: ['whistler'] },
 ];
 
 // Ensemble members borrow the calibration of their parent model.
@@ -96,7 +98,7 @@ function fetchDeterministic(resort, elevM, lean = false) {
   const q = new URLSearchParams({
     latitude: resort.lat, longitude: resort.lon, elevation: elevM,
     hourly: (lean ? LEAN_VARS : HOURLY_VARS).join(','),
-    models: MODELS.filter((m) => !lean || !m.ref).map((m) => m.id).join(','),
+    models: MODELS.filter((m) => (!lean || !m.ref) && !m.hideAt?.includes(resort.id)).map((m) => m.id).join(','),
     forecast_days: lean ? 8 : FORECAST_DAYS, past_days: lean ? 1 : PAST_DAYS, timezone: resort.tz, wind_speed_unit: 'mph',
   });
   return fetchJSON(`https://api.open-meteo.com/v1/forecast?${q}`);

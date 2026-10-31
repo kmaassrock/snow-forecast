@@ -132,7 +132,7 @@
     <details class="card fold resort-only method" data-tab="models">
       <summary><h2>How this forecast is built</h2></summary>
       <ul>
-        <li><b>Models:</b> HRRR (3 km, 0–48 h), NBM (2.5 km, ~11 days), ECMWF IFS (9 km, ~15 days), GFS, Canadian GEM, DWD ICON and UK Met Office. Each hour is a weighted average of the models that reach that far out. ECMWF AIFS and NOAA AIGFS are shown for reference only.</li>
+        <li><b>Models:</b> HRRR (3 km, 0–48 h), NBM (2.5 km, ~11 days), ECMWF IFS (9 km, ~15 days), GFS, Canadian GEM, DWD ICON and UK Met Office. Each hour is a weighted average of the models that reach that far out. ECMWF's and NOAA's AI models (AIFS, AIGFS) are shown for reference only; AIGFS is hidden at Whistler.</li>
         <li><b>Calibration:</b> each model's archived forecasts were checked against what the nearest snow station measured over the last three winters. Each model gets a correction for how much it typically under- or over-forecasts there, and a weight based on how well it tracked real storms. Resorts without a station borrow the nearest calibrated resort's numbers.</li>
         <li><b>Snow ratio:</b> snow water is turned into inches of snow using a temperature-based ratio (Kuchera method), reduced for strong winds.</li>
         <li><b>Range:</b> 82 ensemble runs (GFS + ECMWF ensembles) give the 10th–90th percentile spread, scaled to the blend.</li>
@@ -169,6 +169,7 @@
 
   <script src="resorts.js?v=__V__"></script>
   <script src="cams.js?v=__V__"></script>
+  <script src="passes.js?v=__V__"></script>
   <script src="core.js?v=__V__"></script>
   <script src="history.js?v=__V__"></script>
   <script src="app.js?v=__V__"></script>

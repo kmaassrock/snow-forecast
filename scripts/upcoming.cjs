@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // Writes data/upcoming.json: for every resort, the next 7 days of snow (lean
-// model blend at mid-mountain) and snow measured in the last 48 hours (the
-// resort's own report when available, otherwise its SNOTEL station). Powers
-// the "Upcoming Snow" ranking and the 48-hour number on favorite cards.
+// model blend at mid-mountain), snow measured in the last 48 hours, and the
+// season so far (the resort's own report when available, otherwise its SNOTEL
+// station). Powers the Upcoming Snow page, snow map, season leaderboard and the
+// 48-hour number on favorite cards.
 // Runs on each deploy, after scripts/reports.cjs.
 //
 //   node scripts/upcoming.cjs
@@ -39,6 +40,32 @@ async function stationSnow() {
   return out;
 }
 
+// Season so far at every station, in one request: new snow (sum of daily depth
+// gains since Oct 1), current depth, and snow water vs. the 1991–2020 median.
+async function stationSeason() {
+  const ids = [...new Set(RESORTS.map((r) => r.stations[0]).filter((s) => s?.source === 'snotel').map((s) => s.id))];
+  const day = (ms) => new Date(ms).toISOString().slice(0, 10);
+  const now = new Date();
+  const seasonStart = `${now.getUTCMonth() >= 7 ? now.getUTCFullYear() : now.getUTCFullYear() - 1}-09-30`;
+  const q = new URLSearchParams({ stationTriplets: ids.join(','), elements: 'SNWD,WTEQ', duration: 'DAILY', beginDate: seasonStart, endDate: day(Date.now()), centralTendencyType: 'MEDIAN' });
+  const r = await fetch(`https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1/data?${q}`);
+  if (!r.ok) throw new Error(`SNOTEL ${r.status}`);
+  const out = {};
+  for (const st of await r.json()) {
+    const el = (code) => (st.data || []).find((e) => e.stationElement.elementCode === code)?.values.filter((v) => v.value != null) || [];
+    const depth = el('SNWD'), swe = el('WTEQ');
+    let season = 0;
+    // Daily values are end-of-day; jitter under 1" and jumps over 36" are ignored.
+    for (let i = 1; i < depth.length; i++) { const g = depth[i].value - depth[i - 1].value; if (g >= 1 && g <= 36) season += g; }
+    const last = swe.at(-1);
+    out[st.stationTriplet] = {
+      season, depth: depth.at(-1)?.value ?? null,
+      pctNormal: last?.median > 0.1 ? Math.round((100 * last.value) / last.median) : null,
+    };
+  }
+  return out;
+}
+
 async function inBatches(items, size, fn) {
   const results = [];
   for (let i = 0; i < items.length; i += size) results.push(...(await Promise.all(items.slice(i, i + size).map(fn))));
@@ -48,7 +75,10 @@ async function inBatches(items, size, fn) {
 (async () => {
   const calibration = readJSON('calibration.json')?.resorts || {};
   const reports = readJSON('reports.json')?.resorts || {};
-  const stations = await stationSnow().catch((e) => { console.error(e.message); return {}; });
+  const [stations, seasons] = await Promise.all([
+    stationSnow().catch((e) => { console.error(e.message); return {}; }),
+    stationSeason().catch((e) => { console.error(e.message); return {}; }),
+  ]);
   const out = { generated: new Date().toISOString(), resorts: {} };
 
   await inBatches(RESORTS, 4, async (r) => {
@@ -56,6 +86,12 @@ async function inBatches(items, size, fn) {
     const rep = reports[r.id], st = r.stations[0];
     if (rep?.new48 != null) entry.recent48 = { inches: rep.new48, source: 'resort report' };
     else if (st && st.id in stations) entry.recent48 = { inches: r1(stations[st.id]), source: `${st.name} station` };
+    const ss = st && seasons[st.id];
+    if (rep?.season != null) entry.season = { inches: rep.season, source: 'resort report' };
+    else if (ss) entry.season = { inches: r1(ss.season), source: `${st.name} station` };
+    if (rep?.baseDepth != null) entry.depth = { inches: rep.baseDepth, source: 'resort report' };
+    else if (ss?.depth != null) entry.depth = { inches: ss.depth, source: `${st.name} station` };
+    if (ss?.pctNormal != null) entry.pctNormal = ss.pctNormal;
     try {
       const f = await getForecast(r, r.elevations.mid, calibration[r.id], { ensemble: false, lean: true });
       const ti = f.days.findIndex((d) => d.date === f.todayStr);
