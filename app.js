@@ -58,6 +58,7 @@ const state = {
   view: hash === 'favorites' ? 'favorites' : 'resort',
   resortId: hash && hash !== 'favorites' ? hash : DEFAULT_RESORT,
   elev: store.get('elev') || 'mid',
+  tab: store.get('tab') || 'summary',
   favorites: loadFavorites(),
   calibration: null,
   days: [], ens: {}, todayStr: '', selected: null,
@@ -338,38 +339,109 @@ function renderSnowReport() {
 
 // ---------- hourly charts ----------
 
-// Snowfall bars with a temperature line on top, wind and gusts below.
+// Three stacked panels sharing one time axis (snow, temperature, wind), each with
+// its own scale and units. Hover or tap shows the exact values for that hour.
+const hourlyData = new Map(); // chart id -> { hours, padL, step }
+let hourlySeq = 0;
+
 function hourlyChart(hours) {
   if (!hours.length) return '';
-  const W = Math.max(640, hours.length * 9), padL = 34, padR = 38, top = 18, h1 = 120, gap = 30, h2 = 64;
-  const H = top + h1 + gap + h2 + 30;
-  const n = hours.length, step = (W - padL - padR) / n;
+  const id = `hc${++hourlySeq}`;
+  for (const k of hourlyData.keys()) if (!document.querySelector(`[data-chart="${k}"]`)) hourlyData.delete(k);
+  const W = 720, padL = 46, padR = 10, n = hours.length, step = (W - padL - padR) / n;
+  hourlyData.set(id, { hours, padL, step });
   const x = (i) => padL + step * (i + 0.5);
-  const snowMax = Math.max(0.3, ...hours.map((h) => h.snow));
+  const P = { snow: { y: 48, h: 80 }, temp: { y: 158, h: 76 }, wind: { y: 264, h: 54 } };
+  const H = P.wind.y + P.wind.h + 26;
+  const nice = (v, steps) => steps.find((s) => s >= v) ?? Math.ceil(v);
+  const snowMax = nice(Math.max(...hours.map((h) => h.snow)), [0.1, 0.2, 0.3, 0.5, 0.75, 1, 1.5, 2, 3]);
   const temps = hours.map((h) => h.tempF);
-  const tMin = Math.floor(Math.min(...temps) / 5) * 5 - 5, tMax = Math.ceil(Math.max(...temps) / 5) * 5 + 5;
-  const ys = (v) => top + h1 * (1 - v / snowMax);
-  const yt = (v) => top + h1 * (1 - (v - tMin) / (tMax - tMin));
-  const wMax = Math.max(20, ...hours.map((h) => h.gust));
-  const yw = (v) => top + h1 + gap + h2 * (1 - v / wMax);
+  let tLo = Math.floor(Math.min(...temps) / 10) * 10, tHi = Math.ceil(Math.max(...temps) / 10) * 10;
+  if (tHi - tLo < 20) tHi = tLo + 20;
+  const wMax = Math.ceil(Math.max(10, ...hours.map((h) => h.gust)) / 10) * 10;
+  const ys = (v) => P.snow.y + P.snow.h * (1 - v / snowMax);
+  const yt = (v) => P.temp.y + P.temp.h * (1 - (v - tLo) / (tHi - tLo));
+  const yw = (v) => P.wind.y + P.wind.h * (1 - v / wMax);
+  const left = x(0) - step / 2, right = x(n - 1) + step / 2;
+  const hourLbl = (hr) => (hr === 0 ? '12a' : hr === 12 ? '12p' : hr < 12 ? `${hr}a` : `${hr - 12}p`);
+
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Hourly snowfall, temperature and wind">`;
+  // Lift hours, shaded behind all three panels.
   hours.forEach((h, i) => {
-    if (h.hour >= LIFTS_OPEN && h.hour < LIFTS_CLOSE) s += `<rect class="lift-hrs" x="${x(i) - step / 2}" y="${top}" width="${step}" height="${h1 + gap + h2}"/>`;
-    if (h.hour === 0 && i > 0) s += `<line class="grid" x1="${x(i) - step / 2}" x2="${x(i) - step / 2}" y1="${top - 6}" y2="${top + h1 + gap + h2}"/>`;
-    if (h.hour === 0 || i === 0) s += `<text class="day-lbl" x="${x(i) - step / 2 + 4}" y="${top - 6}">${dayLabel(h.date, state.todayStr).long}</text>`;
-    if (h.snow >= 0.02) s += `<rect class="hr-snow" x="${x(i) - step * 0.4}" y="${ys(h.snow)}" width="${step * 0.8}" height="${ys(0) - ys(h.snow)}"><title>${h.time.slice(11)} ${h.snow.toFixed(2)}"</title></rect>`;
-    if (h.hour % 6 === 0) s += `<text x="${x(i)}" y="${H - 8}" text-anchor="middle">${h.hour === 0 ? '12a' : h.hour === 12 ? '12p' : h.hour < 12 ? `${h.hour}a` : `${h.hour - 12}p`}</text>`;
+    if (h.hour >= LIFTS_OPEN && h.hour < LIFTS_CLOSE) s += `<rect class="lift-hrs" x="${x(i) - step / 2}" y="${P.snow.y}" width="${step}" height="${P.wind.y + P.wind.h - P.snow.y}"/>`;
   });
-  if (tMin < 32 && tMax > 32) s += `<line class="freeze" x1="${padL}" x2="${W - padR}" y1="${yt(32)}" y2="${yt(32)}"/><text class="freeze-lbl" x="${W - padR + 4}" y="${yt(32) + 4}">32°</text>`;
+  // Day columns: separator line and a header with that day's snow total.
+  const starts = hours.map((h, i) => (i === 0 || h.hour === 0 ? i : -1)).filter((i) => i >= 0);
+  starts.forEach((a, k) => {
+    const b = (starts[k + 1] ?? n) - 1;
+    const dayHours = hours.slice(a, b + 1);
+    const total = sum(dayHours.map((h) => h.snow));
+    const x0 = x(a) - step / 2, x1 = x(b) + step / 2;
+    if (a > 0) s += `<line class="day-sep" x1="${x0}" x2="${x0}" y1="6" y2="${P.wind.y + P.wind.h}"/>`;
+    if (x1 - x0 > 60) {
+      s += `<text class="day-lbl" x="${(x0 + x1) / 2}" y="16" text-anchor="middle">${dayLabel(hours[a].date, state.todayStr).long}</text>`;
+      s += `<text class="day-tot ${total >= 0.1 ? 'has' : ''}" x="${(x0 + x1) / 2}" y="31" text-anchor="middle">${total >= 0.1 ? `❄ ${fmtIn(total)}` : 'no snow'}</text>`;
+    }
+  });
+  // Panel titles and scales.
+  const panel = (p, title, ticks, y, fmt) => {
+    s += `<text class="panel-title" x="${padL}" y="${p.y - 6}">${title}</text>`;
+    for (const v of ticks) s += `<line class="grid" x1="${left}" x2="${right}" y1="${y(v)}" y2="${y(v)}"/><text class="axis" x="${padL - 6}" y="${y(v) + 4}" text-anchor="end">${fmt(v)}</text>`;
+  };
+  panel(P.snow, 'Snow per hour', [0, snowMax / 2, snowMax], ys, (v) => (v ? `${+v.toFixed(2)}"` : '0'));
+  panel(P.temp, 'Temperature', [tLo, (tLo + tHi) / 2, tHi], yt, (v) => `${Math.round(v)}°`);
+  panel(P.wind, 'Wind', [0, wMax / 2, wMax], yw, (v) => `${v}`);
+  // Snow bars.
+  hours.forEach((h, i) => {
+    if (h.snow >= 0.01) s += `<rect class="hr-snow" x="${x(i) - step * 0.42}" y="${ys(h.snow)}" width="${step * 0.84}" height="${ys(0) - ys(h.snow)}"/>`;
+  });
+  // Temperature, with the freezing line labeled.
+  if (tLo < 32 && tHi > 32) s += `<line class="freeze" x1="${left}" x2="${right}" y1="${yt(32)}" y2="${yt(32)}"/><text class="freeze-lbl" x="${right - 2}" y="${yt(32) - 4}" text-anchor="end">32° freezing</text>`;
   const path = (vals, y) => vals.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('');
   s += `<path class="hr-temp" d="${path(temps, yt)}"/>`;
+  // Wind and gusts.
   s += `<path class="hr-gust" d="${path(hours.map((h) => h.gust), yw)}"/><path class="hr-wind" d="${path(hours.map((h) => h.wind), yw)}"/>`;
-  s += `<text x="${padL - 6}" y="${top + 8}" text-anchor="end">${snowMax.toFixed(1)}"</text><text x="${padL - 6}" y="${top + h1}" text-anchor="end">0</text>`;
-  s += `<text x="${W - padR + 4}" y="${yt(tMax) + 8}">${tMax}°</text><text x="${W - padR + 4}" y="${yt(tMin)}">${tMin}°</text>`;
-  s += `<text x="${padL - 6}" y="${yw(wMax) + 8}" text-anchor="end">${Math.round(wMax)}</text><text x="${padL - 6}" y="${yw(0)}" text-anchor="end">0</text>`;
-  s += `<text class="day-lbl" x="${padL}" y="${top + h1 + gap - 8}">Wind &amp; gusts (mph)</text>`;
-  return s + '</svg>';
+  s += `<text class="panel-note" x="${right}" y="${P.wind.y - 6}" text-anchor="end">mph · solid = wind, dashed = gusts</text>`;
+  // Time axis.
+  hours.forEach((h, i) => { if (h.hour % 6 === 0) s += `<text class="axis" x="${x(i)}" y="${H - 8}" text-anchor="middle">${hourLbl(h.hour)}</text>`; });
+  s += `<line class="hc-cursor" x1="0" x2="0" y1="${P.snow.y - 4}" y2="${P.wind.y + P.wind.h}"/>`;
+  return `<div class="hourly-chart" data-chart="${id}"><div class="hc-scroll">${s}</svg></div><div class="hc-tip" hidden></div>
+    <p class="legend"><i class="sw sw-snow"></i>Snow <i class="sw sw-temp"></i>Temperature <i class="sw sw-wind"></i>Wind
+      <i class="sw sw-gust"></i>Gusts <i class="sw sw-lift"></i>Lifts open (9a–4p)</p></div>`;
 }
+
+// Hover (desktop) or tap (phone) a chart to see that hour's numbers.
+function onHourlyPointer(e) {
+  const wrap = e.target.closest?.('.hourly-chart');
+  document.querySelectorAll('.hourly-chart').forEach((c) => {
+    if (c === wrap) return;
+    c.querySelector('.hc-tip').hidden = true;
+    c.querySelector('.hc-cursor')?.classList.remove('on');
+  });
+  if (!wrap) return;
+  const data = hourlyData.get(wrap.dataset.chart);
+  const svg = wrap.querySelector('svg');
+  if (!data || !svg) return;
+  const pt = svg.createSVGPoint();
+  pt.x = e.clientX; pt.y = e.clientY;
+  const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+  const i = Math.floor((p.x - data.padL) / data.step);
+  const h = data.hours[i];
+  const tip = wrap.querySelector('.hc-tip'), cursor = wrap.querySelector('.hc-cursor');
+  if (!h) { tip.hidden = true; cursor.classList.remove('on'); return; }
+  const cx = data.padL + data.step * (i + 0.5);
+  cursor.setAttribute('x1', cx); cursor.setAttribute('x2', cx); cursor.classList.add('on');
+  const when = `${dayLabel(h.date, state.todayStr).short} ${new Date(`${h.time}:00`).toLocaleTimeString('en-US', { hour: 'numeric' })}`;
+  tip.innerHTML = `<b>${when}</b><br>Snow ${h.snow >= 0.01 ? `${h.snow.toFixed(2)}"` : 'none'}${h.pop != null ? ` · ${h.pop}% chance` : ''}<br>
+    ${Math.round(h.tempF)}°F, feels ${Math.round(h.feelsF)}°<br>Wind ${compass(h.dir)} ${Math.round(h.wind)}, gusts ${Math.round(h.gust)} mph`;
+  tip.hidden = false;
+  const box = wrap.getBoundingClientRect();
+  const left = Math.min(Math.max(8, e.clientX - box.left + 14), box.width - tip.offsetWidth - 8);
+  tip.style.left = `${left}px`;
+  tip.style.top = `${Math.max(0, e.clientY - box.top - tip.offsetHeight - 14)}px`;
+}
+document.addEventListener('pointermove', onHourlyPointer);
+document.addEventListener('pointerdown', onHourlyPointer);
 
 function renderHourly() {
   const now = nowLocalHour(resort().tz);
@@ -447,7 +519,7 @@ function loadLeaflet() {
 }
 
 async function showTrailMap() {
-  if (!$('mapCard').open) return;
+  if (state.view !== 'resort' || state.tab !== 'mountain') return; // Leaflet needs a visible map
   const r = resort();
   try {
     await loadLeaflet();
@@ -502,7 +574,7 @@ function dayDetail(d, lead) {
       ${d.snowLevel != null ? `<dt>Snow level</dt><dd>${(Math.round(d.snowLevel / 100) * 100).toLocaleString()} ft</dd>` : ''}
     </dl>
     <p class="hint">${models}</p>
-    <div class="chart hourly">${hourlyChart(d.hours)}</div>
+    ${hourlyChart(d.hours)}
     <details class="hour-table"><summary>Hourly table</summary>
       <div class="table-wrap"><table>
         <tr><th>Time</th><th></th><th>Snow</th><th>Ratio</th><th>Precip</th><th>Temp</th><th>Feels</th><th>Wind</th><th>Gust</th><th>RH</th><th>Cloud</th><th>Snow lvl</th></tr>
@@ -649,7 +721,7 @@ function renderModels() {
 // previous-runs API reports raw model snowfall, so the change is scaled into our
 // calibrated inches using each model's current calibrated/raw ratio.
 async function loadRunTrend() {
-  if (!$('modelsCard').open) return;
+  if (state.view !== 'resort' || state.tab !== 'models') return;
   const r = resort(), elev = state.elev;
   if (runTrend?.resortId === r.id && runTrend.elev === elev) return;
   const ids = MODELS.map((m) => m.id);
@@ -995,8 +1067,25 @@ $('themeBtn').addEventListener('click', () => {
   store.set('theme', theme);
   applyTheme();
 });
-$('mapCard').addEventListener('toggle', showTrailMap);
-$('modelsCard').addEventListener('toggle', loadRunTrend);
+// Tabs: Summary · Daily · Hourly · Models · History · Mountain (remembered per device).
+function applyTab() {
+  document.querySelectorAll('main [data-tab]').forEach((el) => el.classList.toggle('tab-off', el.dataset.tab !== state.tab));
+  document.querySelectorAll('#tabs button').forEach((b) => b.classList.toggle('on', b.dataset.tab === state.tab));
+  if (state.view !== 'resort') return;
+  if (state.tab === 'summary' && state.days.length) renderSnowSummary(); // strip needs to be visible to scroll
+  if (state.tab === 'mountain') showTrailMap();
+  if (state.tab === 'models') loadRunTrend();
+}
+$('tabs').addEventListener('click', (e) => {
+  const t = e.target.closest('button')?.dataset.tab;
+  if (!t || t === state.tab) return;
+  state.tab = t;
+  store.set('tab', t);
+  applyTab();
+  const top = $('tabs').getBoundingClientRect().top + window.scrollY;
+  if (window.scrollY > top) window.scrollTo({ top, behavior: 'smooth' });
+});
+applyTab();
 $('stormToggle').addEventListener('change', (e) => { stormTotals = e.target.checked; renderModels(); });
 applyTheme();
 
