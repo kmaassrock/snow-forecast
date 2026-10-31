@@ -1,7 +1,8 @@
 name: Deploy site
 
 # Publishes the site to GitHub Pages on every push, and every 3 hours rebuilds
-# data/summary.json (the forecast snapshot the iPhone widget reads).
+# the data snapshots: resort reports, the widget summary, and the Upcoming Snow
+# ranking (data/reports.json, summary.json, upcoming.json).
 on:
   push:
     branches: [main]
@@ -29,17 +30,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Read resort snow reports
+        run: node scripts/reports.cjs
+        continue-on-error: true
       - name: Build widget summary
         run: node scripts/summary.cjs
         env:
           WIDGET_RESORTS: ${{ vars.WIDGET_RESORTS }}
         # A forecast outage shouldn't block publishing; the widget keeps its last copy.
         continue-on-error: true
+      - name: Rank upcoming snow at every resort
+        run: node scripts/upcoming.cjs
+        continue-on-error: true
       # Stamp asset links with this commit so a browser never pairs a new page
       # with older cached scripts or styles.
-      - name: Read resort snow reports
-        run: node scripts/reports.cjs
-        continue-on-error: true
       - name: Version asset URLs
         run: sed -i "s/__V__/${GITHUB_SHA::7}/g" index.html widget.html
       - uses: actions/configure-pages@v5
