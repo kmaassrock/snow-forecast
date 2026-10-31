@@ -1,12 +1,12 @@
 {
-  "generated": "2026-10-27",
+  "generated": "2026-10-31",
   "resorts": {
     "bear-valley": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Blue Lakes"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.044,
@@ -57,6 +57,13 @@
           "maeMm": 7.2,
           "days": 725,
           "weight": 0.875
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 0.907,
+          "r": 0.856,
+          "maeMm": 6.8,
+          "days": 254,
+          "weight": 0.847
         }
       },
       "check": {
@@ -68,11 +75,11 @@
       }
     },
     "boreal": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Css Lab"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.219,
@@ -123,6 +130,13 @@
           "maeMm": 7.77,
           "days": 725,
           "weight": 0.905
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.434,
+          "r": 0.869,
+          "maeMm": 8.99,
+          "days": 254,
+          "weight": 0.808
         }
       },
       "check": {
@@ -134,11 +148,11 @@
       }
     },
     "donner-ski-ranch": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Css Lab"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.219,
@@ -189,6 +203,13 @@
           "maeMm": 7.77,
           "days": 725,
           "weight": 0.905
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.434,
+          "r": 0.869,
+          "maeMm": 8.99,
+          "days": 254,
+          "weight": 0.808
         }
       },
       "check": {
@@ -200,11 +221,11 @@
       }
     },
     "heavenly": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Heavenly Valley"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.507,
@@ -255,6 +276,13 @@
           "maeMm": 9.9,
           "days": 725,
           "weight": 0.657
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 0.762,
+          "r": 0.856,
+          "maeMm": 5.73,
+          "days": 254,
+          "weight": 0.842
         }
       },
       "check": {
@@ -266,11 +294,11 @@
       }
     },
     "homewood": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Ward Creek #3"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.529,
@@ -321,6 +349,13 @@
           "maeMm": 9.18,
           "days": 722,
           "weight": 0.907
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.464,
+          "r": 0.882,
+          "maeMm": 9.05,
+          "days": 253,
+          "weight": 0.864
         }
       },
       "check": {
@@ -332,11 +367,11 @@
       }
     },
     "kirkwood": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Carson Pass"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.11,
@@ -387,6 +422,13 @@
           "maeMm": 9.14,
           "days": 725,
           "weight": 0.79
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.029,
+          "r": 0.852,
+          "maeMm": 7.43,
+          "days": 254,
+          "weight": 0.811
         }
       },
       "check": {
@@ -398,11 +440,11 @@
       }
     },
     "northstar": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Truckee #2"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.145,
@@ -453,6 +495,13 @@
           "maeMm": 6.39,
           "days": 725,
           "weight": 0.891
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 0.806,
+          "r": 0.883,
+          "maeMm": 5.83,
+          "days": 254,
+          "weight": 0.868
         }
       },
       "check": {
@@ -464,11 +513,11 @@
       }
     },
     "palisades-tahoe-alpine-meadows": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Ward Creek #3"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.529,
@@ -519,6 +568,13 @@
           "maeMm": 9.18,
           "days": 722,
           "weight": 0.907
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.464,
+          "r": 0.882,
+          "maeMm": 9.05,
+          "days": 253,
+          "weight": 0.864
         }
       },
       "check": {
@@ -530,11 +586,11 @@
       }
     },
     "palisades-tahoe-olympic-valley": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Palisades Tahoe"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.279,
@@ -585,6 +641,13 @@
           "maeMm": 10.73,
           "days": 724,
           "weight": 0.885
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.396,
+          "r": 0.86,
+          "maeMm": 10.74,
+          "days": 254,
+          "weight": 0.863
         }
       },
       "check": {
@@ -596,11 +659,11 @@
       }
     },
     "sierra-at-tahoe": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Echo Peak"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.425,
@@ -651,6 +714,13 @@
           "maeMm": 8.56,
           "days": 723,
           "weight": 0.917
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.368,
+          "r": 0.867,
+          "maeMm": 8.7,
+          "days": 254,
+          "weight": 0.847
         }
       },
       "check": {
@@ -662,11 +732,11 @@
       }
     },
     "soda-springs": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Css Lab"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.219,
@@ -717,6 +787,13 @@
           "maeMm": 7.77,
           "days": 725,
           "weight": 0.905
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.434,
+          "r": 0.869,
+          "maeMm": 8.99,
+          "days": 254,
+          "weight": 0.808
         }
       },
       "check": {
@@ -728,11 +805,11 @@
       }
     },
     "sugar-bowl": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Css Lab"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.219,
@@ -783,6 +860,13 @@
           "maeMm": 7.77,
           "days": 725,
           "weight": 0.905
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.434,
+          "r": 0.869,
+          "maeMm": 8.99,
+          "days": 254,
+          "weight": 0.808
         }
       },
       "check": {
@@ -794,11 +878,11 @@
       }
     },
     "arapahoe-basin": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Grizzly Peak"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.372,
@@ -849,6 +933,13 @@
           "maeMm": 4.37,
           "days": 725,
           "weight": 0.788
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.797,
+          "r": 0.6,
+          "maeMm": 3.88,
+          "days": 254,
+          "weight": 0.712
         }
       },
       "check": {
@@ -860,11 +951,11 @@
       }
     },
     "aspen-highlands": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Chapman Tunnel"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.052,
@@ -915,6 +1006,13 @@
           "maeMm": 3.44,
           "days": 725,
           "weight": 0.898
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.249,
+          "r": 0.768,
+          "maeMm": 2.78,
+          "days": 254,
+          "weight": 0.926
         }
       },
       "check": {
@@ -926,11 +1024,11 @@
       }
     },
     "aspen-mountain": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Chapman Tunnel"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.052,
@@ -981,6 +1079,13 @@
           "maeMm": 3.44,
           "days": 725,
           "weight": 0.898
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.249,
+          "r": 0.768,
+          "maeMm": 2.78,
+          "days": 254,
+          "weight": 0.926
         }
       },
       "check": {
@@ -992,11 +1097,11 @@
       }
     },
     "beaver-creek": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Mccoy Park"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.587,
@@ -1047,6 +1152,13 @@
           "maeMm": 4,
           "days": 724,
           "weight": 0.93
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.284,
+          "r": 0.687,
+          "maeMm": 3.16,
+          "days": 253,
+          "weight": 0.756
         }
       },
       "check": {
@@ -1058,11 +1170,11 @@
       }
     },
     "breckenridge": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Copper Mountain"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.426,
@@ -1113,6 +1225,13 @@
           "maeMm": 4.11,
           "days": 725,
           "weight": 0.854
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.503,
+          "r": 0.611,
+          "maeMm": 3.48,
+          "days": 254,
+          "weight": 0.712
         }
       },
       "check": {
@@ -1124,11 +1243,11 @@
       }
     },
     "buttermilk": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Chapman Tunnel"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.052,
@@ -1179,6 +1298,13 @@
           "maeMm": 3.44,
           "days": 725,
           "weight": 0.898
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.249,
+          "r": 0.768,
+          "maeMm": 2.78,
+          "days": 254,
+          "weight": 0.926
         }
       },
       "check": {
@@ -1190,11 +1316,11 @@
       }
     },
     "copper-mountain": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Copper Mountain"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.426,
@@ -1245,6 +1371,13 @@
           "maeMm": 4.11,
           "days": 725,
           "weight": 0.854
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.503,
+          "r": 0.611,
+          "maeMm": 3.48,
+          "days": 254,
+          "weight": 0.712
         }
       },
       "check": {
@@ -1256,11 +1389,11 @@
       }
     },
     "crested-butte": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Butte"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.105,
@@ -1311,6 +1444,13 @@
           "maeMm": 3.51,
           "days": 725,
           "weight": 0.738
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.073,
+          "r": 0.803,
+          "maeMm": 3.12,
+          "days": 254,
+          "weight": 0.779
         }
       },
       "check": {
@@ -1322,11 +1462,11 @@
       }
     },
     "echo-mountain": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Echo Lake"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.268,
@@ -1377,6 +1517,13 @@
           "maeMm": 4.66,
           "days": 725,
           "weight": 0.66
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.242,
+          "r": 0.606,
+          "maeMm": 3.08,
+          "days": 254,
+          "weight": 0.553
         }
       },
       "check": {
@@ -1388,11 +1535,11 @@
       }
     },
     "eldora": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Lake Eldora"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.555,
@@ -1443,6 +1590,13 @@
           "maeMm": 4.4,
           "days": 725,
           "weight": 0.877
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.643,
+          "r": 0.626,
+          "maeMm": 3.71,
+          "days": 254,
+          "weight": 0.714
         }
       },
       "check": {
@@ -1454,11 +1608,11 @@
       }
     },
     "granby-ranch": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Stillwater Creek"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.171,
@@ -1509,6 +1663,13 @@
           "maeMm": 3.89,
           "days": 711,
           "weight": 0.866
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 0.788,
+          "r": 0.59,
+          "maeMm": 2.34,
+          "days": 254,
+          "weight": 0.948
         }
       },
       "check": {
@@ -1520,11 +1681,11 @@
       }
     },
     "keystone": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Grizzly Peak"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.372,
@@ -1575,6 +1736,13 @@
           "maeMm": 4.37,
           "days": 725,
           "weight": 0.788
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.797,
+          "r": 0.6,
+          "maeMm": 3.88,
+          "days": 254,
+          "weight": 0.712
         }
       },
       "check": {
@@ -1586,11 +1754,11 @@
       }
     },
     "loveland-basin": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Loveland Basin"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.329,
@@ -1641,6 +1809,13 @@
           "maeMm": 3.25,
           "days": 725,
           "weight": 0.951
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.755,
+          "r": 0.713,
+          "maeMm": 3.38,
+          "days": 254,
+          "weight": 0.783
         }
       },
       "check": {
@@ -1652,11 +1827,11 @@
       }
     },
     "monarch-mountain": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Porphyry Creek"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.833,
@@ -1707,6 +1882,13 @@
           "maeMm": 5.64,
           "days": 725,
           "weight": 0.577
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 2,
+          "r": 0.73,
+          "maeMm": 4.08,
+          "days": 254,
+          "weight": 0.673
         }
       },
       "check": {
@@ -1718,11 +1900,11 @@
       }
     },
     "powderhorn": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Mesa Lakes"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.138,
@@ -1773,6 +1955,13 @@
           "maeMm": 5.06,
           "days": 725,
           "weight": 0.677
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.692,
+          "r": 0.782,
+          "maeMm": 3.85,
+          "days": 254,
+          "weight": 0.84
         }
       },
       "check": {
@@ -1784,12 +1973,12 @@
       }
     },
     "purgatory": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Spud Mountain",
         "Cascade #2"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.291,
@@ -1840,6 +2029,13 @@
           "maeMm": 5.2,
           "days": 1448,
           "weight": 0.86
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.452,
+          "r": 0.809,
+          "maeMm": 4.63,
+          "days": 508,
+          "weight": 0.79
         }
       },
       "check": {
@@ -1851,11 +2047,11 @@
       }
     },
     "silverton-mountain": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Red Mountain Pass"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.341,
@@ -1906,6 +2102,13 @@
           "maeMm": 3.93,
           "days": 725,
           "weight": 1
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.929,
+          "r": 0.797,
+          "maeMm": 4.18,
+          "days": 254,
+          "weight": 0.863
         }
       },
       "check": {
@@ -1917,11 +2120,11 @@
       }
     },
     "ski-cooper": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Fremont Pass"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.466,
@@ -1972,6 +2175,13 @@
           "maeMm": 3.56,
           "days": 725,
           "weight": 0.845
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.475,
+          "r": 0.731,
+          "maeMm": 2.84,
+          "days": 254,
+          "weight": 0.904
         }
       },
       "check": {
@@ -1982,12 +2192,85 @@
         "calibratedMaeMm": 2.8
       }
     },
+    "snowmass": {
+      "updated": "2026-10-31",
+      "stations": [
+        "Schofield Pass"
+      ],
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
+      "models": {
+        "ncep_hrrr_conus": {
+          "ratio": 1.51,
+          "r": 0.762,
+          "maeMm": 6.5,
+          "days": 725,
+          "weight": 0.774,
+          "measuredRatio": 2
+        },
+        "ncep_nbm_conus": {
+          "ratio": 1.349,
+          "r": 0.866,
+          "maeMm": 4.88,
+          "days": 362,
+          "weight": 1
+        },
+        "ecmwf_ifs": {
+          "ratio": 1.806,
+          "r": 0.808,
+          "maeMm": 5.51,
+          "days": 725,
+          "weight": 0.871
+        },
+        "gfs_global": {
+          "ratio": 1.625,
+          "r": 0.732,
+          "maeMm": 6.03,
+          "days": 710,
+          "weight": 0.714
+        },
+        "gem_seamless": {
+          "ratio": 1.123,
+          "r": 0.811,
+          "maeMm": 5.28,
+          "days": 703,
+          "weight": 0.877
+        },
+        "icon_seamless": {
+          "ratio": 1.364,
+          "r": 0.796,
+          "maeMm": 5.48,
+          "days": 709,
+          "weight": 0.845
+        },
+        "ukmo_seamless": {
+          "ratio": 1.795,
+          "r": 0.795,
+          "maeMm": 5.88,
+          "days": 725,
+          "weight": 0.843
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 2,
+          "r": 0.72,
+          "maeMm": 5.55,
+          "days": 254,
+          "weight": 0.691
+        }
+      },
+      "check": {
+        "wetDays": 502,
+        "rawPctOfObserved": 67,
+        "calibratedPctOfObserved": 100,
+        "rawMaeMm": 4.7,
+        "calibratedMaeMm": 4.94
+      }
+    },
     "steamboat": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Dry Lake"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.198,
@@ -2038,6 +2321,13 @@
           "maeMm": 4.47,
           "days": 725,
           "weight": 0.895
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.778,
+          "r": 0.741,
+          "maeMm": 3.91,
+          "days": 254,
+          "weight": 0.789
         }
       },
       "check": {
@@ -2049,11 +2339,11 @@
       }
     },
     "telluride": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Red Mountain Pass"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.341,
@@ -2104,6 +2394,13 @@
           "maeMm": 3.93,
           "days": 725,
           "weight": 1
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.929,
+          "r": 0.797,
+          "maeMm": 4.18,
+          "days": 254,
+          "weight": 0.863
         }
       },
       "check": {
@@ -2115,11 +2412,11 @@
       }
     },
     "vail": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Vail Mountain"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.369,
@@ -2170,6 +2467,13 @@
           "maeMm": 4.08,
           "days": 725,
           "weight": 0.719
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.299,
+          "r": 0.726,
+          "maeMm": 3.12,
+          "days": 254,
+          "weight": 0.78
         }
       },
       "check": {
@@ -2181,11 +2485,11 @@
       }
     },
     "winter-park": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Berthoud Summit"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.787,
@@ -2236,6 +2540,13 @@
           "maeMm": 4.5,
           "days": 725,
           "weight": 0.798
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 2,
+          "r": 0.68,
+          "maeMm": 3.94,
+          "days": 254,
+          "weight": 0.745
         }
       },
       "check": {
@@ -2247,11 +2558,11 @@
       }
     },
     "wolf-creek": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Wolf Creek Summit"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.643,
@@ -2302,6 +2613,13 @@
           "maeMm": 7.23,
           "days": 725,
           "weight": 0.59
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 2,
+          "r": 0.888,
+          "maeMm": 5.14,
+          "days": 254,
+          "weight": 0.885
         }
       },
       "check": {
@@ -2313,11 +2631,11 @@
       }
     },
     "alta": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Snowbird"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.636,
@@ -2368,6 +2686,13 @@
           "maeMm": 8.21,
           "days": 725,
           "weight": 0.811
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 2,
+          "r": 0.743,
+          "maeMm": 8.05,
+          "days": 254,
+          "weight": 0.706
         }
       },
       "check": {
@@ -2379,11 +2704,11 @@
       }
     },
     "beaver-mountain": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Klondike Narrows"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.212,
@@ -2434,6 +2759,13 @@
           "maeMm": 5.08,
           "days": 725,
           "weight": 0.918
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.73,
+          "r": 0.687,
+          "maeMm": 6.61,
+          "days": 254,
+          "weight": 0.611
         }
       },
       "check": {
@@ -2445,11 +2777,11 @@
       }
     },
     "brian-head": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Brian Head"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.332,
@@ -2500,6 +2832,13 @@
           "maeMm": 6.15,
           "days": 725,
           "weight": 0.775
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.932,
+          "r": 0.814,
+          "maeMm": 4.5,
+          "days": 254,
+          "weight": 0.892
         }
       },
       "check": {
@@ -2511,11 +2850,11 @@
       }
     },
     "brighton": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Brighton"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.242,
@@ -2566,6 +2905,13 @@
           "maeMm": 5.49,
           "days": 725,
           "weight": 0.836
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.643,
+          "r": 0.743,
+          "maeMm": 5.98,
+          "days": 254,
+          "weight": 0.705
         }
       },
       "check": {
@@ -2577,11 +2923,11 @@
       }
     },
     "cherry-peak": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Klondike Narrows"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.212,
@@ -2632,6 +2978,13 @@
           "maeMm": 5.08,
           "days": 725,
           "weight": 0.918
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.73,
+          "r": 0.687,
+          "maeMm": 6.61,
+          "days": 254,
+          "weight": 0.611
         }
       },
       "check": {
@@ -2643,11 +2996,11 @@
       }
     },
     "deer-valley": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Thaynes Canyon"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.158,
@@ -2698,6 +3051,13 @@
           "maeMm": 5.15,
           "days": 725,
           "weight": 0.827
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.345,
+          "r": 0.751,
+          "maeMm": 4.89,
+          "days": 254,
+          "weight": 0.759
         }
       },
       "check": {
@@ -2709,11 +3069,11 @@
       }
     },
     "eagle-point": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Big Flat"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.477,
@@ -2764,6 +3124,13 @@
           "maeMm": 5.08,
           "days": 725,
           "weight": 0.85
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 2,
+          "r": 0.747,
+          "maeMm": 4.8,
+          "days": 254,
+          "weight": 0.672
         }
       },
       "check": {
@@ -2775,11 +3142,11 @@
       }
     },
     "nordic-valley": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Ben Lomond Trail"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.409,
@@ -2830,6 +3197,13 @@
           "maeMm": 7.15,
           "days": 725,
           "weight": 0.792
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.603,
+          "r": 0.734,
+          "maeMm": 6.3,
+          "days": 254,
+          "weight": 0.691
         }
       },
       "check": {
@@ -2841,11 +3215,11 @@
       }
     },
     "park-city": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Thaynes Canyon"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.158,
@@ -2896,6 +3270,13 @@
           "maeMm": 5.15,
           "days": 725,
           "weight": 0.827
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.345,
+          "r": 0.751,
+          "maeMm": 4.89,
+          "days": 254,
+          "weight": 0.759
         }
       },
       "check": {
@@ -2907,11 +3288,11 @@
       }
     },
     "powder-mountain": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Powder Mountain"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.416,
@@ -2962,6 +3343,13 @@
           "maeMm": 5.85,
           "days": 725,
           "weight": 0.884
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 2,
+          "r": 0.746,
+          "maeMm": 7.3,
+          "days": 254,
+          "weight": 0.656
         }
       },
       "check": {
@@ -2973,11 +3361,11 @@
       }
     },
     "snowbasin": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Ben Lomond Peak"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.888,
@@ -3028,6 +3416,13 @@
           "maeMm": 9.4,
           "days": 725,
           "weight": 0.875
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 2,
+          "r": 0.673,
+          "maeMm": 9.26,
+          "days": 254,
+          "weight": 0.65
         }
       },
       "check": {
@@ -3039,11 +3434,11 @@
       }
     },
     "snowbird": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Snowbird"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.636,
@@ -3094,6 +3489,13 @@
           "maeMm": 8.21,
           "days": 725,
           "weight": 0.811
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 2,
+          "r": 0.743,
+          "maeMm": 8.05,
+          "days": 254,
+          "weight": 0.706
         }
       },
       "check": {
@@ -3105,11 +3507,11 @@
       }
     },
     "solitude": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Brighton"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.242,
@@ -3160,6 +3562,13 @@
           "maeMm": 5.49,
           "days": 725,
           "weight": 0.836
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.643,
+          "r": 0.743,
+          "maeMm": 5.98,
+          "days": 254,
+          "weight": 0.705
         }
       },
       "check": {
@@ -3171,11 +3580,11 @@
       }
     },
     "sundance": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Timpanogos Divide"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.181,
@@ -3226,6 +3635,13 @@
           "maeMm": 6.49,
           "days": 725,
           "weight": 0.881
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.437,
+          "r": 0.628,
+          "maeMm": 7.19,
+          "days": 254,
+          "weight": 0.513
         }
       },
       "check": {
@@ -3237,11 +3653,11 @@
       }
     },
     "whistler": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Whistler Roundhouse"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 0.966,
@@ -3292,6 +3708,13 @@
           "maeMm": 7.28,
           "days": 616,
           "weight": 0.963
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 0.659,
+          "r": 0.657,
+          "maeMm": 7.16,
+          "days": 217,
+          "weight": 0.765
         }
       },
       "check": {
@@ -3302,78 +3725,12 @@
         "calibratedMaeMm": 6.23
       }
     },
-    "snowmass": {
-      "updated": "2026-10-27",
-      "stations": [
-        "Schofield Pass"
-      ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
-      "models": {
-        "ncep_hrrr_conus": {
-          "ratio": 1.51,
-          "r": 0.762,
-          "maeMm": 6.5,
-          "days": 725,
-          "weight": 0.774,
-          "measuredRatio": 2
-        },
-        "ncep_nbm_conus": {
-          "ratio": 1.349,
-          "r": 0.866,
-          "maeMm": 4.88,
-          "days": 362,
-          "weight": 1
-        },
-        "ecmwf_ifs": {
-          "ratio": 1.806,
-          "r": 0.808,
-          "maeMm": 5.51,
-          "days": 725,
-          "weight": 0.871
-        },
-        "gfs_global": {
-          "ratio": 1.625,
-          "r": 0.732,
-          "maeMm": 6.03,
-          "days": 710,
-          "weight": 0.714
-        },
-        "gem_seamless": {
-          "ratio": 1.123,
-          "r": 0.811,
-          "maeMm": 5.28,
-          "days": 703,
-          "weight": 0.877
-        },
-        "icon_seamless": {
-          "ratio": 1.364,
-          "r": 0.796,
-          "maeMm": 5.48,
-          "days": 709,
-          "weight": 0.845
-        },
-        "ukmo_seamless": {
-          "ratio": 1.795,
-          "r": 0.795,
-          "maeMm": 5.88,
-          "days": 725,
-          "weight": 0.843
-        }
-      },
-      "check": {
-        "wetDays": 502,
-        "rawPctOfObserved": 67,
-        "calibratedPctOfObserved": 100,
-        "rawMaeMm": 4.7,
-        "calibratedMaeMm": 4.94
-      }
-    },
     "dodge-ridge": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Blue Lakes"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.044,
@@ -3424,6 +3781,13 @@
           "maeMm": 7.2,
           "days": 725,
           "weight": 0.875
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 0.907,
+          "r": 0.856,
+          "maeMm": 6.8,
+          "days": 254,
+          "weight": 0.847
         }
       },
       "check": {
@@ -3436,12 +3800,12 @@
       "borrowedFrom": "Bear Valley"
     },
     "hesperus": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Spud Mountain",
         "Cascade #2"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.291,
@@ -3492,6 +3856,13 @@
           "maeMm": 5.2,
           "days": 1448,
           "weight": 0.86
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 1.452,
+          "r": 0.809,
+          "maeMm": 4.63,
+          "days": 508,
+          "weight": 0.79
         }
       },
       "check": {
@@ -3504,11 +3875,11 @@
       "borrowedFrom": "Purgatory"
     },
     "sunlight": {
-      "updated": "2026-10-27",
+      "updated": "2026-10-31",
       "stations": [
         "Schofield Pass"
       ],
-      "period": "2022-11-01 to 2026-10-25 (Nov–Apr)",
+      "period": "2022-11-01 to 2026-10-29 (Nov–Apr)",
       "models": {
         "ncep_hrrr_conus": {
           "ratio": 1.51,
@@ -3559,6 +3930,13 @@
           "maeMm": 5.88,
           "days": 725,
           "weight": 0.843
+        },
+        "ecmwf_aifs025_single": {
+          "ratio": 2,
+          "r": 0.72,
+          "maeMm": 5.55,
+          "days": 254,
+          "weight": 0.691
         }
       },
       "check": {

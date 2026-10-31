@@ -61,7 +61,8 @@ const state = {
   upcoming: null, // data/upcoming.json: every resort's next 7 days + last 48 hours
   upFilter: 'all',
   upSort: 'next7',
-  elev: store.get('elev') || 'mid',
+  // Always opens at mid-mountain; Base/Summit apply only to the page being viewed.
+  elev: 'mid',
   tab: store.get('tab') || 'summary',
   favorites: loadFavorites(),
   calibration: null,
@@ -132,7 +133,7 @@ function renderHeader() {
   $('resortSub').textContent = fav
     ? `${state.favorites.length} mountain${state.favorites.length === 1 ? '' : 's'} · tap one to open it`
     : up ? `Next 7 days at mid-mountain, every resort · most snow first`
-    : `${ftLabel(r.elevations.base)}–${ftLabel(r.elevations.summit)} · ${r.region}`;
+    : `${ftLabel(r.elevations.base)}–${ftLabel(r.elevations.summit)} · ${r.region}${driveTo(r.id) != null ? ` · 🚗 ${fmtDrive(driveTo(r.id))} drive` : ''}`;
   $('elevSeg').innerHTML = ['base', 'mid', 'summit'].map((k) =>
     `<button data-elev="${k}" class="${k === state.elev ? 'on' : ''}" title="${fav ? '' : ftLabel(r.elevations[k])}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('');
   renderPicker();
@@ -627,7 +628,7 @@ function renderChart() {
   const W = Math.max(720, days.length * 46), H = 250, padL = 30, padB = 40, padT = 30;
   // Scale to the bars, with headroom; taller range whiskers are clipped with an arrow.
   const maxV = Math.max(4, ...days.map((d) => d.snow * 1.6));
-  const step = maxV > 24 ? 6 : maxV > 12 ? 4 : maxV > 6 ? 2 : 1;
+  const step = niceStep(maxV);
   const top = Math.ceil(maxV / step) * step;
   const y = (v) => padT + (H - padT - padB) * (1 - Math.min(v, top) / top);
   const bw = (W - padL - 10) / days.length;
@@ -663,6 +664,11 @@ function renderChart() {
 }
 
 // ---------- details ----------
+
+// A round axis step (inches) that gives at most 6 gridlines up to max.
+function niceStep(max) {
+  return [1, 2, 3, 4, 6, 12, 24, 36, 48, 60, 120, 240].find((st) => max / st <= 6) ?? Math.ceil(max / 6);
+}
 
 function heat(v) {
   if (v == null || v < 0.1) return '';
@@ -719,7 +725,9 @@ function renderModels() {
   const trend = runTrend?.resortId === state.resortId && runTrend.elev === state.elev ? runTrend.delta : {};
   const rows = [
     row('Blend', 'weighted', blendCells, 'blend', null),
-    ...MODELS.map((m) => row(`<i class="mdot" style="background:${MODEL_COLORS[m.id]}"></i>${m.name}`, m.note, modelCells(m.id), m.ref ? 'ref' : '', trend[m.id] ?? null)),
+    // Models with no data here (hidden at this resort, or outside their coverage) get no row.
+    ...MODELS.map((m) => [m, modelCells(m.id)]).filter(([, cells]) => cells.some(Boolean))
+      .map(([m, cells]) => row(`<i class="mdot" style="background:${MODEL_COLORS[m.id]}"></i>${m.name}`, m.note, cells, m.ref ? 'ref' : '', trend[m.id] ?? null)),
   ];
   $('models').innerHTML = `<table class="ptable">${head}${rows.join('')}</table>`;
 }
@@ -781,7 +789,7 @@ function renderRange() {
     return scaledRangeOf(blend[i], Object.fromEntries(keys.map((k) => [k, sum(days.map((e) => e[k]))])));
   });
   const top_ = Math.max(4, ...blend, ...lines.flatMap((l) => l.pts), ...band.map((b) => b?.hi ?? 0));
-  const step = top_ > 48 ? 12 : top_ > 24 ? 6 : top_ > 12 ? 4 : 2;
+  const step = niceStep(top_);
   const yMax = Math.ceil(top_ / step) * step;
   const y = (v) => top + (H - top - bottom) * (1 - v / yMax);
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cumulative snowfall by model">`;
@@ -898,7 +906,8 @@ async function loadFavView() {
   const cards = Object.fromEntries(resorts.map((r) => [r.id, savedForecast(r, state.elev)]));
   const draw = () => {
     if (seq !== favSeq) return;
-    $('favView').innerHTML = resorts.map((r) => favCard(r, cards[r.id])).join('') + `<div class="card">${QUALITY_LEGEND}</div>`;
+    $('favView').innerHTML = `<div class="fav-storms">${stormsHTML(resorts.map((r) => r.id))}</div>`
+      + resorts.map((r) => favCard(r, cards[r.id])).join('') + `<div class="card">${QUALITY_LEGEND}</div>`;
   };
   draw();
   loadUpcoming().then(draw); // fills in the last-48-hours badges
@@ -937,51 +946,212 @@ function loadUpcoming(force) {
   return upcomingLoad;
 }
 
+// ---------- drive times (from the viewer's location) ----------
+
+// Saved on this device only: { lat, lon, at, times: { resortId: seconds } }.
+state.drive = (() => {
+  try {
+    const d = JSON.parse(store.get('drive'));
+    return d && Date.now() - d.at < 30 * 86400e3 ? d : null;
+  } catch { return null; }
+})();
+
+const fmtDrive = (sec) => {
+  if (sec == null) return '–';
+  const m = Math.round(sec / 60);
+  return m < 60 ? `${m}m` : `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m`;
+};
+const driveTo = (id) => state.drive?.times?.[id] ?? null;
+
+// Ask for the location (rounded to ~1 km), then get driving times to every resort
+// in one request from the public OSRM router. Estimates ignore winter road closures.
+async function locateAndRoute() {
+  const pos = await new Promise((ok, fail) => navigator.geolocation.getCurrentPosition(ok, fail, { timeout: 15000, maximumAge: 3600e3 }));
+  const lat = +pos.coords.latitude.toFixed(2), lon = +pos.coords.longitude.toFixed(2);
+  const coords = [[lon, lat], ...RESORTS.map((r) => [r.lon, r.lat])].map(([x, y]) => `${x},${y}`).join(';');
+  const res = await fetch(`https://router.project-osrm.org/table/v1/driving/${coords}?sources=0&annotations=duration`);
+  const data = await res.json();
+  if (data.code !== 'Ok') throw new Error(data.message || 'routing failed');
+  const times = Object.fromEntries(RESORTS.map((r, i) => [r.id, data.durations[0][i + 1]]));
+  state.drive = { lat, lon, at: Date.now(), times };
+  store.set('drive', JSON.stringify(state.drive));
+}
+
+// ---------- storm tracker ----------
+
+// Groups resorts whose biggest 3-day window (≥ 6") starts within a day of each
+// other into storms, biggest first. Returns up to two storms.
+function findStorms(ids) {
+  const d = state.upcoming;
+  if (!d) return [];
+  const hits = [];
+  for (const id of ids) {
+    const days = d.resorts[id]?.days;
+    if (!days || days.length < 3) continue;
+    let best = null;
+    for (let i = 0; i + 3 <= days.length; i++) {
+      const win = days.slice(i, i + 3), total = sum(win.map((x) => x.snow));
+      if (!best || total > best.total) best = { total, win };
+    }
+    if (best.total < 6) continue;
+    const snowy = best.win.filter((x) => x.snow >= 0.5);
+    hits.push({ id, total: best.total, start: snowy[0].date, end: snowy.at(-1).date, today: days[0].date });
+  }
+  hits.sort((a, b) => b.total - a.total);
+  const storms = [];
+  const gap = (a, b) => Math.abs(Date.parse(a) - Date.parse(b)) / 86400e3;
+  for (const h of hits) {
+    const s = storms.find((x) => gap(x.start, h.start) <= 1);
+    if (s) { s.hits.push(h); if (h.end > s.end) s.end = h.end; } else storms.push({ start: h.start, end: h.end, today: h.today, hits: [h] });
+  }
+  return storms.filter((s) => s.hits.length >= 2 || s.hits[0].total >= 12).slice(0, 2);
+}
+
+function stormsHTML(ids) {
+  return findStorms(ids).map((s) => {
+    const day = (dt) => dayLabel(dt, s.today).short;
+    const when = s.start === s.end ? day(s.start) : `${day(s.start)}–${day(s.end)}`;
+    const names = s.hits.slice(0, 5).map((h) => `<a href="#${h.id}" data-open="${h.id}">${RESORTS.find((r) => r.id === h.id).name} <b>${fmtIn(h.total)}</b></a>`).join(' · ');
+    const more = s.hits.length > 5 ? ` · +${s.hits.length - 5} more` : '';
+    return `<div class="storm">🌨️ <b>Storm ${when}:</b> ${names}${more}</div>`;
+  }).join('');
+}
+
+// ---------- upcoming snow page ----------
+
 const UP_SORTS = {
   next7: { label: 'Next 7 days', value: (e) => e.next7 ?? -1 },
   tomorrow: { label: 'By 9 am tomorrow', value: (e) => e.tomorrowBy9 ?? -1 },
   recent48: { label: 'Last 48 hours', value: (e) => e.recent48?.inches ?? -1 },
+  season: { label: 'Season so far', value: (e) => e.season?.inches ?? -1 },
+  drive: { label: 'Drive time', value: (e, id) => -(driveTo(id) ?? Infinity) },
 };
+state.upPass = 'any';
+state.upDrive = 0; // max drive hours, 0 = any
+state.upMode = 'list'; // or 'map'
+
+function upcomingRows() {
+  const d = state.upcoming;
+  return RESORTS
+    .filter((r) => d.resorts[r.id]?.days)
+    .filter((r) => state.upFilter === 'all' || (state.upFilter === 'fav' ? state.favorites.includes(r.id) : r.state === state.upFilter))
+    .filter((r) => state.upPass === 'any' || PASSES[state.upPass].resorts.includes(r.id))
+    .filter((r) => !state.upDrive || (driveTo(r.id) != null && driveTo(r.id) <= state.upDrive * 3600))
+    .map((r) => ({ r, e: d.resorts[r.id] }))
+    .sort((a, b) => UP_SORTS[state.upSort].value(b.e, b.r.id) - UP_SORTS[state.upSort].value(a.e, a.r.id) || a.r.name.localeCompare(b.r.name));
+}
+
+function passBadges(id) {
+  return passesFor(id).map((k) => `<span class="pass pass-${k}">${PASSES[k].name}</span>`).join('');
+}
 
 function renderUpcoming() {
   const d = state.upcoming;
   if (!d) { $('upcomingView').innerHTML = '<p class="card hint">Loading every resort…</p>'; return; }
-  const filters = [['all', 'All'], ['fav', '★ Favorites'], ['CO', 'Colorado'], ['UT', 'Utah'], ['CA', 'California']];
-  const rows = RESORTS
-    .filter((r) => d.resorts[r.id]?.days)
-    .filter((r) => state.upFilter === 'all' || (state.upFilter === 'fav' ? state.favorites.includes(r.id) : r.state === state.upFilter))
-    .map((r) => ({ r, e: d.resorts[r.id] }))
-    .sort((a, b) => UP_SORTS[state.upSort].value(b.e) - UP_SORTS[state.upSort].value(a.e) || a.r.name.localeCompare(b.r.name));
-  const max = Math.max(3, ...rows.flatMap(({ e }) => e.days.map((x) => x.snow)));
-  const first = rows[0]?.e;
-  const dayHead = first ? first.days.map((x) => {
-    const l = dayLabel(x.date, first.todayStr);
-    return `<span class="${l.weekend ? 'wknd' : ''}">${l.short === 'Today' ? 'Tdy' : l.weekend ? l.wk.slice(0, 2) : l.wk[0]}</span>`;
-  }).join('') : '';
-  const list = rows.map(({ r, e }, i) => {
-    const bars = e.days.map((x) => {
-      const h = x.snow < 0.05 ? 2 : Math.max(4, (x.snow / max) * 34);
-      return `<span class="ub ${x.snow < 0.05 ? 'none' : QUALITY[x.q] || 'q-med'} ${x.snow >= POWDER_DAY_IN ? 'pow' : ''}" style="height:${h}px" title="${x.date}: ${fmtIn(x.snow)}"></span>`;
+  const chip = (attr, k, label, on) => `<button data-${attr}="${k}" class="${on ? 'on' : ''}">${label}</button>`;
+  const regions = [['all', 'All'], ['fav', '★ Favorites'], ['CO', 'Colorado'], ['UT', 'Utah'], ['CA', 'California']]
+    .map(([k, l]) => chip('filter', k, l, state.upFilter === k)).join('');
+  const passes = [['any', 'Any pass'], ...Object.entries(PASSES).map(([k, p]) => [k, p.name])]
+    .map(([k, l]) => chip('pass', k, l, state.upPass === k)).join('');
+  const sorts = Object.entries(UP_SORTS).filter(([k]) => k !== 'drive' || state.drive)
+    .map(([k, v]) => `<option value="${k}" ${state.upSort === k ? 'selected' : ''}>${v.label}</option>`).join('');
+  const drive = state.drive
+    ? `<label class="up-sort">🚗 Within <select id="upDrive">${[[0, 'any time'], [1, '1 hour'], [2, '2 hours'], [3, '3 hours'], [5, '5 hours'], [8, '8 hours']]
+      .map(([h, l]) => `<option value="${h}" ${state.upDrive === h ? 'selected' : ''}>${l}</option>`).join('')}</select>
+      <button class="link-btn" id="relocate" title="Update my location">↻</button></label>`
+    : '<button class="loc-btn" id="locate">📍 Use my location for drive times</button>';
+  const rows = upcomingRows();
+  const ids = rows.map((x) => x.r.id);
+
+  let body;
+  if (state.upMode === 'map') {
+    body = '<div id="snowMap" class="snow-map"></div><div id="mapLegend" class="q-legend"></div>';
+  } else {
+    const max = Math.max(3, ...rows.flatMap(({ e }) => e.days.map((x) => x.snow)));
+    const first = rows[0]?.e;
+    const dayHead = first ? first.days.map((x) => {
+      const l = dayLabel(x.date, first.todayStr);
+      return `<span class="${l.weekend ? 'wknd' : ''}">${l.short === 'Today' ? 'Tdy' : l.weekend ? l.wk.slice(0, 2) : l.wk[0]}</span>`;
+    }).join('') : '';
+    // Phones show one extra column: whatever the list is sorted by (or last 48h).
+    const extraKey = state.upSort === 'next7' ? 'recent48' : state.upSort;
+    const extra = (r, e) => ({
+      tomorrow: [fmtIn(e.tomorrowBy9), 'by 9am'], recent48: [e.recent48 ? fmtIn(e.recent48.inches) : '–', 'last 48h'],
+      season: [e.season ? fmtIn(e.season.inches) : '–', 'season'], drive: [fmtDrive(driveTo(r.id)), 'drive'],
+    })[extraKey];
+    const list = rows.map(({ r, e }, i) => {
+      const bars = e.days.map((x) => {
+        const h = x.snow < 0.05 ? 2 : Math.max(4, (x.snow / max) * 34);
+        return `<span class="ub ${x.snow < 0.05 ? 'none' : QUALITY[x.q] || 'q-med'} ${x.snow >= POWDER_DAY_IN ? 'pow' : ''}" style="height:${h}px" title="${x.date}: ${fmtIn(x.snow)}"></span>`;
+      }).join('');
+      const [xv, xl] = extra(r, e);
+      const dt = driveTo(r.id);
+      return `<button class="up-row" data-id="${r.id}">
+        <span class="up-rank">${i + 1}</span>
+        <span class="up-name"><b>${state.favorites.includes(r.id) ? '★ ' : ''}${r.name}</b>
+          <small>${r.state} · ${ftLabel(r.elevations.mid)}${dt != null ? ` · 🚗 ${fmtDrive(dt)}` : ''} ${passBadges(r.id)}</small></span>
+        <span class="up-bars">${bars}</span>
+        <span class="up-num ${state.upSort === 'next7' ? 'sorted' : ''}"><b>${fmtIn(e.next7)}</b><small>7 days</small></span>
+        <span class="up-num wide ${state.upSort === 'tomorrow' ? 'sorted' : ''}"><b>${fmtIn(e.tomorrowBy9)}</b><small>by 9am tmw</small></span>
+        <span class="up-num wide ${state.upSort === 'recent48' ? 'sorted' : ''}"><b>${e.recent48 ? fmtIn(e.recent48.inches) : '–'}</b><small>last 48h</small></span>
+        <span class="up-num wide ${state.upSort === 'season' ? 'sorted' : ''}"><b>${e.season ? fmtIn(e.season.inches) : '–'}</b><small>${e.pctNormal != null ? `${e.pctNormal}% of normal` : 'season'}</small></span>
+        <span class="up-num narrow sorted"><b>${xv}</b><small>${xl}</small></span>
+      </button>`;
     }).join('');
-    const rec = e.recent48;
-    return `<button class="up-row" data-id="${r.id}">
-      <span class="up-rank">${i + 1}</span>
-      <span class="up-name"><b>${state.favorites.includes(r.id) ? '★ ' : ''}${r.name}</b><small>${r.state} · ${ftLabel(r.elevations.mid)}</small></span>
-      <span class="up-bars">${bars}</span>
-      <span class="up-num ${state.upSort === 'next7' ? 'sorted' : ''}"><b>${fmtIn(e.next7)}</b><small>7 days</small></span>
-      <span class="up-num ${state.upSort === 'tomorrow' ? 'sorted' : ''}"><b>${fmtIn(e.tomorrowBy9)}</b><small>by 9am tmw</small></span>
-      <span class="up-num ${state.upSort === 'recent48' ? 'sorted' : ''}"><b>${rec ? fmtIn(rec.inches) : '–'}</b><small>last 48h</small></span>
-    </button>`;
-  }).join('');
-  $('upcomingView').innerHTML = `<section class="card">
+    body = `<div class="up-head"><span></span><span>Resort</span><span class="up-bars">${dayHead}</span><span>7 days</span>
+        <span class="wide">Tmw 9am</span><span class="wide">48h</span><span class="wide">Season</span><span class="narrow"></span></div>
+      <div class="up-list">${list || '<p class="hint">No resorts match.</p>'}</div>`;
+  }
+
+  $('upcomingView').innerHTML = stormsHTML(ids) + `<section class="card">
     <div class="up-tools">
-      <div class="chips">${filters.map(([k, l]) => `<button data-filter="${k}" class="${state.upFilter === k ? 'on' : ''}">${l}</button>`).join('')}</div>
-      <label class="up-sort">Sort by <select id="upSort">${Object.entries(UP_SORTS).map(([k, v]) => `<option value="${k}" ${state.upSort === k ? 'selected' : ''}>${v.label}</option>`).join('')}</select></label>
+      <div class="chips">${regions}</div>
+      <div class="seg mode-seg"><button data-mode="list" class="${state.upMode === 'list' ? 'on' : ''}">List</button><button data-mode="map" class="${state.upMode === 'map' ? 'on' : ''}">Map</button></div>
     </div>
-    <div class="up-head"><span></span><span>Resort</span><span class="up-bars">${dayHead}</span><span>7 days</span><span>Tmw 9am</span><span>48h</span></div>
-    <div class="up-list">${list || '<p class="hint">No resorts match.</p>'}</div>
-    <p class="hint">Model blend at each resort's mid-mountain, updated ${ago(Date.parse(d.generated))}. Last 48 hours is measured: the resort's own report where available, otherwise the nearest snow station.</p>
+    <div class="up-tools">
+      <div class="chips">${passes}</div>
+      <div class="up-tools-right">${drive}<label class="up-sort">${state.upMode === 'map' ? 'Show' : 'Sort by'} <select id="upSort">${sorts}</select></label></div>
+    </div>
+    ${body}
+    <p class="hint">Forecasts are the model blend at each resort's mid-mountain, updated ${ago(Date.parse(d.generated))}. Last 48 hours and season are measured: the resort's own report where available, otherwise the nearest snow station (station season totals count early snow that has since melted). Passes are 2025–26 lineups; check the pass site before you go. Drive times are estimates that ignore winter road closures.</p>
   </section>`;
+  if (state.upMode === 'map') renderSnowMap(rows);
+}
+
+// ---------- snow map ----------
+
+let snowMap = null, snowLayer = null;
+
+async function renderSnowMap(rows) {
+  try { await loadLeaflet(); } catch { $('snowMap').innerHTML = '<p class="hint">The map couldn\'t load.</p>'; return; }
+  const metric = state.upSort === 'drive' ? 'next7' : state.upSort;
+  const value = (e) => ({ next7: e.next7, tomorrow: e.tomorrowBy9, recent48: e.recent48?.inches, season: e.season?.inches })[metric];
+  const dark = getComputedStyle(document.documentElement).colorScheme === 'dark';
+  // The container is re-created on each render, so the map is too.
+  if (snowMap) snowMap.remove();
+  snowMap = L.map('snowMap', { scrollWheelZoom: false });
+  // Standard OpenStreetMap tiles; in dark mode CSS inverts them (see .dark-tiles).
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 12, attribution: '© OpenStreetMap contributors' }).addTo(snowMap);
+  $('snowMap').classList.toggle('dark-tiles', dark);
+  snowLayer = L.layerGroup().addTo(snowMap);
+  const vals = rows.map(({ e }) => value(e) ?? 0);
+  const max = Math.max(6, ...vals);
+  const color = (v) => (v >= 12 ? '#f28c28' : v >= 6 ? '#a78bfa' : v >= 2 ? '#3b82f6' : v >= 0.5 ? '#7dd3fc' : '#9ca3af');
+  for (const { r, e } of rows) {
+    const v = value(e) ?? 0;
+    const m = L.circleMarker([r.lat, r.lon], {
+      radius: 5 + 18 * Math.sqrt(v / max), color: '#fff', weight: 1.5, fillColor: color(v), fillOpacity: 0.85,
+    }).addTo(snowLayer);
+    m.bindTooltip(`${r.name} ${fmtIn(v)}`, { direction: 'top', permanent: v >= max * 0.35 && v >= 2, className: 'map-label' });
+    m.bindPopup(`<b>${r.name}</b><br>Next 7 days: ${fmtIn(e.next7)}<br>By 9 am tomorrow: ${fmtIn(e.tomorrowBy9)}<br>
+      Last 48 hours: ${e.recent48 ? fmtIn(e.recent48.inches) : '–'}<br>Season: ${e.season ? fmtIn(e.season.inches) : '–'}
+      ${driveTo(r.id) != null ? `<br>Drive: ${fmtDrive(driveTo(r.id))}` : ''}<br><a href="#${r.id}" data-open="${r.id}">Open forecast →</a>`);
+  }
+  if (state.drive) L.circleMarker([state.drive.lat, state.drive.lon], { radius: 6, color: '#fff', weight: 2, fillColor: '#16a34a', fillOpacity: 1 }).addTo(snowLayer).bindTooltip('You');
+  const pts = rows.map(({ r }) => [r.lat, r.lon]);
+  if (pts.length) snowMap.fitBounds(pts, { padding: [30, 30], maxZoom: 9 });
+  $('mapLegend').innerHTML = `${UP_SORTS[metric].label}: ` + [['#9ca3af', 'none'], ['#7dd3fc', '0.5"+'], ['#3b82f6', '2"+'], ['#a78bfa', '6"+'], ['#f28c28', '12"+']]
+    .map(([c, l]) => `<span><i class="q" style="background:${c};border-radius:50%"></i>${l}</span>`).join('') + '<span class="muted">Bigger dot = more snow. Tap a dot for details.</span>';
 }
 
 async function loadUpcomingView() {
@@ -1079,6 +1249,7 @@ async function load({ redraw = true } = {}) {
 
 function switchResort(id) {
   if (id === 'favorites' || id === 'upcoming') {
+    state.elev = 'mid'; // every mountain and view starts at mid-mountain
     state.view = id;
     history.replaceState(null, '', '#' + id);
     applyView();
@@ -1087,6 +1258,7 @@ function switchResort(id) {
     return;
   }
   if (!id || (id === state.resortId && state.view === 'resort')) return;
+  state.elev = 'mid';
   state.view = 'resort';
   state.resortId = id;
   state.selected = null;
@@ -1102,14 +1274,36 @@ $('topnav').addEventListener('click', (e) => {
   const v = e.target.closest('button[data-view]')?.dataset.view;
   if (v) switchResort(v);
 });
-$('upcomingView').addEventListener('click', (e) => {
-  const f = e.target.closest('button[data-filter]')?.dataset.filter;
-  if (f) { state.upFilter = f; renderUpcoming(); return; }
-  const row = e.target.closest('.up-row');
-  if (row) switchResort(row.dataset.id);
+// Links to a resort inside banners, map popups etc. (data-open="resortId").
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-open]');
+  if (!a) return;
+  e.preventDefault();
+  switchResort(a.dataset.open);
+});
+$('upcomingView').addEventListener('click', async (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.filter) { state.upFilter = b.dataset.filter; renderUpcoming(); return; }
+  if (b.dataset.pass) { state.upPass = b.dataset.pass; renderUpcoming(); return; }
+  if (b.dataset.mode) { state.upMode = b.dataset.mode; renderUpcoming(); return; }
+  if (b.id === 'locate' || b.id === 'relocate') {
+    b.disabled = true;
+    b.textContent = 'Finding drive times…';
+    try {
+      await locateAndRoute();
+      if (state.upSort === 'next7' && b.id === 'locate') state.upDrive = 0;
+    } catch (err) {
+      alert(err.code === 1 ? 'Location permission was denied, so drive times are unavailable.' : `Couldn't get drive times: ${err.message}`);
+    }
+    renderUpcoming();
+    return;
+  }
+  if (b.classList.contains('up-row')) switchResort(b.dataset.id);
 });
 $('upcomingView').addEventListener('change', (e) => {
   if (e.target.id === 'upSort') { state.upSort = e.target.value; renderUpcoming(); }
+  if (e.target.id === 'upDrive') { state.upDrive = +e.target.value; renderUpcoming(); }
 });
 $('favView').addEventListener('click', (e) => {
   const card = e.target.closest('.fav-card');
@@ -1129,7 +1323,6 @@ $('elevSeg').addEventListener('click', (e) => {
   const k = e.target.closest('button')?.dataset.elev;
   if (!k) return;
   state.elev = k;
-  store.set('elev', k);
   loadRunTrend();
   if (state.view === 'favorites') loadFavView(); else if (state.view === 'resort') load();
 });

@@ -68,7 +68,8 @@ Purgatory and Wolf Creek are set up. To add one, find the camera ids on the reso
 
 The blend uses HRRR, NBM, ECMWF, GFS, Canadian, ICON and UKMO. ECMWF AIFS and NOAA AIGFS are fetched and
 shown for reference (model table, forecast range) but kept out of the blend: in a backtest against SNOTEL
-(AIFS since Feb 2025, AIGFS since Jan 2026) adding them made errors slightly worse.
+adding them didn't reduce errors. AIGFS is hidden at Whistler (`hideAt` in core.js): too little history to
+calibrate, and it runs ~2x wetter than the corrected models there. Retest both after the 2026–27 winter.
 
 ## Upcoming Snow
 
@@ -76,3 +77,11 @@ shown for reference (model table, forecast range) but kept out of the blend: in 
 resort (blend models only, 5 variables, about a quarter of the normal API cost) plus snow measured in the
 last 48 hours (resort report, else the SNOTEL station, fetched for all stations in one request). It powers
 the Upcoming Snow ranking and the "last 48 hrs" badge on favorite cards.
+
+## Passes, drive times, storms, map
+
+- `passes.js`: Epic / Ikon / Indy lineups (2025–26, from memory; update when lineups change).
+- Drive times: the viewer taps "Use my location"; the browser's location (rounded to ~1 km, kept on the
+  device) goes to the public OSRM router once for times to every resort. Estimates ignore winter closures.
+- Storm tracker: groups resorts whose biggest 3-day window (≥ 6") starts within a day of each other.
+- Snow map: Leaflet + OpenStreetMap tiles, dots sized and colored by the selected metric.
