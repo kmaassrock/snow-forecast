@@ -20,28 +20,48 @@
   <link rel="stylesheet" href="styles.css?v=__V__">
 </head>
 <body>
-  <header class="top">
-    <div class="picker-row">
-      <label class="picker">
-        <h1 id="resortName">Snow Forecast</h1>
-        <span class="chev" aria-hidden="true">▾</span>
-        <select id="resortSel" aria-label="Choose mountain"></select>
-      </label>
-      <button id="favBtn" class="fav" aria-label="Favorite">☆</button>
-      <button id="themeBtn" class="ghost small theme-btn" aria-label="Theme">◐ Auto</button>
-    </div>
-    <div class="meta-row">
-      <p class="sub" id="resortSub"></p>
-      <div class="seg" id="elevSeg" role="group" aria-label="Elevation"></div>
+  <header class="hero">
+    <svg class="hero-art" viewBox="0 0 1440 220" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <path class="ridge far" d="M0 150 L120 96 L210 132 L330 64 L430 120 L540 78 L640 128 L760 52 L880 118 L990 70 L1100 124 L1220 60 L1330 110 L1440 84 V220 H0Z"/>
+      <path class="ridge mid" d="M0 182 L150 120 L260 168 L380 104 L500 160 L620 112 L740 170 L860 98 L980 158 L1110 108 L1240 166 L1350 126 L1440 150 V220 H0Z"/>
+      <path class="snowcap" d="M760 52 L800 76 L782 74 L770 84 L752 70 L736 72Z M330 64 L362 86 L346 84 L334 92 L320 80 L306 82Z M1220 60 L1252 82 L1236 80 L1224 90 L1210 78 L1196 80Z"/>
+      <path class="ridge near" d="M0 220 L0 196 L180 150 L320 196 L470 140 L610 192 L780 136 L930 190 L1080 146 L1230 194 L1440 160 V220Z"/>
+    </svg>
+    <div class="hero-inner">
+      <div class="picker-row">
+        <label class="picker">
+          <h1 id="resortName">Snow Forecast</h1>
+          <span class="chev" aria-hidden="true">▾</span>
+          <select id="resortSel" aria-label="Choose mountain"></select>
+        </label>
+        <button id="favBtn" class="fav" aria-label="Favorite">☆</button>
+        <button id="themeBtn" class="hero-btn theme-btn" aria-label="Theme">◐ Auto</button>
+      </div>
+      <div class="meta-row">
+        <p class="sub" id="resortSub"></p>
+        <div class="seg hero-seg" id="elevSeg" role="group" aria-label="Elevation"></div>
+      </div>
     </div>
   </header>
+
+  <nav class="tabs resort-only" id="tabs" aria-label="Sections">
+    <div class="tabs-inner">
+      <button data-tab="summary">Summary</button>
+      <button data-tab="daily">Daily</button>
+      <button data-tab="hourly">Hourly</button>
+      <button data-tab="models">Models</button>
+      <button data-tab="history">History</button>
+      <button data-tab="mountain">Mountain</button>
+    </div>
+  </nav>
 
   <main>
     <section id="favView" class="fav-view" hidden></section>
 
-    <section id="alertBanner" class="powder resort-only" hidden></section>
+    <!-- Summary -->
+    <section id="alertBanner" class="powder resort-only" data-tab="summary" hidden></section>
 
-    <section class="card resort-only summary-card">
+    <section class="card resort-only summary-card" data-tab="summary">
       <div class="card-head">
         <h2>Snow Summary</h2>
         <button id="refresh" class="ghost small" aria-label="Refresh">↻</button>
@@ -50,12 +70,7 @@
       <p id="status" class="status">Loading forecast models…</p>
     </section>
 
-    <section class="card resort-only" id="camsCard" hidden>
-      <div class="card-head"><h2>Cams</h2><span class="hint">Tap for the live view</span></div>
-      <div id="cams" class="cams"></div>
-    </section>
-
-    <div class="duo resort-only">
+    <div class="duo resort-only" data-tab="summary">
       <section class="card">
         <div class="card-head"><h2>Right Now</h2></div>
         <div id="rightNow"></div>
@@ -66,19 +81,18 @@
       </section>
     </div>
 
-    <section class="card resort-only">
+    <section class="card resort-only" id="camsCard" data-tab="summary" hidden>
+      <div class="card-head"><h2>Cams</h2><span class="hint">Tap for the live view</span></div>
+      <div id="cams" class="cams"></div>
+    </section>
+
+    <!-- Daily -->
+    <section class="card resort-only" data-tab="daily">
       <div class="card-head"><h2>Daily forecast</h2><span class="hint">Tap a day for details</span></div>
       <div id="days" class="day-list"></div>
     </section>
 
-    <section class="card resort-only">
-      <div class="card-head"><h2>Next 3 days, hour by hour</h2></div>
-      <div id="hourly" class="chart hourly"></div>
-      <p class="legend"><i class="sw sw-snow"></i>Snow per hour <i class="sw sw-temp"></i>Temperature
-        <i class="sw sw-wind"></i>Wind <i class="sw sw-gust"></i>Gusts <i class="sw sw-lift"></i>Lift hours</p>
-    </section>
-
-    <section class="card resort-only">
+    <section class="card resort-only" data-tab="daily">
       <div class="card-head">
         <h2>Before &amp; during lift hours</h2>
         <span class="legend">
@@ -90,22 +104,42 @@
       <div id="chart" class="chart"></div>
     </section>
 
-    <section class="card resort-only">
+    <!-- Hourly -->
+    <section class="card resort-only" data-tab="hourly">
+      <div class="card-head"><h2>Next 3 days, hour by hour</h2><span class="hint">Hover or tap the chart for exact values</span></div>
+      <div id="hourly" class="hourly-wrap"></div>
+    </section>
+
+    <!-- Models -->
+    <section class="card resort-only" data-tab="models">
       <div class="card-head"><h2>Forecast range</h2><span class="hint">Running snow total by model · shaded = likely range</span></div>
       <div id="range" class="chart range-chart"></div>
     </section>
 
-    <section class="card resort-only">
-      <div class="card-head"><h2>Avalanche danger</h2></div>
-      <div id="avalanche"><p class="hint">Loading…</p></div>
+    <section class="card resort-only" id="modelsCard" data-tab="models">
+      <div class="card-head"><h2>Precipitation by model</h2>
+        <label class="switch"><input type="checkbox" id="stormToggle"> Storm totals</label>
+      </div>
+      <p class="hint">Calibrated snow (in) per 12 hours. Night = 4 pm–4 am, day = 4 am–4 pm.</p>
+      <div id="models" class="table-wrap"></div>
+      <div class="q-legend"><span><i class="q p-rain"></i>Rain</span><span><i class="q p-mix"></i>Mix</span><span><i class="q p-snow"></i>Snow</span><span><i class="q p-heavy"></i>6"+ snow</span><span class="muted">Gray rows: AI models, shown for reference, not in the blend.</span></div>
     </section>
 
-    <details class="card fold resort-only" id="mapCard">
-      <summary><h2>Trail map</h2></summary>
-      <div id="trailMap" class="trail-map"></div>
+    <details class="card fold resort-only method" data-tab="models">
+      <summary><h2>How this forecast is built</h2></summary>
+      <ul>
+        <li><b>Models:</b> HRRR (3 km, 0–48 h), NBM (2.5 km, ~11 days), ECMWF IFS (9 km, ~15 days), GFS, Canadian GEM, DWD ICON and UK Met Office. Each hour is a weighted average of the models that reach that far out. ECMWF AIFS and NOAA AIGFS are shown for reference only.</li>
+        <li><b>Calibration:</b> each model's archived forecasts were checked against what the nearest snow station measured over the last three winters. Each model gets a correction for how much it typically under- or over-forecasts there, and a weight based on how well it tracked real storms. Resorts without a station borrow the nearest calibrated resort's numbers.</li>
+        <li><b>Snow ratio:</b> snow water is turned into inches of snow using a temperature-based ratio (Kuchera method), reduced for strong winds.</li>
+        <li><b>Range:</b> 82 ensemble runs (GFS + ECMWF ensembles) give the 10th–90th percentile spread, scaled to the blend.</li>
+        <li><b>History:</b> station snow depth from NRCS SNOTEL (US) or Environment Canada (Whistler). New snow is estimated from depth gains, which runs a little low because fresh snow settles.</li>
+      </ul>
+      <div id="calib" class="table-wrap"></div>
+      <p class="hint">Data: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>, NRCS SNOTEL, Environment Canada, <a href="https://openskimap.org/" target="_blank" rel="noopener">OpenSkiMap</a>. These are computer model numbers, not a human forecaster's call.</p>
     </details>
 
-    <section class="card resort-only">
+    <!-- History -->
+    <section class="card resort-only" data-tab="history">
       <div class="card-head">
         <h2>Snowfall history</h2>
         <select id="seasonSel" aria-label="Season"></select>
@@ -115,28 +149,16 @@
       <p class="hint" id="historyNote"></p>
     </section>
 
-    <details class="card fold resort-only" id="modelsCard">
-      <summary><h2>Precipitation by model</h2></summary>
-      <div class="ptools">
-        <span class="hint">Calibrated snow (in) per 12 hours. Night = 4 pm–4 am, day = 4 am–4 pm.</span>
-        <label class="switch"><input type="checkbox" id="stormToggle"> Storm totals</label>
-      </div>
-      <div id="models" class="table-wrap"></div>
-      <div class="q-legend"><span><i class="q p-rain"></i>Rain</span><span><i class="q p-mix"></i>Mix</span><span><i class="q p-snow"></i>Snow</span><span><i class="q p-heavy"></i>6"+ snow</span><span class="muted">Gray rows: AI models, shown for reference, not in the blend.</span></div>
-    </details>
+    <!-- Mountain -->
+    <section class="card resort-only" data-tab="mountain">
+      <div class="card-head"><h2>Avalanche danger</h2></div>
+      <div id="avalanche"><p class="hint">Loading…</p></div>
+    </section>
 
-    <details class="card fold resort-only method">
-      <summary><h2>How this forecast is built</h2></summary>
-      <ul>
-        <li><b>Models:</b> HRRR (3 km, 0–48 h), NBM (2.5 km, ~11 days), ECMWF IFS (9 km, ~15 days), GFS, Canadian GEM, DWD ICON and UK Met Office. Each hour is a weighted average of the models that reach that far out.</li>
-        <li><b>Calibration:</b> each model's archived forecasts were checked against what the nearest snow station measured over the last three winters. Each model gets a correction for how much it typically under- or over-forecasts there, and a weight based on how well it tracked real storms. Resorts without a station borrow the nearest calibrated resort's numbers.</li>
-        <li><b>Snow ratio:</b> snow water is turned into inches of snow using a temperature-based ratio (Kuchera method), reduced for strong winds.</li>
-        <li><b>Range:</b> 82 ensemble runs (GFS + ECMWF ensembles) give the 10th–90th percentile spread, scaled to the blend.</li>
-        <li><b>History:</b> station snow depth from NRCS SNOTEL (US) or Environment Canada (Whistler). New snow is estimated from depth gains, which runs a little low because fresh snow settles.</li>
-      </ul>
-      <div id="calib" class="table-wrap"></div>
-      <p class="hint">Data: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>, NRCS SNOTEL, Environment Canada, <a href="https://openskimap.org/" target="_blank" rel="noopener">OpenSkiMap</a>. These are computer model numbers, not a human forecaster's call.</p>
-    </details>
+    <section class="card resort-only" id="mapCard" data-tab="mountain">
+      <div class="card-head"><h2>Trail map</h2></div>
+      <div id="trailMap" class="trail-map"></div>
+    </section>
 
     <p class="footer-link">📱 <a href="widget.html">Add a Home Screen widget</a></p>
   </main>
