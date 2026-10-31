@@ -28,14 +28,17 @@
       <path class="ridge near" d="M0 220 L0 196 L180 150 L320 196 L470 140 L610 192 L780 136 L930 190 L1080 146 L1230 194 L1440 160 V220Z"/>
     </svg>
     <div class="hero-inner">
-      <div class="picker-row">
-        <label class="picker">
-          <h1 id="resortName">Snow Forecast</h1>
-          <span class="chev" aria-hidden="true">▾</span>
-          <select id="resortSel" aria-label="Choose mountain"></select>
+      <nav class="topnav" id="topnav" aria-label="Views">
+        <button data-view="favorites">★ Favorites</button>
+        <label class="nav-pick" data-view="resort">All Resorts <span aria-hidden="true">▾</span>
+          <select id="resortSel" aria-label="All resorts"></select>
         </label>
-        <button id="favBtn" class="fav" aria-label="Favorite">☆</button>
+        <button data-view="upcoming">❄ Upcoming<span class="wide-only"> Snow</span></button>
         <button id="themeBtn" class="hero-btn theme-btn" aria-label="Theme">◐ Auto</button>
+      </nav>
+      <div class="picker-row">
+        <h1 id="resortName">Snow Forecast</h1>
+        <button id="favBtn" class="fav" aria-label="Favorite">☆</button>
       </div>
       <div class="meta-row">
         <p class="sub" id="resortSub"></p>
@@ -57,6 +60,7 @@
 
   <main>
     <section id="favView" class="fav-view" hidden></section>
+    <section id="upcomingView" class="upcoming-view" hidden></section>
 
     <!-- Summary -->
     <section id="alertBanner" class="powder resort-only" data-tab="summary" hidden></section>

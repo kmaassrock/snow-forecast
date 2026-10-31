@@ -89,11 +89,15 @@ async function fetchJSON(url) {
   return r.json();
 }
 
-function fetchDeterministic(resort, elevM) {
+// lean: only what snow totals need (blend models, 5 variables, 8 days), about a
+// quarter of the API cost, for ranking every resort in the background job.
+const LEAN_VARS = ['temperature_2m', 'precipitation', 'snowfall', 'temperature_700hPa', 'wind_speed_10m'];
+function fetchDeterministic(resort, elevM, lean = false) {
   const q = new URLSearchParams({
     latitude: resort.lat, longitude: resort.lon, elevation: elevM,
-    hourly: HOURLY_VARS.join(','), models: MODELS.map((m) => m.id).join(','),
-    forecast_days: FORECAST_DAYS, past_days: PAST_DAYS, timezone: resort.tz, wind_speed_unit: 'mph',
+    hourly: (lean ? LEAN_VARS : HOURLY_VARS).join(','),
+    models: MODELS.filter((m) => !lean || !m.ref).map((m) => m.id).join(','),
+    forecast_days: lean ? 8 : FORECAST_DAYS, past_days: lean ? 1 : PAST_DAYS, timezone: resort.tz, wind_speed_unit: 'mph',
   });
   return fetchJSON(`https://api.open-meteo.com/v1/forecast?${q}`);
 }
@@ -304,10 +308,11 @@ function periodTotal(days, ens, from, to) {
 }
 
 // Full forecast for one resort and elevation. { ensemble: false } skips the
-// ensemble request (no uncertainty ranges) for lightweight overviews.
-async function getForecast(resort, elevM, calib, { ensemble = true } = {}) {
+// ensemble request (no uncertainty ranges) for lightweight overviews; { lean: true }
+// also trims the model request to snow totals only (see fetchDeterministic).
+async function getForecast(resort, elevM, calib, { ensemble = true, lean = false } = {}) {
   const [det, ensRaw] = await Promise.all([
-    fetchDeterministic(resort, elevM),
+    fetchDeterministic(resort, elevM, lean),
     ensemble ? fetchEnsemble(resort, elevM).catch((e) => { console.warn('Ensemble failed', e); return null; }) : null,
   ]);
   const nowKey = nowLocalHour(resort.tz);

@@ -55,8 +55,12 @@ function loadFavorites() {
 const hash = location.hash.slice(1);
 const state = {
   // The app opens on Purgatory unless a link names a mountain (#vail) or the favorites list.
-  view: hash === 'favorites' ? 'favorites' : 'resort',
-  resortId: hash && hash !== 'favorites' ? hash : DEFAULT_RESORT,
+  // Views: 'resort' (one mountain), 'favorites' (starred cards), 'upcoming' (ranking).
+  view: hash === 'favorites' || hash === 'upcoming' ? hash : 'resort',
+  resortId: hash && hash !== 'favorites' && hash !== 'upcoming' ? hash : DEFAULT_RESORT,
+  upcoming: null, // data/upcoming.json: every resort's next 7 days + last 48 hours
+  upFilter: 'all',
+  upSort: 'next7',
   elev: store.get('elev') || 'mid',
   tab: store.get('tab') || 'summary',
   favorites: loadFavorites(),
@@ -101,10 +105,10 @@ function savedForecast(r, elev) {
 // ---------- header ----------
 
 function renderPicker() {
-  const fav = state.view === 'favorites';
-  const opt = (r) => `<option value="${r.id}" ${!fav && r.id === state.resortId ? 'selected' : ''}>${r.name}</option>`;
+  const onResort = state.view === 'resort';
+  const opt = (r) => `<option value="${r.id}" ${onResort && r.id === state.resortId ? 'selected' : ''}>${r.name}</option>`;
   const favs = state.favorites.map((id) => RESORTS.find((r) => r.id === id)).filter(Boolean);
-  let html = `<option value="favorites" ${fav ? 'selected' : ''}>★ All favorites</option>`;
+  let html = onResort ? '' : '<option value="" selected disabled>Choose a resort</option>';
   if (favs.length) html += `<optgroup label="★ Favorites">${favs.map(opt).join('')}</optgroup>`;
   for (const [code, label] of Object.entries(STATE_NAMES)) {
     const rs = RESORTS.filter((r) => r.state === code && !state.favorites.includes(r.id));
@@ -115,16 +119,19 @@ function renderPicker() {
 
 function renderHeader() {
   const r = resort();
-  const fav = state.view === 'favorites';
-  document.title = fav ? 'Favorites · Snow Forecast' : `${r.name} Snow Forecast`;
-  $('resortName').textContent = fav ? '★ Favorites' : r.name;
-  $('favBtn').hidden = fav;
+  const fav = state.view === 'favorites', up = state.view === 'upcoming';
+  document.title = fav ? 'Favorites · Snow Forecast' : up ? 'Upcoming Snow' : `${r.name} Snow Forecast`;
+  $('resortName').textContent = fav ? '★ Favorites' : up ? '❄ Upcoming Snow' : r.name;
+  $('favBtn').hidden = fav || up;
+  $('elevSeg').hidden = up;
+  document.querySelectorAll('#topnav [data-view]').forEach((b) => b.classList.toggle('on', b.dataset.view === state.view));
   const starred = state.favorites.includes(r.id);
   $('favBtn').textContent = starred ? '★' : '☆';
   $('favBtn').classList.toggle('on', starred);
   $('favBtn').setAttribute('aria-label', starred ? 'Remove from favorites' : 'Add to favorites');
   $('resortSub').textContent = fav
     ? `${state.favorites.length} mountain${state.favorites.length === 1 ? '' : 's'} · tap one to open it`
+    : up ? `Next 7 days at mid-mountain, every resort · most snow first`
     : `${ftLabel(r.elevations.base)}–${ftLabel(r.elevations.summit)} · ${r.region}`;
   $('elevSeg').innerHTML = ['base', 'mid', 'summit'].map((k) =>
     `<button data-elev="${k}" class="${k === state.elev ? 'on' : ''}" title="${fav ? '' : ftLabel(r.elevations[k])}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('');
@@ -872,7 +879,7 @@ function favCard(r, c) {
   const when = c?.failed ? "couldn't refresh" : c?.savedAt ? ago(c.savedAt) : '';
   return `<div class="card fav-card" role="button" tabindex="0" data-id="${r.id}">
     <div class="fc-head">
-      <span><b class="fc-name">${r.name}</b> <span class="muted">${ftLabel(r.elevations[state.elev])} · ${r.state}</span></span>
+      <span><b class="fc-name">${r.name}</b> <span class="muted">${ftLabel(r.elevations[state.elev])} · ${r.state}</span>${recentBadge(r.id)}</span>
       <span class="muted fc-when">${when}</span>
     </div>
     ${body}
@@ -894,6 +901,7 @@ async function loadFavView() {
     $('favView').innerHTML = resorts.map((r) => favCard(r, cards[r.id])).join('') + `<div class="card">${QUALITY_LEGEND}</div>`;
   };
   draw();
+  loadUpcoming().then(draw); // fills in the last-48-hours badges
   // Each card refreshes on its own; ensembles are skipped to keep this light.
   await Promise.all(resorts.map(async (r) => {
     if (cards[r.id] && Date.now() - cards[r.id].savedAt < STALE_MS) return;
@@ -910,10 +918,84 @@ async function loadFavView() {
   }));
 }
 
+// "❄ 4" last 48 hrs" from data/upcoming.json (resort report or station).
+function recentBadge(id) {
+  const rec = state.upcoming?.resorts?.[id]?.recent48;
+  if (!rec) return '';
+  return `<span class="fc-recent ${rec.inches >= 1 ? 'has' : ''}" title="${rec.source}">❄ ${fmtIn(rec.inches)} last 48 hrs</span>`;
+}
+
+// ---------- upcoming snow (every resort, ranked) ----------
+
+let upcomingLoad = null;
+function loadUpcoming(force) {
+  if (!upcomingLoad || force) {
+    upcomingLoad = fetch('data/upcoming.json', { cache: 'no-cache' }).then((r) => r.json())
+      .then((d) => { state.upcoming = d; return d; })
+      .catch((e) => { console.warn('No upcoming snow data', e); upcomingLoad = null; return null; });
+  }
+  return upcomingLoad;
+}
+
+const UP_SORTS = {
+  next7: { label: 'Next 7 days', value: (e) => e.next7 ?? -1 },
+  tomorrow: { label: 'By 9 am tomorrow', value: (e) => e.tomorrowBy9 ?? -1 },
+  recent48: { label: 'Last 48 hours', value: (e) => e.recent48?.inches ?? -1 },
+};
+
+function renderUpcoming() {
+  const d = state.upcoming;
+  if (!d) { $('upcomingView').innerHTML = '<p class="card hint">Loading every resort…</p>'; return; }
+  const filters = [['all', 'All'], ['fav', '★ Favorites'], ['CO', 'Colorado'], ['UT', 'Utah'], ['CA', 'California']];
+  const rows = RESORTS
+    .filter((r) => d.resorts[r.id]?.days)
+    .filter((r) => state.upFilter === 'all' || (state.upFilter === 'fav' ? state.favorites.includes(r.id) : r.state === state.upFilter))
+    .map((r) => ({ r, e: d.resorts[r.id] }))
+    .sort((a, b) => UP_SORTS[state.upSort].value(b.e) - UP_SORTS[state.upSort].value(a.e) || a.r.name.localeCompare(b.r.name));
+  const max = Math.max(3, ...rows.flatMap(({ e }) => e.days.map((x) => x.snow)));
+  const first = rows[0]?.e;
+  const dayHead = first ? first.days.map((x) => {
+    const l = dayLabel(x.date, first.todayStr);
+    return `<span class="${l.weekend ? 'wknd' : ''}">${l.short === 'Today' ? 'Tdy' : l.weekend ? l.wk.slice(0, 2) : l.wk[0]}</span>`;
+  }).join('') : '';
+  const list = rows.map(({ r, e }, i) => {
+    const bars = e.days.map((x) => {
+      const h = x.snow < 0.05 ? 2 : Math.max(4, (x.snow / max) * 34);
+      return `<span class="ub ${x.snow < 0.05 ? 'none' : QUALITY[x.q] || 'q-med'} ${x.snow >= POWDER_DAY_IN ? 'pow' : ''}" style="height:${h}px" title="${x.date}: ${fmtIn(x.snow)}"></span>`;
+    }).join('');
+    const rec = e.recent48;
+    return `<button class="up-row" data-id="${r.id}">
+      <span class="up-rank">${i + 1}</span>
+      <span class="up-name"><b>${state.favorites.includes(r.id) ? '★ ' : ''}${r.name}</b><small>${r.state} · ${ftLabel(r.elevations.mid)}</small></span>
+      <span class="up-bars">${bars}</span>
+      <span class="up-num ${state.upSort === 'next7' ? 'sorted' : ''}"><b>${fmtIn(e.next7)}</b><small>7 days</small></span>
+      <span class="up-num ${state.upSort === 'tomorrow' ? 'sorted' : ''}"><b>${fmtIn(e.tomorrowBy9)}</b><small>by 9am tmw</small></span>
+      <span class="up-num ${state.upSort === 'recent48' ? 'sorted' : ''}"><b>${rec ? fmtIn(rec.inches) : '–'}</b><small>last 48h</small></span>
+    </button>`;
+  }).join('');
+  $('upcomingView').innerHTML = `<section class="card">
+    <div class="up-tools">
+      <div class="chips">${filters.map(([k, l]) => `<button data-filter="${k}" class="${state.upFilter === k ? 'on' : ''}">${l}</button>`).join('')}</div>
+      <label class="up-sort">Sort by <select id="upSort">${Object.entries(UP_SORTS).map(([k, v]) => `<option value="${k}" ${state.upSort === k ? 'selected' : ''}>${v.label}</option>`).join('')}</select></label>
+    </div>
+    <div class="up-head"><span></span><span>Resort</span><span class="up-bars">${dayHead}</span><span>7 days</span><span>Tmw 9am</span><span>48h</span></div>
+    <div class="up-list">${list || '<p class="hint">No resorts match.</p>'}</div>
+    <p class="hint">Model blend at each resort's mid-mountain, updated ${ago(Date.parse(d.generated))}. Last 48 hours is measured: the resort's own report where available, otherwise the nearest snow station.</p>
+  </section>`;
+}
+
+async function loadUpcomingView() {
+  renderHeader();
+  renderUpcoming();
+  await loadUpcoming(true);
+  if (state.view === 'upcoming') renderUpcoming();
+}
+
 function applyView() {
-  const fav = state.view === 'favorites';
-  document.body.classList.toggle('fav-mode', fav);
-  $('favView').hidden = !fav;
+  document.body.classList.toggle('fav-mode', state.view === 'favorites');
+  document.body.classList.toggle('list-mode', state.view !== 'resort');
+  $('favView').hidden = state.view !== 'favorites';
+  $('upcomingView').hidden = state.view !== 'upcoming';
 }
 
 // ---------- loading ----------
@@ -996,11 +1078,12 @@ async function load({ redraw = true } = {}) {
 }
 
 function switchResort(id) {
-  if (id === 'favorites') {
-    state.view = 'favorites';
-    history.replaceState(null, '', '#favorites');
+  if (id === 'favorites' || id === 'upcoming') {
+    state.view = id;
+    history.replaceState(null, '', '#' + id);
     applyView();
-    loadFavView();
+    window.scrollTo(0, 0);
+    if (id === 'favorites') loadFavView(); else loadUpcomingView();
     return;
   }
   if (!id || (id === state.resortId && state.view === 'resort')) return;
@@ -1015,6 +1098,19 @@ function switchResort(id) {
 }
 
 $('resortSel').addEventListener('change', (e) => switchResort(e.target.value));
+$('topnav').addEventListener('click', (e) => {
+  const v = e.target.closest('button[data-view]')?.dataset.view;
+  if (v) switchResort(v);
+});
+$('upcomingView').addEventListener('click', (e) => {
+  const f = e.target.closest('button[data-filter]')?.dataset.filter;
+  if (f) { state.upFilter = f; renderUpcoming(); return; }
+  const row = e.target.closest('.up-row');
+  if (row) switchResort(row.dataset.id);
+});
+$('upcomingView').addEventListener('change', (e) => {
+  if (e.target.id === 'upSort') { state.upSort = e.target.value; renderUpcoming(); }
+});
 $('favView').addEventListener('click', (e) => {
   const card = e.target.closest('.fav-card');
   if (card) switchResort(card.dataset.id);
@@ -1035,7 +1131,7 @@ $('elevSeg').addEventListener('click', (e) => {
   state.elev = k;
   store.set('elev', k);
   loadRunTrend();
-  if (state.view === 'favorites') loadFavView(); else load();
+  if (state.view === 'favorites') loadFavView(); else if (state.view === 'resort') load();
 });
 $('refresh').addEventListener('click', load);
 
@@ -1043,18 +1139,21 @@ $('refresh').addEventListener('click', load);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState !== 'visible') return;
   if (state.view === 'favorites') loadFavView();
+  else if (state.view === 'upcoming') loadUpcomingView();
   else if (!state.fetchedAt || Date.now() - state.fetchedAt > STALE_MS) { load(); loadStation(); }
 });
 setInterval(renderStatus, 60e3);
 
 applyView();
 // Theme: Auto follows the phone's light/dark setting; the button cycles Auto → Light → Dark.
-const THEMES = { auto: '◐ Auto', light: '☀︎ Light', dark: '☾ Dark' };
+const THEMES = { auto: ['◐', 'Auto'], light: ['☀︎', 'Light'], dark: ['☾', 'Dark'] };
 let theme = store.get('theme') || 'auto';
 function applyTheme() {
   if (theme === 'auto') delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = theme;
-  $('themeBtn').textContent = THEMES[theme];
+  const [icon_, label] = THEMES[theme];
+  $('themeBtn').innerHTML = `${icon_}<span class="wide-only"> ${label}</span>`;
+  $('themeBtn').setAttribute('aria-label', `Theme: ${label}`);
   const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
   document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {
     if (theme === 'auto') m.content = m.media.includes('dark') ? '#0e0e10' : '#f2f4f7';
@@ -1091,7 +1190,7 @@ applyTheme();
 
 // Saved forecast first so the app opens instantly; calibration and fresh data follow.
 if (state.view === 'resort') showSaved();
-loadCalibration().then(() => (state.view === 'favorites' ? loadFavView() : load({ redraw: false })));
+loadCalibration().then(() => (state.view === 'favorites' ? loadFavView() : state.view === 'upcoming' ? loadUpcomingView() : load({ redraw: false })));
 loadReports().then(() => { if (state.view === 'resort') { renderSnowReport(); if (state.days.length) renderSnowSummary(); } });
 if (state.view === 'resort') loadResortExtras();
 

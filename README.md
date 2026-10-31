@@ -69,3 +69,10 @@ Purgatory and Wolf Creek are set up. To add one, find the camera ids on the reso
 The blend uses HRRR, NBM, ECMWF, GFS, Canadian, ICON and UKMO. ECMWF AIFS and NOAA AIGFS are fetched and
 shown for reference (model table, forecast range) but kept out of the blend: in a backtest against SNOTEL
 (AIFS since Feb 2025, AIGFS since Jan 2026) adding them made errors slightly worse.
+
+## Upcoming Snow
+
+`scripts/upcoming.cjs` runs on each deploy and writes `data/upcoming.json`: a lean 7-day forecast for every
+resort (blend models only, 5 variables, about a quarter of the normal API cost) plus snow measured in the
+last 48 hours (resort report, else the SNOTEL station, fetched for all stations in one request). It powers
+the Upcoming Snow ranking and the "last 48 hrs" badge on favorite cards.
