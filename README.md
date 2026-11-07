@@ -85,3 +85,13 @@ the Upcoming Snow ranking and the "last 48 hrs" badge on favorite cards.
   device) goes to the public OSRM router once for times to every resort. Estimates ignore winter closures.
 - Storm tracker: groups resorts whose biggest 3-day window (≥ 6") starts within a day of each other.
 - Snow map: Leaflet + OpenStreetMap tiles, dots sized and colored by the selected metric.
+
+## Over-forecast correction
+
+Forecasts of snowy days promise more snow than falls (a backtest of the calibrated blend against SNOTEL
+found 10–20% too much at 1–7 days ahead), and far-out days rest on just a few models. `correctForLead` in
+`core.js` scales snowy days by a factor for how many days ahead they are, and from day 8 leans toward the
+ensemble median. `scripts/verify-forecasts.cjs` runs every morning (`.github/workflows/verify.yml`): it logs
+the raw blend at every SNOTEL station 1–15 days ahead (`data/forecast-log/`, 75-day window), scores past logs
+against what fell, and writes `data/lead-bias.json`. Each lead time switches from its backtest factor to its
+measured factor after 40 snowy station-days; days 8–15 start with day 7's factor.

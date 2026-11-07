@@ -120,6 +120,11 @@
       <div id="range" class="chart range-chart"></div>
     </section>
 
+    <section class="card resort-only" data-tab="models">
+      <div class="card-head"><h2>Forecast check</h2><span class="hint">How much forecasts over-promise, and the correction applied</span></div>
+      <div id="leadCheck"></div>
+    </section>
+
     <section class="card resort-only" id="modelsCard" data-tab="models">
       <div class="card-head"><h2>Precipitation by model</h2>
         <label class="switch"><input type="checkbox" id="stormToggle"> Storm totals</label>
@@ -135,6 +140,7 @@
         <li><b>Models:</b> HRRR (3 km, 0–48 h), NBM (2.5 km, ~11 days), ECMWF IFS (9 km, ~15 days), GFS, Canadian GEM, DWD ICON and UK Met Office. Each hour is a weighted average of the models that reach that far out. ECMWF's and NOAA's AI models (AIFS, AIGFS) are shown for reference only; AIGFS is hidden at Whistler.</li>
         <li><b>Calibration:</b> each model's archived forecasts were checked against what the nearest snow station measured over the last three winters. Each model gets a correction for how much it typically under- or over-forecasts there, and a weight based on how well it tracked real storms. Resorts without a station borrow the nearest calibrated resort's numbers.</li>
         <li><b>Snow ratio:</b> snow water is turned into inches of snow using a temperature-based ratio (Kuchera method), reduced for strong winds.</li>
+        <li><b>Over-forecast correction:</b> forecasts of snowy days tend to promise more than falls, so each day is reduced by a factor for how far ahead it is (−10 to −16% from backtests), and from day 8 the forecast leans toward the ensemble median. A daily job scores every forecast against the snow stations and updates the factors (see Forecast check).</li>
         <li><b>Range:</b> 82 ensemble runs (GFS + ECMWF ensembles) give the 10th–90th percentile spread, scaled to the blend.</li>
         <li><b>History:</b> station snow depth from NRCS SNOTEL (US) or Environment Canada (Whistler). New snow is estimated from depth gains, which runs a little low because fresh snow settles.</li>
       </ul>

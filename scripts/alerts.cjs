@@ -20,11 +20,11 @@ const STORM_IN = +(process.env.STORM_IN || 12); // 3-day total
 const fmt = (x) => `${x < 1 ? x.toFixed(1) : Math.round(x)}"`;
 const weekday = (d) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
 
-async function check(resort, calib) {
+async function check(resort, calib, leadBias) {
   // Retry network hiccups so a blip on the build server doesn't skip an alert.
   let f;
   for (let i = 1; !f; i++) {
-    try { f = await getForecast(resort, resort.elevations.mid, calib); } catch (e) {
+    try { f = await getForecast(resort, resort.elevations.mid, calib, { leadBias }); } catch (e) {
       if (i >= 3) throw e;
       await new Promise((ok) => setTimeout(ok, 3000 * i));
     }
@@ -40,13 +40,15 @@ async function check(resort, calib) {
 
 (async () => {
   const calibration = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'calibration.json'), 'utf8'));
+  let leadBias = null;
+  try { leadBias = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'lead-bias.json'), 'utf8')); } catch {}
   const wanted = (process.env.ALERT_RESORTS || DEFAULT_RESORT).split(',').map((s) => s.trim()).filter(Boolean);
   const resorts = RESORTS.filter((r) => wanted.includes(r.id));
 
   const lines = [];
   for (const r of resorts) {
     try {
-      const line = await check(r, calibration.resorts[r.id]);
+      const line = await check(r, calibration.resorts[r.id], leadBias);
       console.log(`${r.name}: ${line ? 'ALERT' : 'no alert'}`);
       if (line) lines.push(line);
     } catch (e) {

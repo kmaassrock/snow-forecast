@@ -13,8 +13,8 @@ const { getForecast, periodTotal, snowType, mmToIn, addDays, nowLocalHour } = re
 const r1 = (x) => Math.round(x * 10) / 10;
 const weekday = (d) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
 
-async function summarize(resort, calib) {
-  const f = await getForecast(resort, resort.elevations.mid, calib);
+async function summarize(resort, calib, leadBias) {
+  const f = await getForecast(resort, resort.elevations.mid, calib, { leadBias });
   const ti = f.days.findIndex((d) => d.date === f.todayStr);
   const now = nowLocalHour(resort.tz);
   // Before 9 am the next lift opening is today's; after, it's tomorrow's.
@@ -52,10 +52,12 @@ const WIDGET_RESORTS = (process.env.WIDGET_RESORTS || 'purgatory,wolf-creek,vail
 
 (async () => {
   const calibration = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'calibration.json'), 'utf8'));
+  let leadBias = null;
+  try { leadBias = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'lead-bias.json'), 'utf8')); } catch {}
   const out = { generated: new Date().toISOString(), resorts: [] };
   for (const r of WIDGET_RESORTS.map((id) => RESORTS.find((x) => x.id === id)).filter(Boolean)) {
     try {
-      out.resorts.push(await summarize(r, calibration.resorts[r.id]));
+      out.resorts.push(await summarize(r, calibration.resorts[r.id], leadBias));
     } catch (e) {
       console.error(`${r.name}: forecast failed`, e.message);
     }

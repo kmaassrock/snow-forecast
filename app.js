@@ -79,7 +79,7 @@ const upcoming = () => state.days.slice(Math.max(0, todayIndex()));
 // ---------- saved forecasts (instant open) ----------
 
 // Bump SAVED_VERSION when the forecast's shape changes, so older saves are ignored.
-const SAVED_VERSION = 2;
+const SAVED_VERSION = 3;
 const savedKey = (id, elev) => `fc${SAVED_VERSION}:${id}:${elev}`;
 
 function saveForecast(id, elev, f) {
@@ -307,7 +307,7 @@ function renderSnowSummary() {
     + `<div class="strip-wrap" data-resort="${state.resortId}"><div class="strip">${past}${nowBoxHTML('inline')}
         <div class="strip-part future">${summaryHTML(state.days, state.ens, state.todayStr, { selected: state.selected })}</div></div></div>`
     + QUALITY_LEGEND
-    + `<p class="hint">${st ? `<span class="phone-only">Swipe the bars right for the past 15 days. </span>Past days measured at ${st.station} station. ` : ''}Each forecast day runs 4 pm the day before to 4 pm.</p>`;
+    + `<p class="hint">${st ? `<span class="phone-only">Swipe the bars right for the past 15 days. </span>Past days measured at ${st.station} station. ` : ''}Each forecast day runs 4 pm the day before to 4 pm. Snowy days are adjusted down for typical over-forecasting, more so 8+ days out (Models → Forecast check).</p>`;
   $('snowSummary').querySelectorAll('button.col').forEach((b) => b.addEventListener('click', () => selectDay(b.dataset.date, true)));
   // On narrow screens the strip scrolls sideways; start at the forecast (past days are a swipe left).
   const wrap = $('snowSummary').querySelector('.strip-wrap');
@@ -573,6 +573,7 @@ function dayDetail(d, lead) {
       ${r ? `<dt>Could be</dt><dd>${fmtRange(r.lo, r.hi)}${conf ? ` · ${conf.toLowerCase()} confidence` : ''}</dd>` : ''}
       ${powderQuality(d) ? `<dt>Powder quality</dt><dd>${powderQuality(d).label}</dd>` : ''}
       ${d.pop != null ? `<dt>Chance of precip</dt><dd>${d.pop}%</dd>` : ''}
+      ${d.leadFactor && d.leadFactor < 0.97 ? `<dt>Before over-forecast correction</dt><dd>${fmtIn(d.rawSnow)} <span class="muted">(shown ${Math.round((1 - d.leadFactor) * 100)}% lower)</span></dd>` : ''}
       <dt>Snow water</dt><dd>${mmToIn(d.swe).toFixed(2)}"</dd>
       ${d.rainIn >= 0.05 ? `<dt>Rain</dt><dd>${d.rainIn.toFixed(2)}"</dd>` : ''}
       <dt>Wind (lift hours)</dt><dd>${compass(d.dir)} ${Math.round(d.wind)} mph, gusts ${Math.round(d.gust)}</dd>
@@ -867,6 +868,26 @@ function renderCalibration() {
     <table><tr><th class="name">Model</th><th>Correction</th><th>Skill (r)</th><th>Weight</th></tr>${rows}</table>`;
 }
 
+// Forecast check (Models tab): how much each lead time's forecasts over-promised,
+// from the daily scoring (data/lead-bias.json), and the correction applied.
+function renderLeadCheck() {
+  const lb = state.leadBias;
+  if (!lb) { $('leadCheck').innerHTML = '<p class="hint">Not available yet.</p>'; return; }
+  const measured = Object.values(lb.source).filter((x) => x === 'measured').length;
+  const rows = Object.keys(lb.factors).map(Number).sort((a, b) => a - b).map((L) => {
+    const s = lb.leads?.[L] || {}, f = lb.factors[L];
+    const promised = s.ratio ? `${Math.round(100 / s.ratio)}%` : '–';
+    return `<tr><td>${L} day${L > 1 ? 's' : ''}</td><td><b>${f < 1 ? '−' : '+'}${Math.abs(Math.round((1 - f) * 100))}%</b></td>
+      <td>${lb.source[L] === 'measured' ? 'Measured' : L <= 7 ? 'Past winters' : 'Day 7 (not yet measured)'}</td>
+      <td>${s.snowyDays || 0}</td><td>${promised}</td></tr>`;
+  }).join('');
+  $('leadCheck').innerHTML = `<p class="hint">On snowy days, forecasts tend to promise more snow than actually falls. Each day's snow is reduced by the
+    amount below for how far ahead it is, and from day 8 on the forecast also leans toward the middle of the 82 ensemble runs.
+    Scoring started ${new Date(lb.logsSince + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}; a lead time switches to its own
+    measured number after ${lb.minDays} snowy station-days (${measured} of 15 so far).</p>
+    <div class="table-wrap"><table><tr><th class="name">Days ahead</th><th>Correction</th><th>Based on</th><th>Snowy days scored</th><th>Forecast as % of what fell</th></tr>${rows}</table></div>`;
+}
+
 function renderResort() {
   renderBanner();
   renderSnowSummary();
@@ -877,6 +898,7 @@ function renderResort() {
   renderChart();
   renderRange();
   renderModels();
+  renderLeadCheck();
 }
 
 // ---------- favorites overview ----------
@@ -915,7 +937,7 @@ async function loadFavView() {
   await Promise.all(resorts.map(async (r) => {
     if (cards[r.id] && Date.now() - cards[r.id].savedAt < STALE_MS) return;
     try {
-      const f = await getForecast(r, r.elevations[state.elev], state.calibration?.resorts?.[r.id], { ensemble: false });
+      const f = await getForecast(r, r.elevations[state.elev], state.calibration?.resorts?.[r.id], { ensemble: false, leadBias: state.leadBias });
       if (seq !== favSeq) return;
       saveForecast(r.id, state.elev, f);
       cards[r.id] = { ...f, savedAt: Date.now() };
@@ -1216,8 +1238,8 @@ function applyView() {
 
 async function loadCalibration() {
   // no-cache: always revalidate, so a recalibration shows up right away.
-  try { state.calibration = await (await fetch('data/calibration.json', { cache: 'no-cache' })).json(); }
-  catch (e) { console.warn('No calibration file', e); }
+  const get = (f) => fetch(f, { cache: 'no-cache' }).then((r) => r.json()).catch((e) => { console.warn(`No ${f}`, e); return null; });
+  [state.calibration, state.leadBias] = await Promise.all([get('data/calibration.json'), get('data/lead-bias.json')]);
 }
 
 async function loadStation() {
@@ -1274,7 +1296,7 @@ async function load({ redraw = true } = {}) {
   if (redraw) showSaved();
   else { renderCalibration(); state.refreshing = true; renderStatus(); }
   try {
-    const f = await getForecast(r, elevM, state.calibration?.resorts?.[r.id]);
+    const f = await getForecast(r, elevM, state.calibration?.resorts?.[r.id], { leadBias: state.leadBias });
     if (seq !== loadSeq) return; // a newer request replaced this one
     saveForecast(r.id, state.elev, f);
     Object.assign(state, { days: f.days, ens: f.ens, todayStr: f.todayStr, fetchedAt: Date.now(), refreshing: false, hasEnsemble: f.hasEnsemble });

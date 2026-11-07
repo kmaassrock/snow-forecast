@@ -92,6 +92,7 @@ async function inBatches(items, size, fn) {
 (async () => {
   const calibration = readJSON('calibration.json')?.resorts || {};
   const reports = readJSON('reports.json')?.resorts || {};
+  const leadBias = readJSON('lead-bias.json');
   const [stations, seasons, previous] = await Promise.all([
     withRetry(stationSnow).catch((e) => { console.error(e.message); return {}; }),
     withRetry(stationSeason).catch((e) => { console.error(e.message); return {}; }),
@@ -111,7 +112,7 @@ async function inBatches(items, size, fn) {
     else if (ss?.depth != null) entry.depth = { inches: ss.depth, source: `${st.name} station` };
     if (ss?.pctNormal != null) entry.pctNormal = ss.pctNormal;
     try {
-      const f = await withRetry(() => getForecast(r, r.elevations.mid, calibration[r.id], { ensemble: false, lean: true }));
+      const f = await withRetry(() => getForecast(r, r.elevations.mid, calibration[r.id], { ensemble: false, lean: true, leadBias }));
       const ti = f.days.findIndex((d) => d.date === f.todayStr);
       const days = f.days.slice(ti, ti + 7);
       entry.days = days.map((d) => ({ date: d.date, snow: r1(d.snow), q: d.slr && d.snow >= 0.5 ? snowType(d.slr).cls : null }));
