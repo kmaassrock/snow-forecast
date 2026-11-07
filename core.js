@@ -94,12 +94,12 @@ async function fetchJSON(url) {
 // lean: only what snow totals need (blend models, 5 variables, 8 days), about a
 // quarter of the API cost, for ranking every resort in the background job.
 const LEAN_VARS = ['temperature_2m', 'precipitation', 'snowfall', 'temperature_700hPa', 'wind_speed_10m'];
-function fetchDeterministic(resort, elevM, lean = false) {
+function fetchDeterministic(resort, elevM, lean = false, leanDays = 8) {
   const q = new URLSearchParams({
     latitude: resort.lat, longitude: resort.lon, elevation: elevM,
     hourly: (lean ? LEAN_VARS : HOURLY_VARS).join(','),
     models: MODELS.filter((m) => (!lean || !m.ref) && !m.hideAt?.includes(resort.id)).map((m) => m.id).join(','),
-    forecast_days: lean ? 8 : FORECAST_DAYS, past_days: lean ? 1 : PAST_DAYS, timezone: resort.tz, wind_speed_unit: 'mph',
+    forecast_days: lean ? leanDays : FORECAST_DAYS, past_days: lean ? 1 : PAST_DAYS, timezone: resort.tz, wind_speed_unit: 'mph',
   });
   return fetchJSON(`https://api.open-meteo.com/v1/forecast?${q}`);
 }
@@ -312,9 +312,11 @@ function periodTotal(days, ens, from, to) {
 // Full forecast for one resort and elevation. { ensemble: false } skips the
 // ensemble request (no uncertainty ranges) for lightweight overviews; { lean: true }
 // also trims the model request to snow totals only (see fetchDeterministic).
-async function getForecast(resort, elevM, calib, { ensemble = true, lean = false } = {}) {
+// leadBias (data/lead-bias.json) corrects for over-forecasting by lead time; pass
+// correct: false for the raw blend (used when logging forecasts to score them).
+async function getForecast(resort, elevM, calib, { ensemble = true, lean = false, leanDays, leadBias = null, correct = true } = {}) {
   const [det, ensRaw] = await Promise.all([
-    fetchDeterministic(resort, elevM, lean),
+    fetchDeterministic(resort, elevM, lean, leanDays),
     ensemble ? fetchEnsemble(resort, elevM).catch((e) => { console.warn('Ensemble failed', e); return null; }) : null,
   ]);
   const nowKey = nowLocalHour(resort.tz);
@@ -325,9 +327,44 @@ async function getForecast(resort, elevM, calib, { ensemble = true, lean = false
   for (const h of hours) h.pop = chance.hour[h.time] ?? null;
   const days = buildDays(hours, ens, todayStr);
   for (const d of days) d.pop = chance.day[d.date] ?? null;
+  if (correct) correctForLead(days, ens, todayStr, leadBias);
   return { days, ens, todayStr, hasEnsemble: !!ensRaw };
 }
 
+// Starting factors, from backtesting the calibrated blend against SNOTEL (winters
+// 2024–25 and 2025–26): measured ÷ forecast on snowy days, by days ahead. Days 8–15
+// had no archive to test, so they use day 7's until the daily scoring measures them.
+const DEFAULT_LEAD_FACTORS = { 1: 0.85, 2: 0.87, 3: 0.91, 4: 0.89, 5: 0.89, 6: 0.87, 7: 0.84 };
+
+// Past forecasts over-promised snowy days by 10–20%, so snow on snowy days is
+// scaled by the factor for how many days ahead it is (light days barely change).
+// From day 8 the blend also leans toward the ensemble median, which swings far
+// less than the few model runs that reach that far out.
+function correctForLead(days, ens, todayStr, leadBias) {
+  const ti = days.findIndex((d) => d.date === todayStr);
+  if (ti < 0) return;
+  const factors = { ...DEFAULT_LEAD_FACTORS, ...(leadBias?.factors || {}) };
+  days.forEach((d, i) => {
+    const lead = Math.max(1, i - ti);
+    if (i < ti || d.snow < 0.05) return;
+    const F = factors[lead] ?? factors[7];
+    // Full correction from about 4 mm of snow water (~1/6") up, none below 1 mm.
+    const strength = Math.min(1, Math.max(0, (d.swe - 1) / 3));
+    let target = d.snow * (1 - (1 - F) * strength);
+    const members = ens[d.date] ? Object.values(ens[d.date]).sort((a, b) => a - b) : [];
+    if (lead >= 8 && members.length >= 10) {
+      const w = Math.max(0.4, 1 - 0.075 * (lead - 7)); // 0.93 at day 8 → 0.4 by day 15
+      target = w * target + (1 - w) * percentile(members, 0.5);
+    }
+    const k = target / d.snow;
+    d.rawSnow = d.snow;
+    d.leadFactor = k;
+    for (const key of ['snow', 'overnight', 'lifts', 'swe']) d[key] *= k;
+    for (const h of d.hours) { h.snow *= k; h.swe *= k; }
+    d.range = scaledRange(d.snow, ens[d.date]);
+  });
+}
+
 if (typeof module !== 'undefined') {
-  module.exports = { MODELS, FORECAST_DAYS, getForecast, periodTotal, snowType, mmToIn, sum, addDays, nowLocalHour };
+  module.exports = { MODELS, FORECAST_DAYS, DEFAULT_LEAD_FACTORS, getForecast, periodTotal, snowType, mmToIn, sum, addDays, nowLocalHour };
 }

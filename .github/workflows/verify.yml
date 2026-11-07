@@ -1,0 +1,30 @@
+name: Score forecasts
+
+# Every morning, after SNOTEL's midnight readings: log today's forecasts, score
+# earlier ones against what fell, and update data/lead-bias.json (the lead-time
+# correction factors). Commits the log and factors back to the repo.
+on:
+  schedule:
+    - cron: '0 14 * * *' # 7 am MST / 8 am MDT
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/verify-forecasts.cjs
+      - run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add data/forecast-log data/lead-bias.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Score forecasts $(date -u +%F)"
+          git pull --rebase
+          git push

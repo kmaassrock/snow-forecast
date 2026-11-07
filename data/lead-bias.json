@@ -1,0 +1,162 @@
+{
+  "updated": "2026-11-07",
+  "logsSince": "2026-11-07",
+  "snowyMm": 4,
+  "minDays": 40,
+  "factors": {
+    "1": 0.85,
+    "2": 0.87,
+    "3": 0.91,
+    "4": 0.89,
+    "5": 0.89,
+    "6": 0.87,
+    "7": 0.84,
+    "8": 0.84,
+    "9": 0.84,
+    "10": 0.84,
+    "11": 0.84,
+    "12": 0.84,
+    "13": 0.84,
+    "14": 0.84,
+    "15": 0.84
+  },
+  "source": {
+    "1": "backtest",
+    "2": "backtest",
+    "3": "backtest",
+    "4": "backtest",
+    "5": "backtest",
+    "6": "backtest",
+    "7": "backtest",
+    "8": "backtest",
+    "9": "backtest",
+    "10": "backtest",
+    "11": "backtest",
+    "12": "backtest",
+    "13": "backtest",
+    "14": "backtest",
+    "15": "backtest"
+  },
+  "leads": {
+    "1": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    },
+    "2": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    },
+    "3": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    },
+    "4": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    },
+    "5": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    },
+    "6": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    },
+    "7": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    },
+    "8": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    },
+    "9": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    },
+    "10": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    },
+    "11": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    },
+    "12": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    },
+    "13": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    },
+    "14": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    },
+    "15": {
+      "snowyDays": 0,
+      "forecastMm": 0,
+      "measuredMm": 0,
+      "allForecastMm": 0,
+      "allMeasuredMm": 0,
+      "ratio": null
+    }
+  }
+}
