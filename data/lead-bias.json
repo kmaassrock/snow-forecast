@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-08",
+  "updated": "2026-11-09",
   "logsSince": "2026-11-07",
   "snowyMm": 4,
   "minDays": 40,
@@ -43,7 +43,7 @@
       "forecastMm": 0,
       "measuredMm": 0,
       "allForecastMm": 0,
-      "allMeasuredMm": 0,
+      "allMeasuredMm": 15,
       "ratio": null
     },
     "2": {
