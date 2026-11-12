@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-11",
+  "updated": "2026-11-12",
   "logsSince": "2026-11-07",
   "snowyMm": 4,
   "minDays": 40,
@@ -43,7 +43,7 @@
       "forecastMm": 0,
       "measuredMm": 0,
       "allForecastMm": 0,
-      "allMeasuredMm": 122,
+      "allMeasuredMm": 30,
       "ratio": null
     },
     "2": {
@@ -51,15 +51,15 @@
       "forecastMm": 0,
       "measuredMm": 0,
       "allForecastMm": 0,
-      "allMeasuredMm": 112,
+      "allMeasuredMm": 23,
       "ratio": null
     },
     "3": {
       "snowyDays": 0,
       "forecastMm": 0,
       "measuredMm": 0,
-      "allForecastMm": 3,
-      "allMeasuredMm": 97,
+      "allForecastMm": 4,
+      "allMeasuredMm": 10,
       "ratio": null
     },
     "4": {
@@ -67,7 +67,7 @@
       "forecastMm": 0,
       "measuredMm": 0,
       "allForecastMm": 0,
-      "allMeasuredMm": 0,
+      "allMeasuredMm": 5,
       "ratio": null
     },
     "5": {
