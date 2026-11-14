@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-13",
+  "updated": "2026-11-14",
   "logsSince": "2026-11-07",
   "snowyMm": 4,
   "minDays": 40,
@@ -39,51 +39,51 @@
   },
   "leads": {
     "1": {
-      "snowyDays": 0,
-      "forecastMm": 0,
-      "measuredMm": 0,
-      "allForecastMm": 0,
-      "allMeasuredMm": 46,
-      "ratio": null
+      "snowyDays": 14,
+      "forecastMm": 364,
+      "measuredMm": 307,
+      "allForecastMm": 370,
+      "allMeasuredMm": 366,
+      "ratio": 0.846
     },
     "2": {
-      "snowyDays": 0,
-      "forecastMm": 0,
-      "measuredMm": 0,
-      "allForecastMm": 0,
-      "allMeasuredMm": 38,
-      "ratio": null
+      "snowyDays": 9,
+      "forecastMm": 321,
+      "measuredMm": 274,
+      "allForecastMm": 333,
+      "allMeasuredMm": 358,
+      "ratio": 0.854
     },
     "3": {
-      "snowyDays": 0,
-      "forecastMm": 0,
-      "measuredMm": 0,
-      "allForecastMm": 4,
-      "allMeasuredMm": 25,
-      "ratio": null
+      "snowyDays": 8,
+      "forecastMm": 305,
+      "measuredMm": 267,
+      "allForecastMm": 317,
+      "allMeasuredMm": 345,
+      "ratio": 0.874
     },
     "4": {
-      "snowyDays": 0,
-      "forecastMm": 0,
-      "measuredMm": 0,
-      "allForecastMm": 0,
-      "allMeasuredMm": 20,
-      "ratio": null
+      "snowyDays": 8,
+      "forecastMm": 215,
+      "measuredMm": 267,
+      "allForecastMm": 216,
+      "allMeasuredMm": 340,
+      "ratio": 1.243
     },
     "5": {
       "snowyDays": 0,
       "forecastMm": 0,
       "measuredMm": 0,
-      "allForecastMm": 1,
-      "allMeasuredMm": 15,
+      "allForecastMm": 8,
+      "allMeasuredMm": 335,
       "ratio": null
     },
     "6": {
       "snowyDays": 0,
       "forecastMm": 0,
       "measuredMm": 0,
-      "allForecastMm": 0,
-      "allMeasuredMm": 0,
+      "allForecastMm": 10,
+      "allMeasuredMm": 323,
       "ratio": null
     },
     "7": {
