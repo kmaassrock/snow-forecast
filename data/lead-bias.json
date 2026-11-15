@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-14",
+  "updated": "2026-11-15",
   "logsSince": "2026-11-07",
   "snowyMm": 4,
   "minDays": 40,
@@ -39,59 +39,59 @@
   },
   "leads": {
     "1": {
-      "snowyDays": 14,
-      "forecastMm": 364,
-      "measuredMm": 307,
-      "allForecastMm": 370,
-      "allMeasuredMm": 366,
-      "ratio": 0.846
+      "snowyDays": 39,
+      "forecastMm": 738,
+      "measuredMm": 584,
+      "allForecastMm": 758,
+      "allMeasuredMm": 734,
+      "ratio": 0.792
     },
     "2": {
-      "snowyDays": 9,
-      "forecastMm": 321,
-      "measuredMm": 274,
-      "allForecastMm": 333,
-      "allMeasuredMm": 358,
-      "ratio": 0.854
+      "snowyDays": 33,
+      "forecastMm": 653,
+      "measuredMm": 597,
+      "allForecastMm": 695,
+      "allMeasuredMm": 726,
+      "ratio": 0.914
     },
     "3": {
-      "snowyDays": 8,
-      "forecastMm": 305,
-      "measuredMm": 267,
-      "allForecastMm": 317,
-      "allMeasuredMm": 345,
-      "ratio": 0.874
+      "snowyDays": 31,
+      "forecastMm": 642,
+      "measuredMm": 592,
+      "allForecastMm": 685,
+      "allMeasuredMm": 714,
+      "ratio": 0.922
     },
     "4": {
-      "snowyDays": 8,
-      "forecastMm": 215,
-      "measuredMm": 267,
-      "allForecastMm": 216,
-      "allMeasuredMm": 340,
-      "ratio": 1.243
+      "snowyDays": 33,
+      "forecastMm": 530,
+      "measuredMm": 610,
+      "allForecastMm": 556,
+      "allMeasuredMm": 709,
+      "ratio": 1.151
     },
     "5": {
-      "snowyDays": 0,
-      "forecastMm": 0,
-      "measuredMm": 0,
-      "allForecastMm": 8,
-      "allMeasuredMm": 335,
-      "ratio": null
+      "snowyDays": 25,
+      "forecastMm": 304,
+      "measuredMm": 343,
+      "allForecastMm": 333,
+      "allMeasuredMm": 704,
+      "ratio": 1.129
     },
     "6": {
       "snowyDays": 0,
       "forecastMm": 0,
       "measuredMm": 0,
-      "allForecastMm": 10,
-      "allMeasuredMm": 323,
+      "allForecastMm": 33,
+      "allMeasuredMm": 691,
       "ratio": null
     },
     "7": {
       "snowyDays": 0,
       "forecastMm": 0,
       "measuredMm": 0,
-      "allForecastMm": 0,
-      "allMeasuredMm": 0,
+      "allForecastMm": 22,
+      "allMeasuredMm": 368,
       "ratio": null
     },
     "8": {
