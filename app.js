@@ -181,11 +181,17 @@ function summaryHTML(days, ens, todayStr, { interactive = true, selected = null,
       <span class="b-track"><span class="b-val ${powder ? 'pow' : ''}">${d.snow >= 1 ? fmtIn(d.snow) : ''}</span><span class="b ${cls}" style="height:${h}px"></span></span>
       <span class="b-wk ${lbl.weekend ? 'wknd' : ''}">${lbl.weekend ? lbl.wk.slice(0, 2) : lbl.wk[0]}</span>
       <span class="b-dt ${lbl.weekend ? 'wknd' : ''} ${d.date === todayStr ? 'today' : ''}">${+d.date.slice(8)}</span>
-      <span class="pq ${powderQuality(d) ? `pq-${powderQuality(d).key}` : ''}" title="${powderQuality(d)?.label || ''}"></span>
+      ${qualityMark(d)}
     </${tag}>`;
   }).join('');
   return `<div class="periods">${periods}</div><div class="bars">${bars}</div>`;
 }
+
+// Powder quality as 1–3 small snowflakes in the text color (no color, so it can't be
+// confused with the snow-type bar colors or the orange powder-day top). SVG, not the ❄
+// emoji, which iPhones draw blue.
+const FLAKE = '<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0 0L10.5 0M8.5 2.5L6 0L8.5 -2.5M0 0L5.3 9.1M2.1 8.7L3 5.2L6.5 6.1M0 0L-5.2 9.1M-6.5 6.1L-3 5.2L-2.1 8.7M0 0L-10.5 0M-8.5 -2.5L-6 0L-8.5 2.5M0 0L-5.3 -9.1M-2.1 -8.7L-3 -5.2L-6.5 -6.1M0 0L5.3 -9.1M6.5 -6.1L3 -5.2L2.1 -8.7"/></svg>';
+const flakesHTML = (n) => FLAKE.repeat(n);
 
 const QUALITY_LEGEND = `<div class="q-legend">
   <span><i class="q q-wet"></i>Heavy, wet</span><span><i class="q q-med"></i>Medium</span>
@@ -193,7 +199,7 @@ const QUALITY_LEGEND = `<div class="q-legend">
   <span><i class="q q-dry pow"></i>Orange top = ${POWDER_DAY_IN}"+ powder day</span>
 </div>
 <div class="q-legend">Powder quality:
-  <span><i class="pq pq-excellent"></i>Excellent</span><span><i class="pq pq-good"></i>Good</span><span><i class="pq pq-okay"></i>Okay</span>
+  <span><i class="pq">${FLAKE.repeat(3)}</i>Excellent</span><span><i class="pq">${FLAKE.repeat(2)}</i>Good</span><span><i class="pq">${FLAKE}</i>Okay</span>
 </div>`;
 
 // Powder quality for a ski day: snow by first chair counts most, drier snow scores
@@ -203,10 +209,15 @@ function powderQuality(d) {
   const dryness = !d.slr ? 1 : d.slr >= 15 ? 1.25 : d.slr >= 11.5 ? 1.1 : d.slr >= 8 ? 1 : 0.7;
   const wind = d.gust >= 40 ? 0.7 : d.gust >= 30 ? 0.85 : 1;
   const score = (d.overnight + 0.5 * d.lifts) * dryness * wind;
-  if (score >= 6) return { key: 'excellent', label: 'Excellent' };
-  if (score >= 3) return { key: 'good', label: 'Good' };
-  if (score >= 1) return { key: 'okay', label: 'Okay' };
+  if (score >= 6) return { key: 'excellent', label: 'Excellent', flakes: 3 };
+  if (score >= 3) return { key: 'good', label: 'Good', flakes: 2 };
+  if (score >= 1) return { key: 'okay', label: 'Okay', flakes: 1 };
   return null;
+}
+
+function qualityMark(d) {
+  const q = powderQuality(d);
+  return `<span class="pq" ${q ? `title="Powder quality: ${q.label}" aria-label="Powder quality: ${q.label}"` : 'aria-hidden="true"'}>${q ? flakesHTML(q.flakes) : ''}</span>`;
 }
 
 function renderBanner() {
@@ -720,7 +731,7 @@ function dayDetail(d, lead) {
       <dt>Before lifts open</dt><dd>${fmtIn(d.overnight)}</dd>
       <dt>While lifts open</dt><dd>${fmtIn(d.lifts)}</dd>
       ${r ? `<dt>Could be</dt><dd>${fmtRange(r.lo, r.hi)}${conf ? ` · ${conf.toLowerCase()} confidence` : ''}</dd>` : ''}
-      ${powderQuality(d) ? `<dt>Powder quality</dt><dd>${powderQuality(d).label}</dd>` : ''}
+      ${powderQuality(d) ? `<dt>Powder quality</dt><dd><span class="pq">${flakesHTML(powderQuality(d).flakes)}</span> ${powderQuality(d).label}</dd>` : ''}
       ${d.pop != null ? `<dt>Chance of precip</dt><dd>${d.pop}%</dd>` : ''}
       ${trendOf(d) ? `<dt>Forecast trend</dt><dd>${trendText(trendOf(d))}</dd>` : ''}
       ${agreementOf(d) ? `<dt>Models showing snow</dt><dd>${agreementOf(d).agree} of ${agreementOf(d).total}</dd>` : ''}
