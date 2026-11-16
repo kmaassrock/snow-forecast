@@ -864,14 +864,14 @@
   "deer-valley": {
    "maps": [
     {
-     "id": 42023,
-     "year": 1955,
-     "img": "https://files.skimap.org/4by9ja3o66osoicurnziq76dwz2n",
-     "avif": "https://files.skimap.org/cjm5zzvazj2g84k8xww9d7lj7pi5 800w, https://files.skimap.org/32mp62r4gvk6hs2vyc7c108b27h1 1200w",
-     "w": 382,
-     "h": 318,
-     "artist": null,
-     "area": 19228
+     "id": 48005,
+     "year": 2026,
+     "img": "https://files.skimap.org/rjdtdzxkn0s3e3n5lnrgntq3c5nd",
+     "avif": "https://files.skimap.org/6lixh78nwofpcsh2obzg9krigvnt 800w, https://files.skimap.org/ldncfu6z8ym26xbaxhe183mvdnul 1200w",
+     "w": 1000,
+     "h": 646,
+     "artist": "Rad Smith",
+     "area": 223
     }
    ]
   },
