@@ -24,9 +24,9 @@ const SNOWY_MM = 4; // a "snowy day": forecast of at least ~4 mm water (a few in
 const PRIOR_DAYS = 60; // the backtest factor counts as this many snowy station-days
 const readJSON = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return null; } };
 
-async function withRetry(fn, tries = 3) {
+async function withRetry(fn, tries = 3, waitMs = 2000) {
   for (let i = 1; ; i++) {
-    try { return await fn(); } catch (e) { if (i >= tries) throw e; await new Promise((ok) => setTimeout(ok, 2000 * i)); }
+    try { return await fn(); } catch (e) { if (i >= tries) throw e; await new Promise((ok) => setTimeout(ok, waitMs * i)); }
   }
 }
 
@@ -94,13 +94,15 @@ async function score(today) {
   const files = fs.readdirSync(LOG_DIR).filter((f) => /^\d{4}-\d{2}-\d{2}\.json$/.test(f)).sort();
   for (const f of files) if (f.slice(0, 10) < addDays(today, -KEEP_DAYS)) fs.unlinkSync(path.join(LOG_DIR, f));
   const logs = fs.readdirSync(LOG_DIR).filter((f) => f.endsWith('.json')).map((f) => readJSON(path.join(LOG_DIR, f))).filter(Boolean);
+  writeTrends(logs, today); // needs no station data, so it updates even if SNOTEL is down
   const yesterday = addDays(today, -1);
   const leads = {};
   for (let L = 1; L <= 15; L++) leads[L] = { snowyDays: 0, forecastMm: 0, measuredMm: 0, allForecastMm: 0, allMeasuredMm: 0 };
   const scorable = logs.filter((l) => l.made < yesterday);
   if (scorable.length) {
     const ids = [...new Set(scorable.flatMap((l) => Object.keys(l.stations)))];
-    const obs = await withRetry(() => observed(ids, scorable.map((l) => l.made).sort()[0], yesterday));
+    // SNOTEL's API has outages (502s) lasting minutes: 5 tries, waiting 15, 30, 45, 60 s.
+    const obs = await withRetry(() => observed(ids, scorable.map((l) => l.made).sort()[0], yesterday), 5, 15000);
     for (const log of scorable) {
       for (const [id, days] of Object.entries(log.stations)) {
         for (const [date, fc] of Object.entries(days)) {
@@ -131,7 +133,6 @@ async function score(today) {
     updated: today, logsSince: logs.map((l) => l.made).sort()[0] || today, snowyMm: SNOWY_MM, priorDays: PRIOR_DAYS,
     factors, measuredShare, leads,
   };
-  writeTrends(logs, today);
   fs.writeFileSync(path.join(DATA, 'lead-bias.json'), JSON.stringify(out, null, 2) + '\n');
   console.log(`Scored ${scorable.length} logs; measured share by lead: ${Object.values(measuredShare).join(' ')}%`);
 }
@@ -152,7 +153,13 @@ function writeTrends(logs, today) {
 }
 
 // SCORE_ONLY=1 re-scores existing logs without logging a new forecast (local testing).
+// If scoring fails (usually a SNOTEL outage), today's log and the trends are already
+// written: the workflow still commits them, lead-bias.json keeps yesterday's factors,
+// and the run is marked failed so it gets noticed.
 (async () => {
   const today = process.env.SCORE_ONLY ? fs.readdirSync(LOG_DIR).sort().at(-1).slice(0, 10) : await logToday();
-  await score(today);
+  try { await score(today); } catch (e) {
+    console.error(`Scoring failed; kept today's log and yesterday's factors. ${e.message}`);
+    process.exitCode = 1;
+  }
 })().catch((e) => { console.error(e); process.exit(1); });
