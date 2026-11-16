@@ -3,11 +3,14 @@
 //  1. Logs today's raw (uncorrected) blend forecast of daily precipitation water at
 //     every SNOTEL station, 1–15 days ahead: data/forecast-log/<date>.json.
 //  2. Scores earlier logs against what each station measured, by days ahead.
-//  3. Writes data/lead-bias.json: the correction factors core.js applies. A lead
-//     time switches from the backtest starting factor to its measured factor once
-//     it has MIN_DAYS snowy station-days scored.
+//  3. Writes data/lead-bias.json: the correction factors core.js applies. Each
+//     lead's factor blends its measured ratio with the backtest starting factor,
+//     weighted by sample size (PRIOR_DAYS), so one storm can't swing it.
+//  4. Writes data/forecast-trend.json: how each station's forecast for every
+//     upcoming day has changed across the daily logs (trend arrows on the site).
 //
 //   node scripts/verify-forecasts.cjs
+//   SCORE_ONLY=1 node scripts/verify-forecasts.cjs   # re-score without a new log
 
 const fs = require('fs');
 const path = require('path');
@@ -18,7 +21,7 @@ const DATA = path.join(__dirname, '..', 'data');
 const LOG_DIR = path.join(DATA, 'forecast-log');
 const KEEP_DAYS = 75; // rolling window of logs kept and scored
 const SNOWY_MM = 4; // a "snowy day": forecast of at least ~4 mm water (a few inches of snow)
-const MIN_DAYS = 40; // snowy station-days needed before a lead's measured factor is used
+const PRIOR_DAYS = 60; // the backtest factor counts as this many snowy station-days
 const readJSON = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return null; } };
 
 async function withRetry(fn, tries = 3) {
@@ -112,26 +115,44 @@ async function score(today) {
       }
     }
   }
-  // Measured factor once a lead has enough snowy days; otherwise the backtest
-  // starting factor (days 8–15 fall back to day 7's, the furthest one tested).
-  const factors = {}, source = {};
+  // Blend measured and backtest factors by sample size: with n snowy days the
+  // measured ratio gets weight n / (n + PRIOR_DAYS). Days 8–15 start from day 7's.
+  const factors = {}, measuredShare = {};
   for (let L = 1; L <= 15; L++) {
     const s = leads[L];
     s.ratio = s.forecastMm ? Math.round((1000 * s.measuredMm) / s.forecastMm) / 1000 : null;
     for (const k of ['forecastMm', 'measuredMm', 'allForecastMm', 'allMeasuredMm']) s[k] = Math.round(s[k]);
-    if (s.snowyDays >= MIN_DAYS) { factors[L] = Math.min(1.1, Math.max(0.4, s.ratio)); source[L] = 'measured'; }
-    else { factors[L] = DEFAULT_LEAD_FACTORS[L] ?? factors[7] ?? DEFAULT_LEAD_FACTORS[7]; source[L] = 'backtest'; }
+    const prior = DEFAULT_LEAD_FACTORS[L] ?? factors[7];
+    const w = s.ratio == null ? 0 : s.snowyDays / (s.snowyDays + PRIOR_DAYS);
+    factors[L] = Math.round(1000 * Math.min(1.15, Math.max(0.5, w * s.ratio + (1 - w) * prior))) / 1000;
+    measuredShare[L] = Math.round(100 * w);
   }
   const out = {
-    updated: today, logsSince: logs.map((l) => l.made).sort()[0] || today, snowyMm: SNOWY_MM, minDays: MIN_DAYS,
-    factors, source, leads,
+    updated: today, logsSince: logs.map((l) => l.made).sort()[0] || today, snowyMm: SNOWY_MM, priorDays: PRIOR_DAYS,
+    factors, measuredShare, leads,
   };
+  writeTrends(logs, today);
   fs.writeFileSync(path.join(DATA, 'lead-bias.json'), JSON.stringify(out, null, 2) + '\n');
-  const measured = Object.values(source).filter((x) => x === 'measured').length;
-  console.log(`Scored ${scorable.length} logs; ${measured} of 15 lead times now use measured factors`);
+  console.log(`Scored ${scorable.length} logs; measured share by lead: ${Object.values(measuredShare).join(' ')}%`);
 }
 
+// For every station and upcoming day: the forecast water from each daily log,
+// oldest first, so the site can show whether a day's snow is growing or fading.
+function writeTrends(logs, today) {
+  const out = { updated: today, stations: {} };
+  for (const log of [...logs].sort((a, b) => (a.made < b.made ? -1 : 1))) {
+    for (const [id, days] of Object.entries(log.stations)) {
+      for (const [date, mm] of Object.entries(days)) {
+        if (date <= today) continue;
+        ((out.stations[id] ||= {})[date] ||= []).push([log.made, mm]);
+      }
+    }
+  }
+  fs.writeFileSync(path.join(DATA, 'forecast-trend.json'), JSON.stringify(out) + '\n');
+}
+
+// SCORE_ONLY=1 re-scores existing logs without logging a new forecast (local testing).
 (async () => {
-  const today = await logToday();
+  const today = process.env.SCORE_ONLY ? fs.readdirSync(LOG_DIR).sort().at(-1).slice(0, 10) : await logToday();
   await score(today);
 })().catch((e) => { console.error(e); process.exit(1); });

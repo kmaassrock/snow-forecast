@@ -14,8 +14,26 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      # Your own alert (private topic, the resorts in ALERT_RESORTS).
       - run: node scripts/alerts.cjs
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           SITE_URL: ${{ vars.SITE_URL }}
           ALERT_RESORTS: ${{ vars.ALERT_RESORTS }}
+      # Public per-resort channels (Alerts page). What was already sent lives in the
+      # Actions cache, so a powder day gets at most a heads-up and a final call.
+      - uses: actions/cache/restore@v4
+        with:
+          path: alert-state.json
+          key: alert-state-${{ github.run_id }}
+          restore-keys: alert-state-
+      - run: node scripts/channel-alerts.cjs
+        env:
+          SEND: '1'
+          SITE_URL: ${{ vars.SITE_URL }}
+          ALERT_STATE: alert-state.json
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: alert-state.json
+          key: alert-state-${{ github.run_id }}

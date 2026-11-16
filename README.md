@@ -42,6 +42,16 @@ or the 3-day total is ≥ 12". `.github/workflows/powder-alerts.yml` runs it eve
    with that topic name. Optional variables: `SITE_URL`, `ALERT_RESORTS` (e.g. `purgatory,wolf-creek`),
    and thresholds `OVERNIGHT_IN`, `DAY_IN`, `STORM_IN` can be set as env in the workflow.
 
+### Public alert channels (Alerts page)
+
+Every resort has three public ntfy channels by size, 4"+, 8"+ and 12"+ (names in `alert-topics.js`).
+The 🔔 Alerts page lists them with Subscribe and copy buttons. `scripts/channel-alerts.cjs` runs in the
+same evening workflow: it reads the published `data/upcoming.json` and posts when a ski day in the next 3
+reaches a channel's size. Each powder day gets at most a heads-up (first evening it appears) and a final
+call (the evening before). What was sent is kept in the Actions cache (`alert-state.json`), not the repo.
+Dry run: `node scripts/channel-alerts.cjs`. ntfy.sh allows ~250 free messages a day per sender; a storm
+across every resort can come close.
+
 `.github/workflows/calibrate.yml` recalibrates the 15 stalest resorts every week, so each resort is
 refreshed about monthly while staying inside Open-Meteo's free limits.
 
@@ -85,6 +95,11 @@ the Upcoming Snow ranking and the "last 48 hrs" badge on favorite cards.
   device) goes to the public OSRM router once for times to every resort. Estimates ignore winter closures.
 - Storm tracker: groups resorts whose biggest 3-day window (≥ 6") starts within a day of each other.
 - Snow map: Leaflet + OpenStreetMap tiles, dots sized and colored by the selected metric.
+- Getting there (Mountain tab): Google / Apple Maps directions to the base area, plus road-condition sites
+  by state (COtrip and the traction law in CO, UDOT and the Cottonwood Canyons page in UT, Caltrans
+  QuickMap in CA, DriveBC). Live road data would need a CDOT or UDOT API key (not built yet).
+- Trail map (Mountain tab): OpenSkiMap's embedded ski map, plus a link to the resort's own site
+  (`website` in resorts.js, from OpenSkiMap).
 
 ## Over-forecast correction
 
@@ -93,5 +108,14 @@ found 10–20% too much at 1–7 days ahead), and far-out days rest on just a fe
 `core.js` scales snowy days by a factor for how many days ahead they are, and from day 8 leans toward the
 ensemble median. `scripts/verify-forecasts.cjs` runs every morning (`.github/workflows/verify.yml`): it logs
 the raw blend at every SNOTEL station 1–15 days ahead (`data/forecast-log/`, 75-day window), scores past logs
-against what fell, and writes `data/lead-bias.json`. Each lead time switches from its backtest factor to its
-measured factor after 40 snowy station-days; days 8–15 start with day 7's factor.
+against what fell, and writes `data/lead-bias.json`. Each lead's factor blends its measured ratio with the backtest
+factor by sample size (the backtest counts as 60 snowy station-days); days 8–15 start from day 7's.
+The same job writes `data/forecast-trend.json` (how each station's forecast for every upcoming day changed
+across the logs), which drives the trend arrows.
+
+## Daily-list chips and best day
+
+- Trend arrows (↑/↓): how a day's forecast changed vs ~3 days earlier, from `data/forecast-trend.json`.
+- Model agreement ("3/5 models"): blend models showing at least 1" (or 40% of the blend) that day.
+- Best day to ski: next 7 days scored on snow by first chair, snow quality, wind, cold, weekend crowds,
+  with a bonus for a clear day after a storm (`bestDayHTML` in `app.js`).

@@ -523,8 +523,9 @@ tr.open td:first-child { box-shadow: inset 3px 0 0 var(--day); }
 .up-name b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 @media (max-width: 620px) {
   .wide-only { display: none; }
-  .topnav { flex-wrap: nowrap; }
-  .topnav > button[data-view], .nav-pick { padding: 5px 9px; white-space: nowrap; }
+  .topnav { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .topnav::-webkit-scrollbar { display: none; }
+  .topnav > button[data-view], .nav-pick { padding: 5px 9px; white-space: nowrap; flex: none; }
   .topnav .theme-btn { margin-left: auto; padding: 4px 9px; }
 }
 @media (max-width: 620px) {
@@ -574,3 +575,44 @@ tr.open td:first-child { box-shadow: inset 3px 0 0 var(--day); }
 .loc-form { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
 .loc-form input { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 16px; width: 170px; }
 .loc-form .chips { width: 100%; }
+
+/* ---------- trend + model-agreement chips, best day ---------- */
+.chip { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; white-space: nowrap; vertical-align: 1px; }
+.trend-up { background: color-mix(in srgb, var(--good) 18%, transparent); color: var(--good); }
+.trend-down { background: color-mix(in srgb, var(--warm) 18%, transparent); color: var(--warm); }
+.agree-high { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); }
+.agree-mid { background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); }
+.agree-low { background: transparent; color: var(--muted); border: 1px dashed var(--muted); }
+.best-day { margin: 0 0 12px; padding: 8px 12px; border-radius: 10px; background: color-mix(in srgb, var(--good) 12%, var(--panel-2)); font-size: 0.92rem; }
+.d-type { white-space: normal; }
+.trail-map iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+/* ---------- compare ---------- */
+.cmp-picks { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.cmp-pick { display: inline-flex; align-items: center; gap: 4px; }
+.cmp-pick select { font-size: 16px; font-weight: 600; padding: 6px 10px; }
+.cmp-table th, .cmp-table td { text-align: center; white-space: normal; }
+.cmp-table td { min-width: 110px; }
+.cmp-table th.name { text-align: left; color: var(--muted); font-weight: 500; }
+.cmp-table thead th, .cmp-table tr:first-child th a { font-weight: 700; color: var(--text); text-decoration: none; }
+.cmp-win { background: color-mix(in srgb, var(--good) 14%, transparent); font-weight: 700; }
+
+/* Getting there */
+.drive-line { margin: 0 0 10px; }
+.road-links { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+.road-btn { display: inline-block; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel-2); color: var(--text); text-decoration: none; font-size: 0.92rem; }
+.road-btn:hover { border-color: var(--accent); }
+.road-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.sub-head { font-size: 0.95rem; margin: 14px 0 8px; }
+
+/* Alerts */
+.steps { margin: 0 0 8px; padding-left: 20px; line-height: 1.5; }
+.steps li { margin-bottom: 6px; }
+.alert-search { font-size: 16px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel-2); color: var(--text); width: min(100%, 320px); }
+.alert-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 0; border-top: 1px solid var(--line); }
+.alert-row .up-name { display: flex; flex-direction: column; }
+.alert-row .up-name a { color: var(--text); font-weight: 600; text-decoration: none; }
+.alert-row .up-name small { color: var(--muted); }
+.alert-btns { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.alert-btns .road-btn { padding: 5px 11px; }
+.alert-btns .copy { margin-right: 6px; }

@@ -34,6 +34,8 @@
           <select id="resortSel" aria-label="All resorts"></select>
         </label>
         <button data-view="upcoming">❄ Upcoming<span class="wide-only"> Snow</span></button>
+        <button data-view="compare" aria-label="Compare">⚖<span class="wide-only"> Compare</span></button>
+        <button data-view="alerts" aria-label="Alerts">🔔<span class="wide-only"> Alerts</span></button>
         <button id="themeBtn" class="hero-btn theme-btn" aria-label="Theme">◐ Auto</button>
       </nav>
       <div class="picker-row">
@@ -61,6 +63,8 @@
   <main>
     <section id="favView" class="fav-view" hidden></section>
     <section id="upcomingView" class="upcoming-view" hidden></section>
+    <section id="compareView" class="compare-view" hidden></section>
+    <section id="alertsView" class="alerts-view" hidden></section>
 
     <!-- Summary -->
     <section id="alertBanner" class="powder resort-only" data-tab="summary" hidden></section>
@@ -161,6 +165,11 @@
 
     <!-- Mountain -->
     <section class="card resort-only" data-tab="mountain">
+      <div class="card-head"><h2>Getting there</h2><span class="hint">Directions and live road conditions</span></div>
+      <div id="gettingThere"></div>
+    </section>
+
+    <section class="card resort-only" data-tab="mountain">
       <div class="card-head"><h2>Avalanche danger</h2></div>
       <div id="avalanche"><p class="hint">Loading…</p></div>
     </section>
@@ -168,6 +177,7 @@
     <section class="card resort-only" id="mapCard" data-tab="mountain">
       <div class="card-head"><h2>Trail map</h2></div>
       <div id="trailMap" class="trail-map"></div>
+      <p class="hint" id="mapLinks"></p>
     </section>
 
     <p class="footer-link">📱 <a href="widget.html">Add a Home Screen widget</a></p>
@@ -176,6 +186,7 @@
   <script src="resorts.js?v=__V__"></script>
   <script src="cams.js?v=__V__"></script>
   <script src="passes.js?v=__V__"></script>
+  <script src="alert-topics.js?v=__V__"></script>
   <script src="core.js?v=__V__"></script>
   <script src="history.js?v=__V__"></script>
   <script src="app.js?v=__V__"></script>

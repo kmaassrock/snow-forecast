@@ -53,11 +53,12 @@ function loadFavorites() {
 }
 
 const hash = location.hash.slice(1);
+const LIST_VIEWS = ['favorites', 'upcoming', 'compare', 'alerts']; // views that aren't one mountain
 const state = {
   // The app opens on Purgatory unless a link names a mountain (#vail) or the favorites list.
   // Views: 'resort' (one mountain), 'favorites' (starred cards), 'upcoming' (ranking).
-  view: hash === 'favorites' || hash === 'upcoming' ? hash : 'resort',
-  resortId: hash && hash !== 'favorites' && hash !== 'upcoming' ? hash : DEFAULT_RESORT,
+  view: LIST_VIEWS.includes(hash) ? hash : 'resort',
+  resortId: hash && !LIST_VIEWS.includes(hash) ? hash : DEFAULT_RESORT,
   upcoming: null, // data/upcoming.json: every resort's next 7 days + last 48 hours
   upFilter: 'all',
   upSort: 'next7',
@@ -120,17 +121,19 @@ function renderPicker() {
 
 function renderHeader() {
   const r = resort();
-  const fav = state.view === 'favorites', up = state.view === 'upcoming';
-  document.title = fav ? 'Favorites · Snow Forecast' : up ? 'Upcoming Snow' : `${r.name} Snow Forecast`;
-  $('resortName').textContent = fav ? '★ Favorites' : up ? '❄ Upcoming Snow' : r.name;
-  $('favBtn').hidden = fav || up;
-  $('elevSeg').hidden = up;
+  const fav = state.view === 'favorites', up = state.view === 'upcoming', cmp = state.view === 'compare', alr = state.view === 'alerts';
+  document.title = fav ? 'Favorites · Snow Forecast' : up ? 'Upcoming Snow' : cmp ? 'Compare Resorts' : alr ? 'Powder Alerts' : `${r.name} Snow Forecast`;
+  $('resortName').textContent = fav ? '★ Favorites' : up ? '❄ Upcoming Snow' : cmp ? '⚖ Compare' : alr ? '🔔 Powder Alerts' : r.name;
+  $('favBtn').hidden = fav || up || cmp || alr;
+  $('elevSeg').hidden = up || cmp || alr;
   document.querySelectorAll('#topnav [data-view]').forEach((b) => b.classList.toggle('on', b.dataset.view === state.view));
   const starred = state.favorites.includes(r.id);
   $('favBtn').textContent = starred ? '★' : '☆';
   $('favBtn').classList.toggle('on', starred);
   $('favBtn').setAttribute('aria-label', starred ? 'Remove from favorites' : 'Add to favorites');
-  $('resortSub').textContent = fav
+  if (cmp) $('resortSub').textContent = 'Side by side at mid-mountain · pick 2 or 3 resorts';
+  else if (alr) $('resortSub').textContent = 'Free phone notifications when a powder day is coming';
+  else $('resortSub').textContent = fav
     ? `${state.favorites.length} mountain${state.favorites.length === 1 ? '' : 's'} · tap one to open it`
     : up ? `Next 7 days at mid-mountain, every resort · most snow first`
     : `${ftLabel(r.elevations.base)}–${ftLabel(r.elevations.summit)} · ${r.region}${driveTo(r.id) != null ? ` · 🚗 ${fmtDrive(driveTo(r.id))} drive` : ''}`;
@@ -303,7 +306,7 @@ function renderSnowSummary() {
   const keep = stripScroll.resort === state.resortId ? stripScroll.left : null;
   const past = st ? `<div class="strip-part past">${pastHTML(st.past)}</div>` : '';
   // The box sits between past and forecast on wide screens; phones show it as a banner above.
-  $('snowSummary').innerHTML = outlookHTML() + nowBoxHTML('banner')
+  $('snowSummary').innerHTML = outlookHTML() + bestDayHTML() + nowBoxHTML('banner')
     + `<div class="strip-wrap" data-resort="${state.resortId}"><div class="strip">${past}${nowBoxHTML('inline')}
         <div class="strip-part future">${summaryHTML(state.days, state.ens, state.todayStr, { selected: state.selected })}</div></div></div>`
     + QUALITY_LEGEND
@@ -510,7 +513,6 @@ async function loadAvalanche() {
 
 // ---------- trail map ----------
 
-let trailMap = null;
 function loadLeaflet() {
   if (window.L) return Promise.resolve();
   const css = document.createElement('link');
@@ -526,25 +528,129 @@ function loadLeaflet() {
   });
 }
 
-async function showTrailMap() {
-  if (state.view !== 'resort' || state.tab !== 'mountain') return; // Leaflet needs a visible map
+// OpenSkiMap's interactive ski map (runs colored by difficulty, lifts, run names),
+// loaded only when the Mountain tab is open, plus a link to the resort's own site.
+function showTrailMap() {
+  if (state.view !== 'resort' || state.tab !== 'mountain') return;
   const r = resort();
-  try {
-    await loadLeaflet();
-    if (!trailMap) {
-      trailMap = L.map('trailMap', { scrollWheelZoom: false });
-      L.tileLayer('https://tile.opentopomap.org/{z}/{x}/{y}.png', {
-        maxZoom: 17, attribution: '© OpenStreetMap contributors, SRTM · © OpenTopoMap (CC-BY-SA)',
-      }).addTo(trailMap);
-      L.tileLayer('https://tiles.opensnowmap.org/pistes/{z}/{x}/{y}.png', {
-        maxZoom: 18, attribution: 'Runs & lifts © OpenSnowMap.org (CC-BY-SA)',
-      }).addTo(trailMap);
-    }
-    trailMap.setView([r.lat, r.lon], 14);
-    setTimeout(() => trailMap.invalidateSize(), 50);
-  } catch (e) {
-    $('trailMap').innerHTML = '<p class="hint">The map couldn\'t load.</p>';
-  }
+  const src = `https://openskimap.org/#13.6/${r.lat}/${r.lon}`;
+  const frame = $('trailMap').querySelector('iframe');
+  if (frame?.dataset.resort === r.id) return;
+  $('trailMap').innerHTML = `<iframe src="${src}" data-resort="${r.id}" title="${r.name} ski map" loading="lazy" allow="geolocation"></iframe>`;
+  $('mapLinks').innerHTML = `Map: <a href="https://openskimap.org/" target="_blank" rel="noopener">OpenSkiMap</a> (from OpenStreetMap; runs are
+    colored by difficulty: green easy, blue intermediate, black advanced)${r.website ? ` · <a href="${r.website}" target="_blank" rel="noopener">${r.name}'s official trail map &amp; site →</a>` : ''}`;
+}
+
+// Road-condition sites by state/province (closures, chain and traction laws, cams).
+const ROAD_SITES = {
+  CO: [['COtrip (CDOT)', 'https://www.cotrip.org/'], ['Colorado traction law', 'https://www.codot.gov/travel/winter-driving/tractionlaw']],
+  UT: [['UDOT Traffic', 'https://udottraffic.utah.gov/']],
+  CA: [['Caltrans QuickMap', 'https://quickmap.dot.ca.gov/'], ['Highway conditions by number', 'https://roads.dot.ca.gov/']],
+  BC: [['DriveBC', 'https://www.drivebc.ca/']],
+};
+// Canyon roads with their own status page (closures for avalanche control, traction rules).
+const COTTONWOODS = ['alta', 'snowbird', 'brighton', 'solitude'];
+
+function renderGettingThere() {
+  const r = resort();
+  const [lat, lon] = r.base;
+  const dt = driveTo(r.id);
+  const link = ([label, url]) => `<a class="road-btn" href="${url}" target="_blank" rel="noopener">${label} →</a>`;
+  const roads = [...(COTTONWOODS.includes(r.id) ? [['Cottonwood Canyons (UDOT)', 'https://cottonwoodcanyons.udot.utah.gov/']] : []), ...(ROAD_SITES[r.state] || [])];
+  $('gettingThere').innerHTML = `
+    <p class="drive-line">${dt != null ? `🚗 About <b>${fmtDrive(dt)}</b> from ${state.drive.label || 'your location'} in good conditions.` : '🚗 Set your location on Upcoming Snow to see the drive time.'}</p>
+    <div class="road-links">
+      <a class="road-btn primary" href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}" target="_blank" rel="noopener">Google Maps directions →</a>
+      <a class="road-btn" href="https://maps.apple.com/?daddr=${lat},${lon}" target="_blank" rel="noopener">Apple Maps →</a>
+    </div>
+    <h3 class="sub-head">Road conditions</h3>
+    <div class="road-links">${roads.map(link).join('')}</div>
+    <p class="hint">Directions go to the main base area. Mountain roads close for storms and avalanche control; check before you leave on a powder day.</p>`;
+}
+
+// ---------- trends, model agreement, best day ----------
+
+// How this day's forecast has changed across the daily forecast logs (data/forecast-trend.json,
+// blend water at the resort's SNOTEL station before the lead correction): latest vs ~3 days earlier.
+function trendOf(d) {
+  const st = resort().stations[0];
+  const byDate = st && state.trend?.stations?.[st.id];
+  // A ski day runs 4 pm the day before to 4 pm, so it spans two calendar days of the log;
+  // add both, per log, for the logs that have both.
+  const cur = byDate?.[d.date], prevDay = byDate?.[addDays(d.date, -1)];
+  if (!cur || !prevDay) return null;
+  const prevByMade = Object.fromEntries(prevDay);
+  const series = cur.filter(([m]) => m in prevByMade).map(([m, mm]) => [m, mm + prevByMade[m]]);
+  if (series.length < 2) return null;
+  const [latestMade, latest] = series.at(-1);
+  const cutoff = addDays(latestMade, -3);
+  const [olderMade, older] = [...series].reverse().find(([m]) => m <= cutoff) || series[0];
+  if (olderMade === latestMade || Math.max(latest, older) < 3) return null; // ~3 mm water ≈ an inch or two of snow
+  const pct = older > 0 ? latest / older - 1 : 1;
+  if (Math.abs(pct) < 0.25) return null;
+  return { pct, olderMade, isNew: older < 1 };
+}
+const dayName = (date) => new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short' });
+function trendText(t) {
+  if (t.isNew) return `new since ${dayName(t.olderMade)}`;
+  if (t.pct >= 1) return `${(t.pct + 1).toFixed(1).replace('.0', '')}× bigger than on ${dayName(t.olderMade)}`;
+  return t.pct > 0 ? `up ${Math.round(t.pct * 100)}% since ${dayName(t.olderMade)}` : `down ${Math.round(-t.pct * 100)}% since ${dayName(t.olderMade)}`;
+}
+function trendChip(d) {
+  const t = trendOf(d);
+  // Rising trends only matter on days with real snow; tiny far-out amounts swing wildly.
+  if (!t || (t.pct > 0 && d.snow < 1)) return '';
+  const up = t.pct > 0;
+  const amount = t.isNew ? 'new' : t.pct >= 1 ? `${(t.pct + 1).toFixed(1).replace('.0', '')}×` : `${Math.round(Math.abs(t.pct) * 100)}%`;
+  return `<span class="chip ${up ? 'trend-up' : 'trend-down'}" title="Forecast for this day ${trendText(t)}">${up ? '↑' : '↓'} ${amount}</span>`;
+}
+
+// How many blend models show real snow this day (≥1" or ≥40% of the blend).
+function agreementOf(d) {
+  if (d.snow < 1) return null;
+  const vals = MODELS.filter((m) => !m.ref && d.perModel[m.id] != null).map((m) => d.perModel[m.id]);
+  if (vals.length < 2) return null;
+  const need = Math.max(1, 0.4 * (d.rawSnow ?? d.snow));
+  return { agree: vals.filter((v) => v >= need).length, total: vals.length };
+}
+function agreeChip(d) {
+  const a = agreementOf(d);
+  if (!a) return '';
+  const share = a.agree / a.total;
+  const cls = share <= 0.34 ? 'agree-low' : share < 0.67 ? 'agree-mid' : 'agree-high';
+  return `<span class="chip ${cls}" title="${a.agree} of ${a.total} models show at least ${fmtIn(Math.max(1, 0.4 * (d.rawSnow ?? d.snow)))} this day">${a.agree}/${a.total} models</span>`;
+}
+
+// Best day to ski in the next 7: snow by first chair counts most, then snow while
+// open; drier snow, lighter wind and fewer weekend crowds score higher, plus a
+// bluebird bonus for a clear day right after a storm. Dry weeks fall back to weather.
+function bestDayHTML() {
+  const up = upcoming().slice(0, 7);
+  const hour = +nowLocalHour(resort().tz).slice(11, 13);
+  const days = up.filter((d, i) => !(i === 0 && hour >= LIFTS_CLOSE));
+  if (days.length < 2) return '';
+  const score = (d) => {
+    const prev = state.days[state.days.indexOf(d) - 1];
+    const dry = !d.slr ? 1 : d.slr >= 15 ? 1.25 : d.slr >= 11.5 ? 1.1 : d.slr >= 8 ? 1 : 0.75;
+    const wind = d.gust >= 40 ? 0.6 : d.gust >= 30 ? 0.8 : 1;
+    const cold = d.hi < 10 ? 0.85 : 1;
+    const crowds = dayLabel(d.date, state.todayStr).weekend ? 0.9 : 1;
+    const bluebird = prev && prev.snow >= 4 && d.cloud < 35 ? 2 : 0;
+    const weather = ((100 - d.cloud) / 100) * 0.5 + (d.gust < 25 ? 0.5 : 0); // tie-breaker for dry weeks
+    return (d.overnight + 0.5 * d.lifts) * dry * wind * cold * crowds + bluebird + weather;
+  };
+  const best = days.reduce((a, d) => (score(d) > score(a) ? d : a));
+  const lbl = dayLabel(best.date, state.todayStr).long;
+  const prev = state.days[state.days.indexOf(best) - 1];
+  const parts = [];
+  if (best.overnight >= 1) parts.push(`${fmtIn(best.overnight)} by 9 am${best.slr ? ` (${snowType(best.slr).label.toLowerCase()})` : ''}`);
+  else if (best.snow >= 1) parts.push(`${fmtIn(best.snow)} during the day`);
+  if (prev && prev.snow >= 4 && best.cloud < 35) parts.push('clearing after the storm');
+  else if (best.snow < 1) parts.push(best.cloud < 30 ? 'sunny' : best.cloud < 70 ? 'partly cloudy' : 'cloudy');
+  parts.push(best.gust < 20 ? 'light winds' : `gusts to ${Math.round(best.gust)} mph`);
+  parts.push(`high ${Math.round(best.hi)}°F`);
+  const noSnow = days.every((d) => d.snow < 1);
+  return `<p class="best-day">⛷️ <b>Best day to ski${noSnow ? ' (no new snow this week)' : ''}: ${lbl}</b> · ${parts.join(', ')}</p>`;
 }
 
 // ---------- daily list ----------
@@ -573,6 +679,8 @@ function dayDetail(d, lead) {
       ${r ? `<dt>Could be</dt><dd>${fmtRange(r.lo, r.hi)}${conf ? ` · ${conf.toLowerCase()} confidence` : ''}</dd>` : ''}
       ${powderQuality(d) ? `<dt>Powder quality</dt><dd>${powderQuality(d).label}</dd>` : ''}
       ${d.pop != null ? `<dt>Chance of precip</dt><dd>${d.pop}%</dd>` : ''}
+      ${trendOf(d) ? `<dt>Forecast trend</dt><dd>${trendText(trendOf(d))}</dd>` : ''}
+      ${agreementOf(d) ? `<dt>Models showing snow</dt><dd>${agreementOf(d).agree} of ${agreementOf(d).total}</dd>` : ''}
       ${d.leadFactor && d.leadFactor < 0.97 ? `<dt>Before over-forecast correction</dt><dd>${fmtIn(d.rawSnow)} <span class="muted">(shown ${Math.round((1 - d.leadFactor) * 100)}% lower)</span></dd>` : ''}
       <dt>Snow water</dt><dd>${mmToIn(d.swe).toFixed(2)}"</dd>
       ${d.rainIn >= 0.05 ? `<dt>Rain</dt><dd>${d.rainIn.toFixed(2)}"</dd>` : ''}
@@ -603,7 +711,7 @@ function renderDays() {
         <span class="d-day"><b>${lbl.short === 'Today' || lbl.short === 'Tmw' ? lbl.short : lbl.wk}</b><small>${lbl.md}</small></span>
         <span class="d-icon">${icon(d)}</span>
         <span class="d-snow ${d.snow >= POWDER_DAY_IN ? 'big' : ''}">${fmtIn(d.snow)}</span>
-        <span class="d-type">${type ? `<span class="${type.cls}">${type.label}</span>` : d.rainIn >= 0.05 ? '<span class="t-wet">Rain</span>' : ''}</span>
+        <span class="d-type">${type ? `<span class="${type.cls}">${type.label}</span>` : d.rainIn >= 0.05 ? '<span class="t-wet">Rain</span>' : ''}${trendChip(d)}${agreeChip(d)}</span>
         <span class="d-temp">${Math.round(d.hi)}° <small>${Math.round(d.lo)}°</small></span>
         <span class="d-wind">${compass(d.dir)} ${Math.round(d.wind)}<small> mph</small></span>
         <span class="d-chev">›</span>
@@ -873,18 +981,17 @@ function renderCalibration() {
 function renderLeadCheck() {
   const lb = state.leadBias;
   if (!lb) { $('leadCheck').innerHTML = '<p class="hint">Not available yet.</p>'; return; }
-  const measured = Object.values(lb.source).filter((x) => x === 'measured').length;
   const rows = Object.keys(lb.factors).map(Number).sort((a, b) => a - b).map((L) => {
     const s = lb.leads?.[L] || {}, f = lb.factors[L];
     const promised = s.ratio ? `${Math.round(100 / s.ratio)}%` : '–';
     return `<tr><td>${L} day${L > 1 ? 's' : ''}</td><td><b>${f < 1 ? '−' : '+'}${Math.abs(Math.round((1 - f) * 100))}%</b></td>
-      <td>${lb.source[L] === 'measured' ? 'Measured' : L <= 7 ? 'Past winters' : 'Day 7 (not yet measured)'}</td>
+      <td>${lb.measuredShare?.[L] ? `${lb.measuredShare[L]}% this season, ${100 - lb.measuredShare[L]}% past winters` : L <= 7 ? 'Past winters' : 'Day 7 (not yet measured)'}</td>
       <td>${s.snowyDays || 0}</td><td>${promised}</td></tr>`;
   }).join('');
   $('leadCheck').innerHTML = `<p class="hint">On snowy days, forecasts tend to promise more snow than actually falls. Each day's snow is reduced by the
     amount below for how far ahead it is, and from day 8 on the forecast also leans toward the middle of the 82 ensemble runs.
-    Scoring started ${new Date(lb.logsSince + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}; a lead time switches to its own
-    measured number after ${lb.minDays} snowy station-days (${measured} of 15 so far).</p>
+    Scoring started ${new Date(lb.logsSince + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}. Each correction blends what this
+    season's scoring has measured with past winters, leaning more on this season as snowy days add up (past winters count as ${lb.priorDays ?? 60} days).</p>
     <div class="table-wrap"><table><tr><th class="name">Days ahead</th><th>Correction</th><th>Based on</th><th>Snowy days scored</th><th>Forecast as % of what fell</th></tr>${rows}</table></div>`;
 }
 
@@ -1227,11 +1334,159 @@ async function loadUpcomingView() {
   if (state.view === 'upcoming') renderUpcoming();
 }
 
+// ---------- compare resorts ----------
+
+state.compare = (() => {
+  try { const c = JSON.parse(store.get('compare')); if (Array.isArray(c) && c.length >= 2) return c; } catch {}
+  return [state.favorites[0] || DEFAULT_RESORT, state.favorites.find((id) => id !== state.favorites[0]) || 'wolf-creek'];
+})();
+const compareData = {}; // resortId -> forecast (mid-mountain, no ensemble)
+
+async function loadCompareView() {
+  renderHeader();
+  renderCompare();
+  loadUpcoming().then(() => state.view === 'compare' && renderCompare());
+  await Promise.all(state.compare.map(async (id) => {
+    const r = RESORTS.find((x) => x.id === id);
+    if (!r || compareData[id]?.fresh) return;
+    compareData[id] ||= savedForecast(r, 'mid');
+    try {
+      const f = await getForecast(r, r.elevations.mid, state.calibration?.resorts?.[id], { ensemble: false, leadBias: state.leadBias });
+      compareData[id] = { ...f, fresh: true };
+    } catch (e) { console.warn(`Compare: ${r.name}`, e); }
+    if (state.view === 'compare') renderCompare();
+  }));
+}
+
+function renderCompare() {
+  const picks = state.compare.map((id) => RESORTS.find((r) => r.id === id)).filter(Boolean);
+  const options = (sel) => {
+    const opt = (r) => `<option value="${r.id}" ${r.id === sel ? 'selected' : ''}>${r.name}</option>`;
+    const favs = state.favorites.map((id) => RESORTS.find((r) => r.id === id)).filter(Boolean);
+    let html = favs.length ? `<optgroup label="★ Favorites">${favs.map(opt).join('')}</optgroup>` : '';
+    for (const [code, label] of Object.entries(STATE_NAMES)) html += `<optgroup label="${label}">${RESORTS.filter((r) => r.state === code).map(opt).join('')}</optgroup>`;
+    return html;
+  };
+  const pickers = picks.map((r, i) => `<div class="cmp-pick"><select data-slot="${i}" aria-label="Resort ${i + 1}">${options(r.id)}</select>
+      ${picks.length > 2 ? `<button class="link-btn" data-remove="${i}" aria-label="Remove">✕</button>` : ''}</div>`).join('')
+    + (picks.length < 3 ? '<button class="loc-btn" id="cmpAdd">+ Add a third</button>' : '');
+
+  // Per resort: the next 7 ski days from its forecast, plus measured numbers from upcoming.json.
+  const info = picks.map((r) => {
+    const f = compareData[r.id];
+    const ti = f?.days?.findIndex((d) => d.date === f.todayStr) ?? -1;
+    const days = ti >= 0 ? f.days.slice(ti, ti + 15) : [];
+    const wk = days.slice(0, 7), next3 = days.slice(0, 3);
+    const best = wk.slice(1).reduce((a, d) => (!a || d.overnight + 0.5 * d.lifts > a.overnight + 0.5 * a.lifts ? d : a), null);
+    return {
+      r, days, wk, todayStr: f?.todayStr, loaded: days.length > 0,
+      snow7: sum(wk.map((d) => d.snow)), snow15: sum(days.map((d) => d.snow)),
+      by9: days[1]?.overnight ?? null, best,
+      wind: next3.length ? avg(next3.map((d) => d.wind)) : null, gust: next3.length ? Math.max(...next3.map((d) => d.gust)) : null,
+      hiLo: next3.length ? [Math.min(...next3.map((d) => d.lo)), Math.max(...next3.map((d) => d.hi))] : null,
+      up: state.upcoming?.resorts?.[r.id] || {}, drive: driveTo(r.id),
+    };
+  });
+  const loaded = info.every((x) => x.loaded);
+  // Highlight the best value in a row (most snow, least wind, shortest drive).
+  const row = (label, vals, better) => {
+    const nums = vals.map((v) => (typeof v === 'object' && v ? v.n : v));
+    const valid = nums.filter((n) => n != null && !Number.isNaN(n));
+    const winner = better && valid.length > 1 && new Set(valid).size > 1 ? (better === 'max' ? Math.max(...valid) : Math.min(...valid)) : null;
+    return `<tr><th class="name">${label}</th>${vals.map((v, i) => `<td class="${winner != null && nums[i] === winner ? 'cmp-win' : ''}">${typeof v === 'object' && v ? v.t : v ?? '–'}</td>`).join('')}</tr>`;
+  };
+  const N = (n, t) => ({ n, t });
+  const head = `<tr><th></th>${info.map((x) => `<th><a href="#${x.r.id}" data-open="${x.r.id}">${x.r.name}</a><br><small class="muted">${x.r.state} · ${passBadges(x.r.id) || 'no Epic/Ikon/Indy'}</small></th>`).join('')}</tr>`;
+  const table = `<table class="cmp-table">${head}
+    ${row('Next 7 days', info.map((x) => (x.loaded ? N(x.snow7, `<b>${fmtIn(x.snow7)}</b>`) : '…')), 'max')}
+    ${row('Next 15 days', info.map((x) => (x.loaded ? N(x.snow15, fmtIn(x.snow15)) : '…')), 'max')}
+    ${row('By 9 am tomorrow', info.map((x) => (x.by9 != null ? N(x.by9, fmtIn(x.by9)) : '–')), 'max')}
+    ${row('Best powder day', info.map((x) => (x.best && x.best.overnight + x.best.lifts >= 1 ? `${dayLabel(x.best.date, x.todayStr).short}: ${fmtIn(x.best.overnight)} by 9 am` : 'none this week')))}
+    ${row('Last 48 hours', info.map((x) => (x.up.recent48 ? N(x.up.recent48.inches, fmtIn(x.up.recent48.inches)) : '–')), 'max')}
+    ${row('Season so far', info.map((x) => (x.up.season ? N(x.up.season.inches, fmtIn(x.up.season.inches)) : '–')), 'max')}
+    ${row('Snow depth', info.map((x) => (x.up.depth ? N(x.up.depth.inches, fmtIn(x.up.depth.inches)) : '–')), 'max')}
+    ${row('Wind, next 3 days', info.map((x) => (x.wind != null ? N(x.gust, `${Math.round(x.wind)} mph, gusts ${Math.round(x.gust)}`) : '–')), 'min')}
+    ${row('Temps, next 3 days', info.map((x) => (x.hiLo ? `${Math.round(x.hiLo[0])}° to ${Math.round(x.hiLo[1])}°F` : '–')))}
+    ${row('Drive', info.map((x) => (x.drive != null ? N(x.drive, fmtDrive(x.drive)) : '–')), 'min')}
+    ${row('Summit / vertical', info.map((x) => `${ftLabel(x.r.elevations.summit)} / ${(Math.round(mToFt(x.r.elevations.summit - x.r.elevations.base) / 10) * 10).toLocaleString()}′`))}
+  </table>`;
+
+  // Day by day: snow, gusts and high for each resort; the snowiest cell each day is highlighted.
+  const ref = info.find((x) => x.loaded);
+  const grid = ref ? `<table class="cmp-table cmp-days"><tr><th></th>${info.map((x) => `<th>${x.r.name}</th>`).join('')}</tr>
+    ${ref.wk.map((d0, k) => {
+      const cells = info.map((x) => x.wk.find((d) => d.date === d0.date));
+      const most = Math.max(...cells.map((d) => d?.snow ?? 0));
+      const lbl = dayLabel(d0.date, ref.todayStr);
+      return `<tr><th class="name">${lbl.short === 'Today' || lbl.short === 'Tmw' ? lbl.short : lbl.wk} <small class="muted">${lbl.md}</small></th>${cells.map((d) => (d
+        ? `<td class="${most >= 1 && d.snow === most ? 'cmp-win' : ''}">${icon(d)} <b>${fmtIn(d.snow)}</b><br><small class="muted">gusts ${Math.round(d.gust)} · ${Math.round(d.hi)}°</small></td>`
+        : '<td>–</td>')).join('')}</tr>`;
+    }).join('')}</table>` : '';
+
+  // One-line verdict.
+  let verdict = '';
+  if (loaded) {
+    const bySnow = [...info].sort((a, b) => b.snow7 - a.snow7);
+    const [a, b] = bySnow;
+    verdict = a.snow7 - b.snow7 >= 1
+      ? `<b>${a.r.name}</b> gets the most snow over the next 7 days (${fmtIn(a.snow7)} vs ${bySnow.slice(1).map((x) => `${fmtIn(x.snow7)} at ${x.r.name}`).join(', ')}).`
+      : `Snow over the next 7 days is about even (${info.map((x) => `${x.r.name} ${fmtIn(x.snow7)}`).join(', ')}).`;
+    const drives = info.filter((x) => x.drive != null).sort((p, q) => p.drive - q.drive);
+    if (drives.length > 1 && drives[1].drive - drives[0].drive >= 20 * 60) verdict += ` ${drives[0].r.name} is ${fmtDrive(drives[1].drive - drives[0].drive)} closer than ${drives[1].r.name}.`;
+  }
+  $('compareView').innerHTML = `<section class="card">
+      <div class="cmp-picks">${pickers}</div>
+      ${verdict ? `<p class="best-day">${verdict}</p>` : '<p class="hint">Loading forecasts…</p>'}
+      <div class="table-wrap">${table}</div>
+      ${!state.drive ? '<p class="hint">Set your location on Upcoming Snow to see drive times here.</p>' : ''}
+    </section>
+    ${grid ? `<section class="card"><div class="card-head"><h2>Day by day</h2><span class="hint">Highlighted = most snow that day</span></div><div class="table-wrap">${grid}</div></section>` : ''}`;
+}
+
+// ---------- powder alerts (public per-resort ntfy channels) ----------
+
+state.alertQuery = '';
+function renderAlerts() {
+  const q = state.alertQuery.trim().toLowerCase();
+  const match = (r) => !q || `${r.name} ${r.region} ${STATE_NAMES[r.state]}`.toLowerCase().includes(q);
+  const row = (r) => `<div class="alert-row">
+      <span class="up-name"><a href="#${r.id}" data-open="${r.id}">${r.name}</a><small>${r.region}</small></span>
+      <span class="alert-btns">${ALERT_TIERS.map((t) => `<a class="road-btn" href="https://ntfy.sh/${alertTopic(r.id, t)}" target="_blank" rel="noopener" title="${t}&quot; or more in a day">${t}"+</a>
+        <button class="ghost small copy" data-copy="${alertTopic(r.id, t)}" aria-label="Copy the ${t}-inch channel name for ${r.name}" title="Copy channel name">⧉</button>`).join('')}</span>
+    </div>`;
+  const favs = RESORTS.filter((r) => state.favorites.includes(r.id) && match(r));
+  const groups = Object.entries(STATE_NAMES).map(([code, label]) => {
+    const rs = RESORTS.filter((r) => r.state === code && !state.favorites.includes(r.id) && match(r));
+    return rs.length ? `<h3 class="sub-head">${label}</h3>${rs.map(row).join('')}` : '';
+  }).join('');
+  $('alertsView').innerHTML = `
+    <section class="card">
+      <div class="card-head"><h2>How it works</h2></div>
+      <ol class="steps">
+        <li>Get the free <b>ntfy</b> app: <a href="https://apps.apple.com/us/app/ntfy/id1625396347" target="_blank" rel="noopener">iPhone</a> ·
+          <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">Android</a>. No account needed.</li>
+        <li>Pick a mountain and a size below. <b>4"+</b> alerts on any day forecast to get 4 inches or more; <b>8"+</b> and <b>12"+</b> only on bigger days.
+          Subscribe to one size per mountain.</li>
+        <li>Tap the size to open the channel, then subscribe. Or tap ⧉ to copy its name, and in the ntfy app tap <b>+</b> and paste it.</li>
+      </ol>
+      <p class="hint">Alerts go out around 6–7 pm Mountain time and look at the next 3 ski days. You get a heads-up the first evening a powder day shows up,
+        then a final call the evening before (with the amount by 9 am). Forecasts can change, so heads-ups can fade. Channels are public: share them with friends.
+        To mute a channel for a while, long-press it in the ntfy app.</p>
+    </section>
+    <section class="card">
+      <div class="up-tools"><input id="alertSearch" class="alert-search" type="search" placeholder="Find a mountain" value="${state.alertQuery.replace(/"/g, '&quot;')}" aria-label="Find a mountain"></div>
+      ${favs.length ? `<h3 class="sub-head">★ Your favorites</h3>${favs.map(row).join('')}` : ''}
+      ${groups || (favs.length ? '' : '<p class="hint">No mountains match.</p>')}
+    </section>`;
+}
+
 function applyView() {
   document.body.classList.toggle('fav-mode', state.view === 'favorites');
   document.body.classList.toggle('list-mode', state.view !== 'resort');
   $('favView').hidden = state.view !== 'favorites';
   $('upcomingView').hidden = state.view !== 'upcoming';
+  $('compareView').hidden = state.view !== 'compare';
+  $('alertsView').hidden = state.view !== 'alerts';
 }
 
 // ---------- loading ----------
@@ -1239,7 +1494,7 @@ function applyView() {
 async function loadCalibration() {
   // no-cache: always revalidate, so a recalibration shows up right away.
   const get = (f) => fetch(f, { cache: 'no-cache' }).then((r) => r.json()).catch((e) => { console.warn(`No ${f}`, e); return null; });
-  [state.calibration, state.leadBias] = await Promise.all([get('data/calibration.json'), get('data/lead-bias.json')]);
+  [state.calibration, state.leadBias, state.trend] = await Promise.all([get('data/calibration.json'), get('data/lead-bias.json'), get('data/forecast-trend.json')]);
 }
 
 async function loadStation() {
@@ -1267,6 +1522,7 @@ function loadResortExtras() {
   loadStation();
   loadAvalanche();
   showTrailMap();
+  renderGettingThere();
   loadRunTrend();
 }
 
@@ -1314,13 +1570,13 @@ async function load({ redraw = true } = {}) {
 }
 
 function switchResort(id) {
-  if (id === 'favorites' || id === 'upcoming') {
+  if (LIST_VIEWS.includes(id)) {
     state.elev = 'mid'; // every mountain and view starts at mid-mountain
     state.view = id;
     history.replaceState(null, '', '#' + id);
     applyView();
     window.scrollTo(0, 0);
-    if (id === 'favorites') loadFavView(); else loadUpcomingView();
+    if (id === 'favorites') loadFavView(); else if (id === 'upcoming') loadUpcomingView(); else if (id === 'compare') loadCompareView(); else renderAlerts();
     return;
   }
   if (!id || (id === state.resortId && state.view === 'resort')) return;
@@ -1399,6 +1655,38 @@ $('upcomingView').addEventListener('submit', async (e) => {
     out.innerHTML = places.map((p) => `<button type="button" data-place='${JSON.stringify(p).replace(/'/g, '&#39;')}'>${p.label}</button>`).join('');
   } catch (err) { out.textContent = `Search failed: ${err.message}`; }
 });
+$('compareView').addEventListener('change', (e) => {
+  const slot = e.target.dataset.slot;
+  if (slot == null) return;
+  state.compare[+slot] = e.target.value;
+  store.set('compare', JSON.stringify(state.compare));
+  loadCompareView();
+});
+$('compareView').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.id === 'cmpAdd') {
+    state.compare.push(RESORTS.find((r) => !state.compare.includes(r.id) && state.favorites.includes(r.id))?.id || RESORTS.find((r) => !state.compare.includes(r.id)).id);
+  } else if (b.dataset.remove != null) state.compare.splice(+b.dataset.remove, 1);
+  else return;
+  store.set('compare', JSON.stringify(state.compare));
+  loadCompareView();
+});
+$('alertsView').addEventListener('input', (e) => {
+  if (e.target.id !== 'alertSearch') return;
+  state.alertQuery = e.target.value;
+  renderAlerts();
+  const box = $('alertSearch');
+  box.focus();
+  box.setSelectionRange(box.value.length, box.value.length);
+});
+$('alertsView').addEventListener('click', async (e) => {
+  const b = e.target.closest('button[data-copy]');
+  if (b) { // copy a channel name to paste into the ntfy app
+    try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = '✓'; } catch { prompt('Channel name:', b.dataset.copy); }
+    setTimeout(() => { b.textContent = '⧉'; }, 1500);
+  }
+});
 $('upcomingView').addEventListener('change', (e) => {
   if (e.target.id === 'upSort') { state.upSort = e.target.value; renderUpcoming(); }
   if (e.target.id === 'upDrive') { state.upDrive = +e.target.value; renderUpcoming(); }
@@ -1431,6 +1719,7 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState !== 'visible') return;
   if (state.view === 'favorites') loadFavView();
   else if (state.view === 'upcoming') loadUpcomingView();
+  else if (state.view === 'compare') loadCompareView();
   else if (!state.fetchedAt || Date.now() - state.fetchedAt > STALE_MS) { load(); loadStation(); }
 });
 setInterval(renderStatus, 60e3);
@@ -1481,7 +1770,8 @@ applyTheme();
 
 // Saved forecast first so the app opens instantly; calibration and fresh data follow.
 if (state.view === 'resort') showSaved();
-loadCalibration().then(() => (state.view === 'favorites' ? loadFavView() : state.view === 'upcoming' ? loadUpcomingView() : load({ redraw: false })));
+if (state.view === 'alerts') { renderHeader(); renderAlerts(); }
+loadCalibration().then(() => (state.view === 'favorites' ? loadFavView() : state.view === 'upcoming' ? loadUpcomingView() : state.view === 'compare' ? loadCompareView() : state.view === 'alerts' ? null : load({ redraw: false })));
 loadReports().then(() => { if (state.view === 'resort') { renderSnowReport(); if (state.days.length) renderSnowSummary(); } });
 if (state.view === 'resort') loadResortExtras();
 

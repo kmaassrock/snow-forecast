@@ -23,7 +23,7 @@ jobs:
       - run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git add data/forecast-log data/lead-bias.json
+          git add data/forecast-log data/lead-bias.json data/forecast-trend.json
           git diff --cached --quiet && exit 0
           git commit -m "Score forecasts $(date -u +%F)"
           git pull --rebase

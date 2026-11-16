@@ -43,7 +43,7 @@ const OVERRIDES = {
 
 const WHISTLER = {
   id: 'whistler', name: 'Whistler', region: 'Whistler, BC', state: 'BC',
-  lat: 50.067, lon: -122.947, base: [50.115, -122.948], tz: 'America/Vancouver',
+  lat: 50.067, lon: -122.947, base: [50.115, -122.948], website: 'https://www.whistlerblackcomb.com/', tz: 'America/Vancouver',
   elevations: { base: 675, mid: 1850, summit: 2182 },
   stations: [{ source: 'eccc', id: '1108906', name: 'Whistler Roundhouse', lat: 50.0678, lon: -122.9472, elev: 1835 }],
 };
@@ -132,6 +132,7 @@ function bestStation(r, stations) {
     const r = {
       id: slug(name), name, region: o.region || (locality ? `${locality}, ${st}` : STATES[st]), state: st,
       lat: r4(lat), lon: r4(lon), base: baseArea(bottoms[p.id]) || [r4(lat), r4(lon)], tz: TZ[st],
+      ...(p.websites?.[0] ? { website: p.websites[0] } : {}),
       elevations: o.elevations || { base: Math.round(s.minElevation), mid: Math.round((s.minElevation + s.maxElevation) / 2), summit: Math.round(s.maxElevation) },
     };
     r.stations = o.stations || bestStation(r, stations);
