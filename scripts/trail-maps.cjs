@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-// Finds each resort's newest official winter trail map on skimap.org (an archive of the
+// Finds each resort's newest official winter trail maps on skimap.org (an archive of the
 // trail maps resorts publish, e.g. James Niehues' paintings) and writes data/trail-maps.json.
 // The site shows the map image from skimap.org and links to the full-size original.
 // Runs weekly (.github/workflows/calibrate.yml) to pick up new season maps.
 //
 //   node scripts/trail-maps.cjs
+//   ONLY=vail,alta node scripts/trail-maps.cjs   # just these resorts
 
 const fs = require('fs');
 const path = require('path');
@@ -32,6 +33,7 @@ function parseMaps(html) {
       tags: [...body.matchAll(/class="badge[^"]*">([^<]+)</g)].map((t) => t[1].trim().toLowerCase()),
       img: img[3], avif: avif || null, w: +img[1], h: +img[2],
       artist: body.match(/created by <a href="\/artists\/\d+">([^<]+)<\/a>/)?.[1] || null,
+      uploader: body.match(/added by <a href="\/users\/(\d+)">/)?.[1] || null,
       caption: text(body.match(/<figcaption[\s\S]*?<span>([\s\S]*?)<\/span>/)?.[1] || '') || null,
     });
   }
@@ -45,24 +47,55 @@ function nameMatch(resortName, areaName) {
   return resortName.toLowerCase().split(/[^a-z]+/).filter((w) => w.length > 2 && area.includes(w)).length;
 }
 
-// Newest winter ski map from the best-matching area: skip summer/nordic maps and master plans; when any map is
-// tagged downhill, only those count (not touring, village or parking maps).
+// The newest season's winter ski maps from the best-matching area. Big resorts publish
+// one per area (Vail: Front Side, Back Bowls, Blue Sky Basin), so all of that year's maps
+// count. Skip summer/nordic maps and master plans; when any map is tagged downhill, only
+// those count (not touring, village or parking maps).
 function pick(maps) {
   const winter = maps.filter((m) => m.year && !m.tags.some((t) => SKIP.includes(t)));
   const downhill = winter.filter((m) => m.tags.includes('downhill'));
-  const pool = downhill.length ? downhill : winter.filter((m) => !m.tags.length);
-  return pool.sort((a, b) => b.match - a.match || b.year - a.year || a.order - b.order)[0] || null;
+  const untagged = winter.filter((m) => !m.tags.length);
+  // Last resort: any winter map (Bear Mountain's only one is tagged village / base).
+  const pool = downhill.length ? downhill : untagged.length ? untagged : winter;
+  if (!pool.length) return [];
+  const best = pool.reduce((a, b) => (b.match > a.match || (b.match === a.match && (b.year > a.year || (b.year === a.year && b.order < a.order))) ? b : a));
+  const season = pool.filter((m) => m.area === best.area && m.year === best.year);
+  // A resort's per-area maps get uploaded together, as one person's set; other people's
+  // uploads of the same year are usually the same map again (often cropped differently).
+  // So use the biggest set, the newest one on a tie.
+  const sets = {};
+  for (const m of season) (sets[m.uploader || `map${m.id}`] ||= []).push(m);
+  const set = Object.values(sets).sort((a, b) => b.length - a.length || Math.max(...b.map((m) => m.id)) - Math.max(...a.map((m) => m.id)))[0];
+  // In upload order, which is usually the resort's own (main mountain first).
+  return set.sort((a, b) => a.id - b.id);
+}
+
+// Some uploaders add the same map twice, as a PDF and as an image (same shape, different
+// file type). Drop the image copy; the PDF is the sharper full-size version.
+async function dropFormatCopies(set) {
+  if (set.length < 2) return set;
+  for (const m of set) {
+    try {
+      const res = await fetch(`https://skimap.org/skimaps/view/${m.id}`, { method: 'HEAD', headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(30e3) });
+      m.pdf = (res.headers.get('content-type') || '').includes('pdf');
+    } catch { m.pdf = null; }
+    await sleep(500);
+  }
+  const ratio = (m) => m.h / m.w;
+  return set.filter((m) => !(m.pdf === false && set.some((o) => o.pdf === true && Math.abs(ratio(o) - ratio(m)) < 0.015 * ratio(m))));
 }
 
 (async () => {
   const old = (() => { try { return JSON.parse(fs.readFileSync(OUT, 'utf8')).resorts; } catch { return {}; } })();
-  const out = { updated: new Date().toISOString().slice(0, 10), resorts: {} };
-  for (const r of RESORTS) {
+  // ONLY=vail,alta refreshes just those resorts and keeps the rest of the file.
+  const only = process.env.ONLY?.split(',').map((x) => x.trim());
+  const out = { updated: new Date().toISOString().slice(0, 10), resorts: only ? { ...old } : {} };
+  for (const r of RESORTS.filter((x) => !only || only.includes(x.id))) {
     const maps = [];
     let failed = false;
     for (const [i, area] of (r.skimapIds || []).entries()) {
       try {
-        const res = await fetch(`https://skimap.org/skiareas/view/${area}`, { headers: { 'User-Agent': UA } });
+        const res = await fetch(`https://skimap.org/skiareas/view/${area}`, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(30e3) });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const html = await res.text();
         const name = html.match(/<meta name="description" content="[^"]* for (.+?) in [^"]*"/)?.[1] || '';
@@ -70,12 +103,10 @@ function pick(maps) {
       } catch (e) { failed = true; console.error(`${r.name} (area ${area}): ${e.message}`); }
       await sleep(1500); // be gentle with skimap.org
     }
-    const best = pick(maps);
-    if (best) {
-      const { tags, caption, order, match, ...m } = best;
-      out.resorts[r.id] = m;
-    } else if (failed && old[r.id]) out.resorts[r.id] = old[r.id];
-    console.log(`${r.name.padEnd(32)} ${best ? `${best.year} ${best.artist || ''} (area ${best.area}; ${best.tags.join(', ') || 'untagged'})` : 'no winter map'}`);
+    const picked = await dropFormatCopies(pick(maps));
+    if (picked.length) out.resorts[r.id] = { maps: picked.map(({ tags, caption, order, match, uploader, pdf, ...m }) => m) };
+    else if (failed && old[r.id]) out.resorts[r.id] = old[r.id];
+    console.log(`${r.name.padEnd(32)} ${picked.length ? `${picked[0].year} ${picked[0].artist || ''} (area ${picked[0].area}): ${picked.length} map${picked.length > 1 ? 's' : ''} ${picked.map((m) => m.id).join(',')}` : 'no winter map'}`);
   }
   if (!Object.keys(out.resorts).length) throw new Error('No trail maps found');
   fs.writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n');

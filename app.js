@@ -533,27 +533,36 @@ function loadLeaflet() {
 // interactive map (runs from OpenStreetMap). Loaded only when the Mountain tab is open.
 let trailMaps = null;
 state.mapMode = store.get('mapMode') === 'live' ? 'live' : 'resort';
+state.mapIdx = 0; // which of a resort's area maps is shown (Vail: Front Side, Back Bowls, Blue Sky Basin)
 async function showTrailMap() {
   if (state.view !== 'resort' || state.tab !== 'mountain') return;
   trailMaps ||= fetch('data/trail-maps.json', { cache: 'no-cache' }).then((r) => r.json()).then((d) => d.resorts).catch(() => ({}));
-  const maps = await trailMaps;
+  const all = await trailMaps;
   const r = resort();
-  const m = maps[r.id];
-  const mode = m ? state.mapMode : 'live';
+  const entry = all[r.id];
+  const list = entry?.maps || (entry ? [entry] : []); // older files had one map per resort
+  if (state.mapIdx >= list.length) state.mapIdx = 0;
+  const mode = list.length ? state.mapMode : 'live';
   document.querySelectorAll('#mapSeg button').forEach((b) => b.classList.toggle('on', b.dataset.map === mode));
-  $('mapSeg').hidden = !m;
+  $('mapSeg').hidden = !list.length;
   const box = $('trailMap');
-  const key = `${r.id}:${mode}`;
+  const key = `${r.id}:${mode}:${mode === 'resort' ? state.mapIdx : ''}`;
   if (box.dataset.key === key) return;
   box.dataset.key = key;
   box.classList.toggle('resort-map', mode === 'resort');
   const site = r.website ? ` · <a href="${r.website}" target="_blank" rel="noopener">${r.name} website →</a>` : '';
   if (mode === 'resort') {
+    const m = list[state.mapIdx];
     const full = `https://skimap.org/skimaps/view/${m.id}`;
-    box.innerHTML = `<a href="${full}" target="_blank" rel="noopener" title="Open the full-size map">
+    const n = list.length;
+    // More than one map: thumbnails to switch between the resort's areas.
+    const thumbs = n > 1 ? `<div class="map-thumbs" role="group" aria-label="${r.name} maps">${list.map((t, i) =>
+      `<button data-map-idx="${i}" class="${i === state.mapIdx ? 'on' : ''}" aria-label="Map ${i + 1} of ${n}" aria-pressed="${i === state.mapIdx}">
+        <picture>${t.avif ? `<source srcset="${t.avif.split(' ')[0]}" type="image/avif">` : ''}<img src="${t.img}" alt="" width="${Math.round((56 * t.w) / t.h)}" height="56" decoding="async"></picture></button>`).join('')}</div>` : '';
+    box.innerHTML = `${thumbs}<a href="${full}" target="_blank" rel="noopener" title="Open the full-size map">
       <picture>${m.avif ? `<source srcset="${m.avif}" sizes="(min-width: 900px) 860px, 100vw" type="image/avif">` : ''}
-        <img src="${m.img}" width="${m.w}" height="${m.h}" alt="${r.name} trail map (${m.year})" loading="lazy" decoding="async"></picture></a>`;
-    $('mapLinks').innerHTML = `${r.name}'s ${m.year} trail map${m.artist ? ` by ${m.artist}` : ''}. <a href="${full}" target="_blank" rel="noopener">Open full size to zoom →</a>
+        <img class="map-main" src="${m.img}" width="${m.w}" height="${m.h}" alt="${r.name} trail map${n > 1 ? ` ${state.mapIdx + 1} of ${n}` : ''} (${m.year})" decoding="async"></picture></a>`;
+    $('mapLinks').innerHTML = `${n > 1 ? `${r.name}'s ${m.year} trail maps: ${n} areas, tap a thumbnail to switch. ` : `${r.name}'s ${m.year} trail map. `}${m.artist ? `Art by ${m.artist}. ` : ''}<a href="${full}" target="_blank" rel="noopener">Open full size to zoom →</a>
       · via <a href="https://skimap.org/skiareas/view/${m.area}" target="_blank" rel="noopener">skimap.org</a>${site}`;
   } else {
     box.innerHTML = `<iframe src="https://openskimap.org/#13.6/${r.lat}/${r.lon}" title="${r.name} ski map" loading="lazy" allow="geolocation"></iframe>`;
@@ -566,6 +575,12 @@ $('mapSeg').addEventListener('click', (e) => {
   if (!mode || mode === state.mapMode) return;
   state.mapMode = mode;
   store.set('mapMode', mode);
+  showTrailMap();
+});
+$('trailMap').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-map-idx]');
+  if (!b) return;
+  state.mapIdx = +b.dataset.mapIdx;
   showTrailMap();
 });
 
@@ -1612,6 +1627,7 @@ function switchResort(id) {
   state.view = 'resort';
   state.resortId = id;
   state.selected = null;
+  state.mapIdx = 0;
   history.replaceState(null, '', id === DEFAULT_RESORT ? location.pathname : '#' + id);
   applyView();
   window.scrollTo(0, 0);

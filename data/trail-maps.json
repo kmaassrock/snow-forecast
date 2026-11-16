@@ -2,654 +2,1004 @@
  "updated": "2026-11-16",
  "resorts": {
   "badger-pass": {
-   "id": 26778,
-   "year": 2019,
-   "img": "https://files.skimap.org/926a0r8wy00koqc5uuvf8qywmh6c",
-   "avif": "https://files.skimap.org/dlnbcmf8he76n54if5ij1gfdnqhk 800w, https://files.skimap.org/6grc3qqgapdeo0r5mrud81xdngga 1200w",
-   "w": 1000,
-   "h": 655,
-   "artist": null,
-   "area": 547
+   "maps": [
+    {
+     "id": 26778,
+     "year": 2019,
+     "img": "https://files.skimap.org/926a0r8wy00koqc5uuvf8qywmh6c",
+     "avif": "https://files.skimap.org/dlnbcmf8he76n54if5ij1gfdnqhk 800w, https://files.skimap.org/6grc3qqgapdeo0r5mrud81xdngga 1200w",
+     "w": 1000,
+     "h": 655,
+     "artist": null,
+     "area": 547
+    }
+   ]
   },
   "bear-mountain": {
-   "id": 28474,
-   "year": 2024,
-   "img": "https://files.skimap.org/vhodo3ts63bkwnnjs6nd4qe1e7t1",
-   "avif": "https://files.skimap.org/0fvbmcviywbm4hgai3aed2nujp81 800w, https://files.skimap.org/xn0i96zlowjbe0dgepgjq7tyhiux 1200w",
-   "w": 1000,
-   "h": 708,
-   "artist": "James Niehues",
-   "area": 536
+   "maps": [
+    {
+     "id": 28474,
+     "year": 2024,
+     "img": "https://files.skimap.org/vhodo3ts63bkwnnjs6nd4qe1e7t1",
+     "avif": "https://files.skimap.org/0fvbmcviywbm4hgai3aed2nujp81 800w, https://files.skimap.org/xn0i96zlowjbe0dgepgjq7tyhiux 1200w",
+     "w": 1000,
+     "h": 708,
+     "artist": "James Niehues",
+     "area": 536
+    }
+   ]
   },
   "bear-valley": {
-   "id": 45900,
-   "year": 2025,
-   "img": "https://files.skimap.org/ldmrha301ihrbo9iv3m4d9awfq2r",
-   "avif": null,
-   "w": 1000,
-   "h": 400,
-   "artist": null,
-   "area": 534
+   "maps": [
+    {
+     "id": 45900,
+     "year": 2025,
+     "img": "https://files.skimap.org/ldmrha301ihrbo9iv3m4d9awfq2r",
+     "avif": null,
+     "w": 1000,
+     "h": 400,
+     "artist": null,
+     "area": 534
+    }
+   ]
   },
   "boreal": {
-   "id": 48040,
-   "year": 2025,
-   "img": "https://files.skimap.org/w10lroog3cmo1khmpomqhnrb66xm",
-   "avif": "https://files.skimap.org/jwdl3t111ste71x1kcqoujv0xm91 800w, https://files.skimap.org/ziu70y0zl8skcpxpn8zrunle73tq 1200w",
-   "w": 1000,
-   "h": 500,
-   "artist": "James Niehues",
-   "area": 523
+   "maps": [
+    {
+     "id": 48040,
+     "year": 2025,
+     "img": "https://files.skimap.org/w10lroog3cmo1khmpomqhnrb66xm",
+     "avif": "https://files.skimap.org/jwdl3t111ste71x1kcqoujv0xm91 800w, https://files.skimap.org/ziu70y0zl8skcpxpn8zrunle73tq 1200w",
+     "w": 1000,
+     "h": 500,
+     "artist": "James Niehues",
+     "area": 523
+    }
+   ]
   },
   "china-peak": {
-   "id": 36418,
-   "year": 2025,
-   "img": "https://files.skimap.org/xytgsy92zsk57byzubpmb85h2r8n",
-   "avif": "https://files.skimap.org/bwjh85s177d8yeme7pq1iavj6wh8 800w, https://files.skimap.org/194sdpbdulnacjcoyby10wtj2bw5 1200w",
-   "w": 1000,
-   "h": 482,
-   "artist": null,
-   "area": 527
+   "maps": [
+    {
+     "id": 36418,
+     "year": 2025,
+     "img": "https://files.skimap.org/xytgsy92zsk57byzubpmb85h2r8n",
+     "avif": "https://files.skimap.org/bwjh85s177d8yeme7pq1iavj6wh8 800w, https://files.skimap.org/194sdpbdulnacjcoyby10wtj2bw5 1200w",
+     "w": 1000,
+     "h": 482,
+     "artist": null,
+     "area": 527
+    }
+   ]
   },
   "dodge-ridge": {
-   "id": 45899,
-   "year": 2025,
-   "img": "https://files.skimap.org/r9hzwlwkso8yvzvy6sjsl0zofvnw",
-   "avif": null,
-   "w": 1000,
-   "h": 490,
-   "artist": "James Niehues",
-   "area": 533
+   "maps": [
+    {
+     "id": 45899,
+     "year": 2025,
+     "img": "https://files.skimap.org/r9hzwlwkso8yvzvy6sjsl0zofvnw",
+     "avif": null,
+     "w": 1000,
+     "h": 490,
+     "artist": "James Niehues",
+     "area": 533
+    }
+   ]
   },
   "donner-ski-ranch": {
-   "id": 13645,
-   "year": 2017,
-   "img": "https://files.skimap.org/ucm6xjl84zie6gvtklr66pp6m0pp",
-   "avif": "https://files.skimap.org/utefrvyn7ks41a6qdjydyupcussv 800w, https://files.skimap.org/smb9kplwk6bagsruq3ulkwzutu3m 1200w",
-   "w": 750,
-   "h": 750,
-   "artist": null,
-   "area": 542
+   "maps": [
+    {
+     "id": 13645,
+     "year": 2017,
+     "img": "https://files.skimap.org/ucm6xjl84zie6gvtklr66pp6m0pp",
+     "avif": "https://files.skimap.org/utefrvyn7ks41a6qdjydyupcussv 800w, https://files.skimap.org/smb9kplwk6bagsruq3ulkwzutu3m 1200w",
+     "w": 750,
+     "h": 750,
+     "artist": null,
+     "area": 542
+    }
+   ]
   },
   "heavenly": {
-   "id": 30139,
-   "year": 2024,
-   "img": "https://files.skimap.org/q0mg7yvyz7msrclr98roib0abmg7",
-   "avif": "https://files.skimap.org/jn5xpreg87pggyjkhidbrangp11s 800w, https://files.skimap.org/gjjpnfuiuzd4ynitjaja8ri5iqne 1200w",
-   "w": 1000,
-   "h": 1342,
-   "artist": "James Niehues",
-   "area": 544
+   "maps": [
+    {
+     "id": 30139,
+     "year": 2024,
+     "img": "https://files.skimap.org/q0mg7yvyz7msrclr98roib0abmg7",
+     "avif": "https://files.skimap.org/jn5xpreg87pggyjkhidbrangp11s 800w, https://files.skimap.org/gjjpnfuiuzd4ynitjaja8ri5iqne 1200w",
+     "w": 1000,
+     "h": 1342,
+     "artist": "James Niehues",
+     "area": 544
+    }
+   ]
   },
   "homewood": {
-   "id": 43085,
-   "year": 2026,
-   "img": "https://files.skimap.org/er03n0sji1exyoytpr6wwaycd07n",
-   "avif": "https://files.skimap.org/rsqw779mlymxpv07iga09njstd9a 800w, https://files.skimap.org/imbig6q88o0fl5i8t33qatoo71h1 1200w",
-   "w": 1000,
-   "h": 861,
-   "artist": "VistaMap (Gary Milliken)",
-   "area": 545
+   "maps": [
+    {
+     "id": 43085,
+     "year": 2026,
+     "img": "https://files.skimap.org/er03n0sji1exyoytpr6wwaycd07n",
+     "avif": "https://files.skimap.org/rsqw779mlymxpv07iga09njstd9a 800w, https://files.skimap.org/imbig6q88o0fl5i8t33qatoo71h1 1200w",
+     "w": 1000,
+     "h": 861,
+     "artist": "VistaMap (Gary Milliken)",
+     "area": 545
+    }
+   ]
   },
   "june-mountain": {
-   "id": 40710,
-   "year": 2025,
-   "img": "https://files.skimap.org/fdpsz5rs4fi9r45klgbcr9rc0a68",
-   "avif": "https://files.skimap.org/8b4s2oqms9eqt54uec7k87hjkiex 800w, https://files.skimap.org/iffxzucer6kny2sta14fds6ym27m 1200w",
-   "w": 1000,
-   "h": 706,
-   "artist": "Steve Fick",
-   "area": 540
+   "maps": [
+    {
+     "id": 40710,
+     "year": 2025,
+     "img": "https://files.skimap.org/fdpsz5rs4fi9r45klgbcr9rc0a68",
+     "avif": "https://files.skimap.org/8b4s2oqms9eqt54uec7k87hjkiex 800w, https://files.skimap.org/iffxzucer6kny2sta14fds6ym27m 1200w",
+     "w": 1000,
+     "h": 706,
+     "artist": "Steve Fick",
+     "area": 540
+    }
+   ]
   },
   "kirkwood": {
-   "id": 38415,
-   "year": 2025,
-   "img": "https://files.skimap.org/fq6jbeo4w2zhizuqxbje8bhncin9",
-   "avif": "https://files.skimap.org/awrjku03x85sxgxqjjzsgxegk2j1 800w, https://files.skimap.org/d4m0znh92t75anbqrcmxwra56oeq 1200w",
-   "w": 1000,
-   "h": 635,
-   "artist": "James Niehues",
-   "area": 537
+   "maps": [
+    {
+     "id": 38415,
+     "year": 2025,
+     "img": "https://files.skimap.org/fq6jbeo4w2zhizuqxbje8bhncin9",
+     "avif": "https://files.skimap.org/awrjku03x85sxgxqjjzsgxegk2j1 800w, https://files.skimap.org/d4m0znh92t75anbqrcmxwra56oeq 1200w",
+     "w": 1000,
+     "h": 635,
+     "artist": "James Niehues",
+     "area": 537
+    }
+   ]
   },
   "mammoth-mountain": {
-   "id": 45030,
-   "year": 2026,
-   "img": "https://files.skimap.org/ydqqimfnuxg43w07cfdiyc8zzxtc",
-   "avif": "https://files.skimap.org/orsgyyaf0vudyc8pwd4x258ezjjx 800w, https://files.skimap.org/67qdrxz7c9wonsdmnb4bza72zbk2 1200w",
-   "w": 1000,
-   "h": 685,
-   "artist": "James Niehues",
-   "area": 530
+   "maps": [
+    {
+     "id": 45030,
+     "year": 2026,
+     "img": "https://files.skimap.org/ydqqimfnuxg43w07cfdiyc8zzxtc",
+     "avif": "https://files.skimap.org/orsgyyaf0vudyc8pwd4x258ezjjx 800w, https://files.skimap.org/67qdrxz7c9wonsdmnb4bza72zbk2 1200w",
+     "w": 1000,
+     "h": 685,
+     "artist": "James Niehues",
+     "area": 530
+    }
+   ]
   },
   "mount-waterman": {
-   "id": 40666,
-   "year": 2025,
-   "img": "https://files.skimap.org/rcaibjzy9cx2auwkigo6fyc7s5sf",
-   "avif": "https://files.skimap.org/06yq4idu0vf67g4q9zrucs6a87kh 800w, https://files.skimap.org/pl1wry6ph1rei5nmu2a3azs1aixz 1200w",
-   "w": 600,
-   "h": 592,
-   "artist": null,
-   "area": 1029
+   "maps": [
+    {
+     "id": 40666,
+     "year": 2025,
+     "img": "https://files.skimap.org/rcaibjzy9cx2auwkigo6fyc7s5sf",
+     "avif": "https://files.skimap.org/06yq4idu0vf67g4q9zrucs6a87kh 800w, https://files.skimap.org/pl1wry6ph1rei5nmu2a3azs1aixz 1200w",
+     "w": 600,
+     "h": 592,
+     "artist": null,
+     "area": 1029
+    }
+   ]
   },
   "mountain-high": {
-   "id": 16311,
-   "year": 2019,
-   "img": "https://files.skimap.org/6ycr5bqhpqqkm8emx72iul3o03pr",
-   "avif": "https://files.skimap.org/qjjfn1b08hbz3jq61onbg781jbeq 800w, https://files.skimap.org/qsrplo8f0gpsqbp3w8j1852tzt8e 1200w",
-   "w": 1000,
-   "h": 746,
-   "artist": "James Niehues",
-   "area": 521
+   "maps": [
+    {
+     "id": 16310,
+     "year": 2019,
+     "img": "https://files.skimap.org/75mul07sjvdw73w4mw6gj7805w3u",
+     "avif": "https://files.skimap.org/trgq0urpb0mfs77lftxgj5ujhcog 800w, https://files.skimap.org/7pbsmlupqnqeokhqjwnsp4kowakc 1200w",
+     "w": 1000,
+     "h": 739,
+     "artist": "James Niehues",
+     "area": 521
+    },
+    {
+     "id": 16311,
+     "year": 2019,
+     "img": "https://files.skimap.org/6ycr5bqhpqqkm8emx72iul3o03pr",
+     "avif": "https://files.skimap.org/qjjfn1b08hbz3jq61onbg781jbeq 800w, https://files.skimap.org/qsrplo8f0gpsqbp3w8j1852tzt8e 1200w",
+     "w": 1000,
+     "h": 746,
+     "artist": "James Niehues",
+     "area": 521
+    }
+   ]
   },
   "mt-baldy": {
-   "id": 45904,
-   "year": 2023,
-   "img": "https://files.skimap.org/hk5g375tccgrdzr97943y9bz0of7",
-   "avif": null,
-   "w": 1000,
-   "h": 684,
-   "artist": "VistaMap (Gary Milliken)",
-   "area": 541
+   "maps": [
+    {
+     "id": 45904,
+     "year": 2023,
+     "img": "https://files.skimap.org/hk5g375tccgrdzr97943y9bz0of7",
+     "avif": null,
+     "w": 1000,
+     "h": 684,
+     "artist": "VistaMap (Gary Milliken)",
+     "area": 541
+    }
+   ]
   },
   "mt-shasta": {
-   "id": 23164,
-   "year": 2022,
-   "img": "https://files.skimap.org/cqds7m7otaqnrao5j0xdyyzo9nyg",
-   "avif": "https://files.skimap.org/pnfl1xxj2q6txi73wn8nfq8kz0p2 800w, https://files.skimap.org/yr9gwgrhqazk7itzva0xgxnlmoj3 1200w",
-   "w": 1000,
-   "h": 910,
-   "artist": "VistaMap (Gary Milliken)",
-   "area": 532
+   "maps": [
+    {
+     "id": 23164,
+     "year": 2022,
+     "img": "https://files.skimap.org/cqds7m7otaqnrao5j0xdyyzo9nyg",
+     "avif": "https://files.skimap.org/pnfl1xxj2q6txi73wn8nfq8kz0p2 800w, https://files.skimap.org/yr9gwgrhqazk7itzva0xgxnlmoj3 1200w",
+     "w": 1000,
+     "h": 910,
+     "artist": "VistaMap (Gary Milliken)",
+     "area": 532
+    }
+   ]
   },
   "northstar": {
-   "id": 36907,
-   "year": 2025,
-   "img": "https://files.skimap.org/b1vh8n03tswr8jg7ml3orr80k0tx",
-   "avif": "https://files.skimap.org/uzw925570wcrw0wljkp1otw20mg0 800w, https://files.skimap.org/tsowve2qzv4lm78p82m17i8qino3 1200w",
-   "w": 1000,
-   "h": 658,
-   "artist": "Alex Tait",
-   "area": 531
+   "maps": [
+    {
+     "id": 36907,
+     "year": 2025,
+     "img": "https://files.skimap.org/b1vh8n03tswr8jg7ml3orr80k0tx",
+     "avif": "https://files.skimap.org/uzw925570wcrw0wljkp1otw20mg0 800w, https://files.skimap.org/tsowve2qzv4lm78p82m17i8qino3 1200w",
+     "w": 1000,
+     "h": 658,
+     "artist": "Alex Tait",
+     "area": 531
+    }
+   ]
   },
   "palisades-tahoe-alpine-meadows": {
-   "id": 36309,
-   "year": 2025,
-   "img": "https://files.skimap.org/zgqg96z3x47wqtmg4uzsj08xu1ef",
-   "avif": "https://files.skimap.org/8g7s1fyk2rd6v0wkew4cwhw4jcqi 800w, https://files.skimap.org/ijdr9jdj7js70zh3pmv40600y4po 1200w",
-   "w": 1000,
-   "h": 663,
-   "artist": null,
-   "area": 522
+   "maps": [
+    {
+     "id": 36309,
+     "year": 2025,
+     "img": "https://files.skimap.org/zgqg96z3x47wqtmg4uzsj08xu1ef",
+     "avif": "https://files.skimap.org/8g7s1fyk2rd6v0wkew4cwhw4jcqi 800w, https://files.skimap.org/ijdr9jdj7js70zh3pmv40600y4po 1200w",
+     "w": 1000,
+     "h": 663,
+     "artist": null,
+     "area": 522
+    },
+    {
+     "id": 36310,
+     "year": 2025,
+     "img": "https://files.skimap.org/n93rj80yrnqxrpv1blxa77vd25uj",
+     "avif": "https://files.skimap.org/tihlyr0asl1x16etliqbwmwduzre 800w, https://files.skimap.org/qnayvikm0sl84d7x1z2tps1ypt0z 1200w",
+     "w": 1000,
+     "h": 502,
+     "artist": null,
+     "area": 522
+    }
+   ]
   },
   "palisades-tahoe-olympic-valley": {
-   "id": 36307,
-   "year": 2025,
-   "img": "https://files.skimap.org/z2jp7xsditc7wb5we53q6p9mw13l",
-   "avif": "https://files.skimap.org/3wy37qsm3i2iuwwh2r3aeycbst5v 800w, https://files.skimap.org/ylxj96b1ewu5sxgvtrmfulvlrs47 1200w",
-   "w": 1000,
-   "h": 677,
-   "artist": null,
-   "area": 538
+   "maps": [
+    {
+     "id": 36307,
+     "year": 2025,
+     "img": "https://files.skimap.org/z2jp7xsditc7wb5we53q6p9mw13l",
+     "avif": "https://files.skimap.org/3wy37qsm3i2iuwwh2r3aeycbst5v 800w, https://files.skimap.org/ylxj96b1ewu5sxgvtrmfulvlrs47 1200w",
+     "w": 1000,
+     "h": 677,
+     "artist": null,
+     "area": 538
+    }
+   ]
   },
   "sierra-at-tahoe": {
-   "id": 43193,
-   "year": 2025,
-   "img": "https://files.skimap.org/khceiqswuiuhlf79yviqwpkfioir",
-   "avif": "https://files.skimap.org/kmqtwlwvhsy7k4hulgdxb07u38ci 800w, https://files.skimap.org/faa5rwvpp2so9b98iwf6ny9qlwn1 1200w",
-   "w": 1000,
-   "h": 706,
-   "artist": "Senan Gorman",
-   "area": 525
+   "maps": [
+    {
+     "id": 43193,
+     "year": 2025,
+     "img": "https://files.skimap.org/khceiqswuiuhlf79yviqwpkfioir",
+     "avif": "https://files.skimap.org/kmqtwlwvhsy7k4hulgdxb07u38ci 800w, https://files.skimap.org/faa5rwvpp2so9b98iwf6ny9qlwn1 1200w",
+     "w": 1000,
+     "h": 706,
+     "artist": "Senan Gorman",
+     "area": 525
+    }
+   ]
   },
   "snow-summit": {
-   "id": 45901,
-   "year": 2026,
-   "img": "https://files.skimap.org/9kya3s4vcsbx0ti13xzwldnhct34",
-   "avif": null,
-   "w": 1000,
-   "h": 746,
-   "artist": null,
-   "area": 546
+   "maps": [
+    {
+     "id": 45901,
+     "year": 2026,
+     "img": "https://files.skimap.org/9kya3s4vcsbx0ti13xzwldnhct34",
+     "avif": null,
+     "w": 1000,
+     "h": 746,
+     "artist": null,
+     "area": 546
+    }
+   ]
   },
   "snow-valley": {
-   "id": 45902,
-   "year": 2026,
-   "img": "https://files.skimap.org/uc8vd7revoitcvfs28rrvoeacim5",
-   "avif": null,
-   "w": 1000,
-   "h": 1221,
-   "artist": "James Niehues",
-   "area": 539
+   "maps": [
+    {
+     "id": 45902,
+     "year": 2026,
+     "img": "https://files.skimap.org/uc8vd7revoitcvfs28rrvoeacim5",
+     "avif": null,
+     "w": 1000,
+     "h": 1221,
+     "artist": "James Niehues",
+     "area": 539
+    }
+   ]
   },
   "soda-springs": {
-   "id": 20042,
-   "year": 2020,
-   "img": "https://files.skimap.org/osw6gh5n5vru5ohvwreghmfbjli7",
-   "avif": "https://files.skimap.org/u6a3sf5jgg3wx52by4qhmgi2lr49 800w, https://files.skimap.org/byxj3ch3u8t8rc744jllrst2uq0n 1200w",
-   "w": 1000,
-   "h": 552,
-   "artist": null,
-   "area": 524
+   "maps": [
+    {
+     "id": 20042,
+     "year": 2020,
+     "img": "https://files.skimap.org/osw6gh5n5vru5ohvwreghmfbjli7",
+     "avif": "https://files.skimap.org/u6a3sf5jgg3wx52by4qhmgi2lr49 800w, https://files.skimap.org/byxj3ch3u8t8rc744jllrst2uq0n 1200w",
+     "w": 1000,
+     "h": 552,
+     "artist": null,
+     "area": 524
+    }
+   ]
   },
   "sugar-bowl": {
-   "id": 42049,
-   "year": 2025,
-   "img": "https://files.skimap.org/vaaa84euimmxdqitw4b418t2980r",
-   "avif": "https://files.skimap.org/dneu4z3fb1w5ed4shjyqp9pcbmck 800w, https://files.skimap.org/deza205vviir2qdibvd6hsnbzp6f 1200w",
-   "w": 1000,
-   "h": 533,
-   "artist": "James Niehues",
-   "area": 543
+   "maps": [
+    {
+     "id": 42049,
+     "year": 2025,
+     "img": "https://files.skimap.org/vaaa84euimmxdqitw4b418t2980r",
+     "avif": "https://files.skimap.org/dneu4z3fb1w5ed4shjyqp9pcbmck 800w, https://files.skimap.org/deza205vviir2qdibvd6hsnbzp6f 1200w",
+     "w": 1000,
+     "h": 533,
+     "artist": "James Niehues",
+     "area": 543
+    }
+   ]
   },
   "arapahoe-basin": {
-   "id": 34841,
-   "year": 2025,
-   "img": "https://files.skimap.org/exfp917urqbnuhb4x2dk1bjahakk",
-   "avif": "https://files.skimap.org/aqhddzeix6a6r4fli4yhdf24v6rk 800w, https://files.skimap.org/3dvhjr104j4djosjj2xotfj5ifhu 1200w",
-   "w": 1000,
-   "h": 649,
-   "artist": "VistaMap (Gary Milliken)",
-   "area": 513
+   "maps": [
+    {
+     "id": 34841,
+     "year": 2025,
+     "img": "https://files.skimap.org/exfp917urqbnuhb4x2dk1bjahakk",
+     "avif": "https://files.skimap.org/aqhddzeix6a6r4fli4yhdf24v6rk 800w, https://files.skimap.org/3dvhjr104j4djosjj2xotfj5ifhu 1200w",
+     "w": 1000,
+     "h": 649,
+     "artist": "VistaMap (Gary Milliken)",
+     "area": 513
+    }
+   ]
   },
   "aspen-highlands": {
-   "id": 36380,
-   "year": 2025,
-   "img": "https://files.skimap.org/81uhcyufb98jp02xl9aq21s6omix",
-   "avif": "https://files.skimap.org/s8zyettpt0pkrryqkcrwa37dv61x 800w, https://files.skimap.org/p2l6oopmf8oczbkv8e4yje8n71aa 1200w",
-   "w": 1000,
-   "h": 1417,
-   "artist": "James Niehues",
-   "area": 1032
+   "maps": [
+    {
+     "id": 36380,
+     "year": 2025,
+     "img": "https://files.skimap.org/81uhcyufb98jp02xl9aq21s6omix",
+     "avif": "https://files.skimap.org/s8zyettpt0pkrryqkcrwa37dv61x 800w, https://files.skimap.org/p2l6oopmf8oczbkv8e4yje8n71aa 1200w",
+     "w": 1000,
+     "h": 1417,
+     "artist": "James Niehues",
+     "area": 1032
+    }
+   ]
   },
   "aspen-mountain": {
-   "id": 36390,
-   "year": 2025,
-   "img": "https://files.skimap.org/pepmk0ohfd4rldhl8kup4wvmefa2",
-   "avif": "https://files.skimap.org/d0rb6lsiujy19mf1vkwnbqs2rbrw 800w, https://files.skimap.org/flqjs1r0vb27esiq4e0sqc9gdy15 1200w",
-   "w": 1000,
-   "h": 1242,
-   "artist": "Rad Smith",
-   "area": 1031
+   "maps": [
+    {
+     "id": 36390,
+     "year": 2025,
+     "img": "https://files.skimap.org/pepmk0ohfd4rldhl8kup4wvmefa2",
+     "avif": "https://files.skimap.org/d0rb6lsiujy19mf1vkwnbqs2rbrw 800w, https://files.skimap.org/flqjs1r0vb27esiq4e0sqc9gdy15 1200w",
+     "w": 1000,
+     "h": 1242,
+     "artist": "Rad Smith",
+     "area": 1031
+    }
+   ]
   },
   "beaver-creek": {
-   "id": 33091,
-   "year": 2025,
-   "img": "https://files.skimap.org/nrug83akmrjqsklgsg4adg88w0mo",
-   "avif": "https://files.skimap.org/cfxzk4nunih0o3j37ohyl28mubqs 800w, https://files.skimap.org/tg5dqq77o5gfl8bimh3rnm3rx5cl 1200w",
-   "w": 1000,
-   "h": 877,
-   "artist": "VistaMap (Gary Milliken)",
-   "area": 497
+   "maps": [
+    {
+     "id": 37647,
+     "year": 2025,
+     "img": "https://files.skimap.org/5e5aas2p7v63kslvflpav2p79twl",
+     "avif": "https://files.skimap.org/hqt319ulpwn9aaj1zltgegp4iuv7 800w, https://files.skimap.org/0sr8v6bodw4mltfqfr6dcsr0dzn7 1200w",
+     "w": 1000,
+     "h": 892,
+     "artist": "VistaMap (Gary Milliken)",
+     "area": 497
+    }
+   ]
   },
   "breckenridge": {
-   "id": 47907,
-   "year": 2026,
-   "img": "https://files.skimap.org/eelrutx53a6lq3mhxeztk7y9j83w",
-   "avif": "https://files.skimap.org/f68oe98ucu8i6mymsubao3dcs6mx 800w, https://files.skimap.org/eymfah3eri1kq609wp5jpzdgt7yw 1200w",
-   "w": 1000,
-   "h": 702,
-   "artist": "James Niehues",
-   "area": 510
+   "maps": [
+    {
+     "id": 47907,
+     "year": 2026,
+     "img": "https://files.skimap.org/eelrutx53a6lq3mhxeztk7y9j83w",
+     "avif": "https://files.skimap.org/f68oe98ucu8i6mymsubao3dcs6mx 800w, https://files.skimap.org/eymfah3eri1kq609wp5jpzdgt7yw 1200w",
+     "w": 1000,
+     "h": 702,
+     "artist": "James Niehues",
+     "area": 510
+    }
+   ]
   },
   "buttermilk": {
-   "id": 36389,
-   "year": 2025,
-   "img": "https://files.skimap.org/ps1ozbfkme5oxca7x17e71c2soaz",
-   "avif": "https://files.skimap.org/xko5vkxkt31efvavl23nvzt8lpb1 800w, https://files.skimap.org/0ni1dktwyadkluwxo1r0m78vks9b 1200w",
-   "w": 1000,
-   "h": 648,
-   "artist": "Bill C. Brown",
-   "area": 504
+   "maps": [
+    {
+     "id": 36389,
+     "year": 2025,
+     "img": "https://files.skimap.org/ps1ozbfkme5oxca7x17e71c2soaz",
+     "avif": "https://files.skimap.org/xko5vkxkt31efvavl23nvzt8lpb1 800w, https://files.skimap.org/0ni1dktwyadkluwxo1r0m78vks9b 1200w",
+     "w": 1000,
+     "h": 648,
+     "artist": "Bill C. Brown",
+     "area": 504
+    }
+   ]
   },
   "copper-mountain": {
-   "id": 36384,
-   "year": 2025,
-   "img": "https://files.skimap.org/bzoozmy6bk85o4yqh0w1pya1vt46",
-   "avif": "https://files.skimap.org/2msq4r7thqequaic2s1uaxh876sj 800w, https://files.skimap.org/pkyw3636lcgbwpmdbdp1imznrxss 1200w",
-   "w": 1000,
-   "h": 1471,
-   "artist": null,
-   "area": 509
+   "maps": [
+    {
+     "id": 36383,
+     "year": 2025,
+     "img": "https://files.skimap.org/7jl1c5c3187l8gekxvya7umbfos8",
+     "avif": "https://files.skimap.org/2piwp314dcn6g4p2ud0gowji1tvc 800w, https://files.skimap.org/eusso9azzksai2rn9lm0u98e0gws 1200w",
+     "w": 1000,
+     "h": 808,
+     "artist": "James Niehues",
+     "area": 509
+    },
+    {
+     "id": 36384,
+     "year": 2025,
+     "img": "https://files.skimap.org/bzoozmy6bk85o4yqh0w1pya1vt46",
+     "avif": "https://files.skimap.org/2msq4r7thqequaic2s1uaxh876sj 800w, https://files.skimap.org/pkyw3636lcgbwpmdbdp1imznrxss 1200w",
+     "w": 1000,
+     "h": 1471,
+     "artist": null,
+     "area": 509
+    },
+    {
+     "id": 36386,
+     "year": 2025,
+     "img": "https://files.skimap.org/dy9bkoc4w7vxujl79ucvj9bdgxva",
+     "avif": "https://files.skimap.org/a17g8910hieqqosvn8mdrdujg62n 800w, https://files.skimap.org/t5crduu7cx381bakgv1yafdjcvho 1200w",
+     "w": 1000,
+     "h": 667,
+     "artist": null,
+     "area": 509
+    },
+    {
+     "id": 36388,
+     "year": 2025,
+     "img": "https://files.skimap.org/nrdcf7va4p7wyq4s4raht8os2gyl",
+     "avif": "https://files.skimap.org/3jvbrjnxb1fsj7reloh5af969tsm 800w, https://files.skimap.org/e1345tjry4x330sxu5pegay750hw 1200w",
+     "w": 1000,
+     "h": 874,
+     "artist": null,
+     "area": 509
+    }
+   ]
   },
   "crested-butte": {
-   "id": 36782,
-   "year": 2025,
-   "img": "https://files.skimap.org/svoz8xqzc51kxk426u7gpie74iiv",
-   "avif": "https://files.skimap.org/wy9a4ml8nvstotyvff0pbvrit38o 800w, https://files.skimap.org/6jslu6ahwkcpgt2ymb7cq5mx7pjk 1200w",
-   "w": 1000,
-   "h": 625,
-   "artist": "James Niehues",
-   "area": 514
+   "maps": [
+    {
+     "id": 36782,
+     "year": 2025,
+     "img": "https://files.skimap.org/svoz8xqzc51kxk426u7gpie74iiv",
+     "avif": "https://files.skimap.org/wy9a4ml8nvstotyvff0pbvrit38o 800w, https://files.skimap.org/6jslu6ahwkcpgt2ymb7cq5mx7pjk 1200w",
+     "w": 1000,
+     "h": 625,
+     "artist": "James Niehues",
+     "area": 514
+    }
+   ]
   },
   "echo-mountain": {
-   "id": 26841,
-   "year": 2022,
-   "img": "https://files.skimap.org/6yjtvx4rulfd6o3ew0lkj5j9tf4f",
-   "avif": "https://files.skimap.org/1gnzgla1mxodxiwhtay252i0izgb 800w, https://files.skimap.org/8w3tlixatreggtkwwkc0ie6lq7lz 1200w",
-   "w": 1000,
-   "h": 578,
-   "artist": null,
-   "area": 1034
+   "maps": [
+    {
+     "id": 26841,
+     "year": 2022,
+     "img": "https://files.skimap.org/6yjtvx4rulfd6o3ew0lkj5j9tf4f",
+     "avif": "https://files.skimap.org/1gnzgla1mxodxiwhtay252i0izgb 800w, https://files.skimap.org/8w3tlixatreggtkwwkc0ie6lq7lz 1200w",
+     "w": 1000,
+     "h": 578,
+     "artist": null,
+     "area": 1034
+    }
+   ]
   },
   "eldora": {
-   "id": 45873,
-   "year": 2025,
-   "img": "https://files.skimap.org/qxqvq066g3h15k5c8nt4fm753d97",
-   "avif": null,
-   "w": 1000,
-   "h": 750,
-   "artist": null,
-   "area": 508
+   "maps": [
+    {
+     "id": 45873,
+     "year": 2025,
+     "img": "https://files.skimap.org/qxqvq066g3h15k5c8nt4fm753d97",
+     "avif": null,
+     "w": 1000,
+     "h": 750,
+     "artist": null,
+     "area": 508
+    }
+   ]
   },
   "granby-ranch": {
-   "id": 47472,
-   "year": 2025,
-   "img": "https://files.skimap.org/uzw4fj0hilklg8w4vz90u7n5xcge",
-   "avif": "https://files.skimap.org/u2mdj4xwrk7e8l3w34zeuolzapvj 800w, https://files.skimap.org/keuis4wrh973a3ilj3wal1rkzdrm 1200w",
-   "w": 1000,
-   "h": 522,
-   "artist": "VistaMap (Gary Milliken)",
-   "area": 516
+   "maps": [
+    {
+     "id": 47472,
+     "year": 2025,
+     "img": "https://files.skimap.org/uzw4fj0hilklg8w4vz90u7n5xcge",
+     "avif": "https://files.skimap.org/u2mdj4xwrk7e8l3w34zeuolzapvj 800w, https://files.skimap.org/keuis4wrh973a3ilj3wal1rkzdrm 1200w",
+     "w": 1000,
+     "h": 522,
+     "artist": "VistaMap (Gary Milliken)",
+     "area": 516
+    }
+   ]
   },
   "hesperus": {
-   "id": 26720,
-   "year": 2022,
-   "img": "https://files.skimap.org/3us9aymnetrd0hvg6w5rw5exz8bc",
-   "avif": "https://files.skimap.org/mworfis53zyd8azvtdgcgib2k72t 800w, https://files.skimap.org/09i4okkrhnlijvzaijfxnghy8bu7 1200w",
-   "w": 1000,
-   "h": 491,
-   "artist": null,
-   "area": 1035
+   "maps": [
+    {
+     "id": 26720,
+     "year": 2022,
+     "img": "https://files.skimap.org/3us9aymnetrd0hvg6w5rw5exz8bc",
+     "avif": "https://files.skimap.org/mworfis53zyd8azvtdgcgib2k72t 800w, https://files.skimap.org/09i4okkrhnlijvzaijfxnghy8bu7 1200w",
+     "w": 1000,
+     "h": 491,
+     "artist": null,
+     "area": 1035
+    }
+   ]
   },
   "keystone": {
-   "id": 46357,
-   "year": 2026,
-   "img": "https://files.skimap.org/100a6a5gj3omn4azhonqtchf7dly",
-   "avif": "https://files.skimap.org/bpbi209agxzzpfd473sloxol3d65 800w, https://files.skimap.org/kjletaows21yma4uyo53zdzeo117 1200w",
-   "w": 1000,
-   "h": 812,
-   "artist": "Rad Smith",
-   "area": 519
+   "maps": [
+    {
+     "id": 46357,
+     "year": 2026,
+     "img": "https://files.skimap.org/100a6a5gj3omn4azhonqtchf7dly",
+     "avif": "https://files.skimap.org/bpbi209agxzzpfd473sloxol3d65 800w, https://files.skimap.org/kjletaows21yma4uyo53zdzeo117 1200w",
+     "w": 1000,
+     "h": 812,
+     "artist": "Rad Smith",
+     "area": 519
+    }
+   ]
   },
   "loveland-basin": {
-   "id": 35275,
-   "year": 2025,
-   "img": "https://files.skimap.org/kp5uwjy3bdsob4oj7tdy6f3z0fe0",
-   "avif": "https://files.skimap.org/uelch1phy9xux821exhbupaof2ny 800w, https://files.skimap.org/0dqtodzp4xphw82nbb8kt7bcsfcz 1200w",
-   "w": 1000,
-   "h": 500,
-   "artist": null,
-   "area": 515
+   "maps": [
+    {
+     "id": 35275,
+     "year": 2025,
+     "img": "https://files.skimap.org/kp5uwjy3bdsob4oj7tdy6f3z0fe0",
+     "avif": "https://files.skimap.org/uelch1phy9xux821exhbupaof2ny 800w, https://files.skimap.org/0dqtodzp4xphw82nbb8kt7bcsfcz 1200w",
+     "w": 1000,
+     "h": 500,
+     "artist": null,
+     "area": 515
+    }
+   ]
   },
   "monarch-mountain": {
-   "id": 36835,
-   "year": 2025,
-   "img": "https://files.skimap.org/mzfww22uxwnnfy6ub10s14aqglje",
-   "avif": "https://files.skimap.org/e5icdwvqou8irfx30yyxsfv7qrsy 800w, https://files.skimap.org/5gt0b0ie9vnvtmcyvg8nfxcnghkn 1200w",
-   "w": 1000,
-   "h": 667,
-   "artist": "VistaMap (Gary Milliken)",
-   "area": 511
+   "maps": [
+    {
+     "id": 36835,
+     "year": 2025,
+     "img": "https://files.skimap.org/mzfww22uxwnnfy6ub10s14aqglje",
+     "avif": "https://files.skimap.org/e5icdwvqou8irfx30yyxsfv7qrsy 800w, https://files.skimap.org/5gt0b0ie9vnvtmcyvg8nfxcnghkn 1200w",
+     "w": 1000,
+     "h": 667,
+     "artist": "VistaMap (Gary Milliken)",
+     "area": 511
+    },
+    {
+     "id": 36836,
+     "year": 2025,
+     "img": "https://files.skimap.org/tffqvr7c6v7gvzk7fiqlw9c2p6pv",
+     "avif": "https://files.skimap.org/rglqh1p2cuowytjd5p5ikpoehsv5 800w, https://files.skimap.org/bwg454selnr7oxhm6oi310cjoaim 1200w",
+     "w": 1000,
+     "h": 667,
+     "artist": "VistaMap (Gary Milliken)",
+     "area": 511
+    },
+    {
+     "id": 36837,
+     "year": 2025,
+     "img": "https://files.skimap.org/rnvz99r07gk9h6irk26cw0g7x4bh",
+     "avif": "https://files.skimap.org/t1rcowg8ml9af9p8uwva1qvhk6ey 800w, https://files.skimap.org/k3nmkvu9z08pnobyfbev6k50i25t 1200w",
+     "w": 1000,
+     "h": 667,
+     "artist": "VistaMap (Gary Milliken)",
+     "area": 511
+    }
+   ]
   },
   "powderhorn": {
-   "id": 27918,
-   "year": 2022,
-   "img": "https://files.skimap.org/6l5l3adv6m5775d9850y42nknyfu",
-   "avif": "https://files.skimap.org/7thia1ah4c0ugnk6nidgb5y719tc 800w, https://files.skimap.org/jzppb58r6lcmjyn143nx6jn6pmyp 1200w",
-   "w": 1000,
-   "h": 1000,
-   "artist": "James Niehues",
-   "area": 520
+   "maps": [
+    {
+     "id": 27918,
+     "year": 2022,
+     "img": "https://files.skimap.org/6l5l3adv6m5775d9850y42nknyfu",
+     "avif": "https://files.skimap.org/7thia1ah4c0ugnk6nidgb5y719tc 800w, https://files.skimap.org/jzppb58r6lcmjyn143nx6jn6pmyp 1200w",
+     "w": 1000,
+     "h": 1000,
+     "artist": "James Niehues",
+     "area": 520
+    }
+   ]
   },
   "purgatory": {
-   "id": 37217,
-   "year": 2025,
-   "img": "https://files.skimap.org/khr1rkq4btjpyw9se0ajibj3g2ha",
-   "avif": "https://files.skimap.org/cpnrn27zp4d6qpz9zv5axs436r1v 800w, https://files.skimap.org/ucjgqm8ew7t3g536i438tibxqqa3 1200w",
-   "w": 1000,
-   "h": 596,
-   "artist": "James Niehues",
-   "area": 518
+   "maps": [
+    {
+     "id": 37217,
+     "year": 2025,
+     "img": "https://files.skimap.org/khr1rkq4btjpyw9se0ajibj3g2ha",
+     "avif": "https://files.skimap.org/cpnrn27zp4d6qpz9zv5axs436r1v 800w, https://files.skimap.org/ucjgqm8ew7t3g536i438tibxqqa3 1200w",
+     "w": 1000,
+     "h": 596,
+     "artist": "James Niehues",
+     "area": 518
+    }
+   ]
   },
   "silverton-mountain": {
-   "id": 16187,
-   "year": 2015,
-   "img": "https://files.skimap.org/vktbkfx7997pwggj7b0jgn5fr4z7",
-   "avif": "https://files.skimap.org/pwpznfo35l44mjiv12pof96iw5th 800w, https://files.skimap.org/z7a65jbkc642byc5r94ivqo9628g 1200w",
-   "w": 1000,
-   "h": 1327,
-   "artist": null,
-   "area": 2280
+   "maps": [
+    {
+     "id": 16187,
+     "year": 2015,
+     "img": "https://files.skimap.org/vktbkfx7997pwggj7b0jgn5fr4z7",
+     "avif": "https://files.skimap.org/pwpznfo35l44mjiv12pof96iw5th 800w, https://files.skimap.org/z7a65jbkc642byc5r94ivqo9628g 1200w",
+     "w": 1000,
+     "h": 1327,
+     "artist": null,
+     "area": 2280
+    }
+   ]
   },
   "ski-cooper": {
-   "id": 32635,
-   "year": 2024,
-   "img": "https://files.skimap.org/1db95td4i817gf4x8hu1kw1cfe4v",
-   "avif": "https://files.skimap.org/pem1xzejian4yrspcqgecwsua4t9 800w, https://files.skimap.org/v5mfpjvfxbbps1twmvjgi4t1d5eh 1200w",
-   "w": 1000,
-   "h": 607,
-   "artist": "Kevin M. Mastin",
-   "area": 512
+   "maps": [
+    {
+     "id": 32635,
+     "year": 2024,
+     "img": "https://files.skimap.org/1db95td4i817gf4x8hu1kw1cfe4v",
+     "avif": "https://files.skimap.org/pem1xzejian4yrspcqgecwsua4t9 800w, https://files.skimap.org/v5mfpjvfxbbps1twmvjgi4t1d5eh 1200w",
+     "w": 1000,
+     "h": 607,
+     "artist": "Kevin M. Mastin",
+     "area": 512
+    }
+   ]
   },
   "snowmass": {
-   "id": 35274,
-   "year": 2025,
-   "img": "https://files.skimap.org/8ensgzh3ehg37mfzymv8q2htlhss",
-   "avif": "https://files.skimap.org/8joi5rtxzapw0uy26fpg7nyqlmns 800w, https://files.skimap.org/dhjs5c7zua513ouiu4vbbce8ghl5 1200w",
-   "w": 1000,
-   "h": 380,
-   "artist": "Bill C. Brown",
-   "area": 1033
+   "maps": [
+    {
+     "id": 35274,
+     "year": 2025,
+     "img": "https://files.skimap.org/8ensgzh3ehg37mfzymv8q2htlhss",
+     "avif": "https://files.skimap.org/8joi5rtxzapw0uy26fpg7nyqlmns 800w, https://files.skimap.org/dhjs5c7zua513ouiu4vbbce8ghl5 1200w",
+     "w": 1000,
+     "h": 380,
+     "artist": "Bill C. Brown",
+     "area": 1033
+    }
+   ]
   },
   "steamboat": {
-   "id": 46358,
-   "year": 2026,
-   "img": "https://files.skimap.org/dy4bmjvfsqyzjnyf0vp53cx1ubn3",
-   "avif": "https://files.skimap.org/mrrcfm43427i47lzi672s1787s6u 800w, https://files.skimap.org/p066ttba5ww8l4tmlayh7arotmfm 1200w",
-   "w": 1000,
-   "h": 703,
-   "artist": "Stefan Bast",
-   "area": 500
+   "maps": [
+    {
+     "id": 46358,
+     "year": 2026,
+     "img": "https://files.skimap.org/dy4bmjvfsqyzjnyf0vp53cx1ubn3",
+     "avif": "https://files.skimap.org/mrrcfm43427i47lzi672s1787s6u 800w, https://files.skimap.org/p066ttba5ww8l4tmlayh7arotmfm 1200w",
+     "w": 1000,
+     "h": 703,
+     "artist": "Stefan Bast",
+     "area": 500
+    }
+   ]
   },
   "sunlight": {
-   "id": 36783,
-   "year": 2024,
-   "img": "https://files.skimap.org/rledfqon3vq8moy08e57oi62dy2f",
-   "avif": "https://files.skimap.org/p6sjz709sjqa74nz720svopzegd5 800w, https://files.skimap.org/yasg7hcurpawm03lerfj1xh8xl0n 1200w",
-   "w": 1000,
-   "h": 505,
-   "artist": "Senan Gorman",
-   "area": 506
+   "maps": [
+    {
+     "id": 36783,
+     "year": 2024,
+     "img": "https://files.skimap.org/rledfqon3vq8moy08e57oi62dy2f",
+     "avif": "https://files.skimap.org/p6sjz709sjqa74nz720svopzegd5 800w, https://files.skimap.org/yasg7hcurpawm03lerfj1xh8xl0n 1200w",
+     "w": 1000,
+     "h": 505,
+     "artist": "Senan Gorman",
+     "area": 506
+    }
+   ]
   },
   "telluride": {
-   "id": 45884,
-   "year": 2024,
-   "img": "https://files.skimap.org/syusbpayg5116nsjz26x6tou5j1f",
-   "avif": null,
-   "w": 1000,
-   "h": 704,
-   "artist": "James Niehues",
-   "area": 517
+   "maps": [
+    {
+     "id": 45884,
+     "year": 2024,
+     "img": "https://files.skimap.org/syusbpayg5116nsjz26x6tou5j1f",
+     "avif": null,
+     "w": 1000,
+     "h": 704,
+     "artist": "James Niehues",
+     "area": 517
+    }
+   ]
   },
   "vail": {
-   "id": 46355,
-   "year": 2026,
-   "img": "https://files.skimap.org/6aqwzdmmdllsjukh5tr3hs6z5788",
-   "avif": "https://files.skimap.org/kp8ehoyrmo9m2fcv38rhax312anf 800w, https://files.skimap.org/18q2s2araptljepp78ciuj14swdi 1200w",
-   "w": 1000,
-   "h": 768,
-   "artist": "VistaMap (Gary Milliken)",
-   "area": 507
+   "maps": [
+    {
+     "id": 46353,
+     "year": 2026,
+     "img": "https://files.skimap.org/6ex07nszwpo9fqkuq86abp8ikyjd",
+     "avif": "https://files.skimap.org/fz6bppu7t3hjjmuh6a04o328athj 800w, https://files.skimap.org/15aks0n76ykbkok8n004k2ul3p77 1200w",
+     "w": 1000,
+     "h": 612,
+     "artist": "VistaMap (Gary Milliken)",
+     "area": 507
+    },
+    {
+     "id": 46354,
+     "year": 2026,
+     "img": "https://files.skimap.org/q6odf1zxth6hrtxazyjp6lbl1u7z",
+     "avif": "https://files.skimap.org/tc5oxo57awybzlmeahixd67jnlf8 800w, https://files.skimap.org/kx7iiy9dxq6xcvsb4b5mvpbrqzp4 1200w",
+     "w": 1000,
+     "h": 491,
+     "artist": "VistaMap (Gary Milliken)",
+     "area": 507
+    },
+    {
+     "id": 46355,
+     "year": 2026,
+     "img": "https://files.skimap.org/6aqwzdmmdllsjukh5tr3hs6z5788",
+     "avif": "https://files.skimap.org/kp8ehoyrmo9m2fcv38rhax312anf 800w, https://files.skimap.org/18q2s2araptljepp78ciuj14swdi 1200w",
+     "w": 1000,
+     "h": 768,
+     "artist": "VistaMap (Gary Milliken)",
+     "area": 507
+    }
+   ]
   },
   "winter-park": {
-   "id": 47103,
-   "year": 2026,
-   "img": "https://files.skimap.org/xja5hdke001onaxg40n50clhev1l",
-   "avif": "https://files.skimap.org/wrdt5lvueuimq23xp4si1vxlrm7q 800w, https://files.skimap.org/524yu70cbwkwxd10zqkblnp8jt8r 1200w",
-   "w": 1000,
-   "h": 704,
-   "artist": "James Niehues",
-   "area": 503
+   "maps": [
+    {
+     "id": 47103,
+     "year": 2026,
+     "img": "https://files.skimap.org/xja5hdke001onaxg40n50clhev1l",
+     "avif": "https://files.skimap.org/wrdt5lvueuimq23xp4si1vxlrm7q 800w, https://files.skimap.org/524yu70cbwkwxd10zqkblnp8jt8r 1200w",
+     "w": 1000,
+     "h": 704,
+     "artist": "James Niehues",
+     "area": 503
+    }
+   ]
   },
   "wolf-creek": {
-   "id": 45863,
-   "year": 2025,
-   "img": "https://files.skimap.org/18e9bg5gaefq2cxl6i4ebmtzeeel",
-   "avif": null,
-   "w": 1000,
-   "h": 348,
-   "artist": null,
-   "area": 505
+   "maps": [
+    {
+     "id": 45863,
+     "year": 2025,
+     "img": "https://files.skimap.org/18e9bg5gaefq2cxl6i4ebmtzeeel",
+     "avif": null,
+     "w": 1000,
+     "h": 348,
+     "artist": null,
+     "area": 505
+    }
+   ]
   },
   "alta": {
-   "id": 36318,
-   "year": 2025,
-   "img": "https://files.skimap.org/ow2dq6ieejhm6xhm5pz1zvvntpsy",
-   "avif": "https://files.skimap.org/y0vfja8naop8xthbumc0z1imuzy0 800w, https://files.skimap.org/q2l9c1x0r35j89l7lsll1yh8yl0o 1200w",
-   "w": 1000,
-   "h": 615,
-   "artist": "James Niehues",
-   "area": 224
+   "maps": [
+    {
+     "id": 36318,
+     "year": 2025,
+     "img": "https://files.skimap.org/ow2dq6ieejhm6xhm5pz1zvvntpsy",
+     "avif": "https://files.skimap.org/y0vfja8naop8xthbumc0z1imuzy0 800w, https://files.skimap.org/q2l9c1x0r35j89l7lsll1yh8yl0o 1200w",
+     "w": 1000,
+     "h": 615,
+     "artist": "James Niehues",
+     "area": 224
+    }
+   ]
   },
   "beaver-mountain": {
-   "id": 20531,
-   "year": 2020,
-   "img": "https://files.skimap.org/r9mbg0oze97z1p5lu2xd7pv25ooa",
-   "avif": "https://files.skimap.org/w6sav6kae2hvkh8i52elktuv2stb 800w, https://files.skimap.org/g59tsy1zdk3dd2urff7kjbd7tajh 1200w",
-   "w": 1000,
-   "h": 500,
-   "artist": "James Niehues",
-   "area": 220
+   "maps": [
+    {
+     "id": 32608,
+     "year": 2020,
+     "img": "https://files.skimap.org/7ekl5tfm1auive9dam0zk0hugn9a",
+     "avif": "https://files.skimap.org/juh76anmqnr6eaghhz8necq1fmng 800w, https://files.skimap.org/0fhgroxb2kro22s7hlaesiktpas9 1200w",
+     "w": 1000,
+     "h": 500,
+     "artist": "James Niehues",
+     "area": 220
+    }
+   ]
   },
   "brian-head": {
-   "id": 43896,
-   "year": 2026,
-   "img": "https://files.skimap.org/6l4ijmcdbs0sdimcpgcmnb6qwpz1",
-   "avif": "https://files.skimap.org/opfqvl5pfb661v6s21szz19caky3 800w, https://files.skimap.org/8vgy52acxlu477q7s70lxrlgh5ko 1200w",
-   "w": 1000,
-   "h": 500,
-   "artist": "Rad Smith",
-   "area": 227
+   "maps": [
+    {
+     "id": 43896,
+     "year": 2026,
+     "img": "https://files.skimap.org/6l4ijmcdbs0sdimcpgcmnb6qwpz1",
+     "avif": "https://files.skimap.org/opfqvl5pfb661v6s21szz19caky3 800w, https://files.skimap.org/8vgy52acxlu477q7s70lxrlgh5ko 1200w",
+     "w": 1000,
+     "h": 500,
+     "artist": "Rad Smith",
+     "area": 227
+    }
+   ]
   },
   "brighton": {
-   "id": 36378,
-   "year": 2025,
-   "img": "https://files.skimap.org/np1bkfavziaoyo0jskvu5smj0pyr",
-   "avif": "https://files.skimap.org/t0xlwrgvz382iacve9lx2odxnc7c 800w, https://files.skimap.org/yxzbl5nekvb9l9rjk6vpmxty7325 1200w",
-   "w": 1000,
-   "h": 750,
-   "artist": "James Niehues",
-   "area": 222
+   "maps": [
+    {
+     "id": 36378,
+     "year": 2025,
+     "img": "https://files.skimap.org/np1bkfavziaoyo0jskvu5smj0pyr",
+     "avif": "https://files.skimap.org/t0xlwrgvz382iacve9lx2odxnc7c 800w, https://files.skimap.org/yxzbl5nekvb9l9rjk6vpmxty7325 1200w",
+     "w": 1000,
+     "h": 750,
+     "artist": "James Niehues",
+     "area": 222
+    }
+   ]
   },
   "cherry-peak": {
-   "id": 47640,
-   "year": 2026,
-   "img": "https://files.skimap.org/gs9sqgsjwh2niysbgyzry46hqb1z",
-   "avif": "https://files.skimap.org/h271j20tq4rshrddd3hb6msa2zpf 800w, https://files.skimap.org/k0nbgizy2dqvjnzb0drjlmx1gn9o 1200w",
-   "w": 1000,
-   "h": 498,
-   "artist": null,
-   "area": 4337
+   "maps": [
+    {
+     "id": 47640,
+     "year": 2026,
+     "img": "https://files.skimap.org/gs9sqgsjwh2niysbgyzry46hqb1z",
+     "avif": "https://files.skimap.org/h271j20tq4rshrddd3hb6msa2zpf 800w, https://files.skimap.org/k0nbgizy2dqvjnzb0drjlmx1gn9o 1200w",
+     "w": 1000,
+     "h": 498,
+     "artist": null,
+     "area": 4337
+    }
+   ]
   },
   "deer-valley": {
-   "id": 48005,
-   "year": 2026,
-   "img": "https://files.skimap.org/rjdtdzxkn0s3e3n5lnrgntq3c5nd",
-   "avif": "https://files.skimap.org/6lixh78nwofpcsh2obzg9krigvnt 800w, https://files.skimap.org/ldncfu6z8ym26xbaxhe183mvdnul 1200w",
-   "w": 1000,
-   "h": 646,
-   "artist": "Rad Smith",
-   "area": 223
+   "maps": [
+    {
+     "id": 42023,
+     "year": 1955,
+     "img": "https://files.skimap.org/4by9ja3o66osoicurnziq76dwz2n",
+     "avif": "https://files.skimap.org/cjm5zzvazj2g84k8xww9d7lj7pi5 800w, https://files.skimap.org/32mp62r4gvk6hs2vyc7c108b27h1 1200w",
+     "w": 382,
+     "h": 318,
+     "artist": null,
+     "area": 19228
+    }
+   ]
   },
   "eagle-point": {
-   "id": 30406,
-   "year": 2024,
-   "img": "https://files.skimap.org/755zj075zqxyewcddhqcwsaa73d9",
-   "avif": "https://files.skimap.org/9wo0k9kawteqadr7i3we9fqi9uns 800w, https://files.skimap.org/hn0r8gaptjchqy9epfxkuwrwaokn 1200w",
-   "w": 1000,
-   "h": 695,
-   "artist": "James Niehues",
-   "area": 231
+   "maps": [
+    {
+     "id": 30406,
+     "year": 2024,
+     "img": "https://files.skimap.org/755zj075zqxyewcddhqcwsaa73d9",
+     "avif": "https://files.skimap.org/9wo0k9kawteqadr7i3we9fqi9uns 800w, https://files.skimap.org/hn0r8gaptjchqy9epfxkuwrwaokn 1200w",
+     "w": 1000,
+     "h": 695,
+     "artist": "James Niehues",
+     "area": 231
+    }
+   ]
   },
   "nordic-valley": {
-   "id": 44193,
-   "year": 2026,
-   "img": "https://files.skimap.org/1ejgqg2vc26ryd6k7rfzfrbsx2tx",
-   "avif": "https://files.skimap.org/iobmxzytyg10rcmzio6kuuanxaol 800w, https://files.skimap.org/hg3e0tds35wvg0e49889ciam7m1w 1200w",
-   "w": 1000,
-   "h": 773,
-   "artist": "Stefan Bast",
-   "area": 221
+   "maps": [
+    {
+     "id": 44193,
+     "year": 2026,
+     "img": "https://files.skimap.org/1ejgqg2vc26ryd6k7rfzfrbsx2tx",
+     "avif": "https://files.skimap.org/iobmxzytyg10rcmzio6kuuanxaol 800w, https://files.skimap.org/hg3e0tds35wvg0e49889ciam7m1w 1200w",
+     "w": 1000,
+     "h": 773,
+     "artist": "Stefan Bast",
+     "area": 221
+    }
+   ]
   },
   "park-city": {
-   "id": 36676,
-   "year": 2025,
-   "img": "https://files.skimap.org/6nm7cqlnnz4lijfcif5wdu9gr9xs",
-   "avif": "https://files.skimap.org/z8keea2ke238jxjg1jlguin9fs3y 800w, https://files.skimap.org/8dfbo5u99ojo8j3v00gx6umz5z2i 1200w",
-   "w": 1000,
-   "h": 634,
-   "artist": null,
-   "area": 229
+   "maps": [
+    {
+     "id": 36676,
+     "year": 2025,
+     "img": "https://files.skimap.org/6nm7cqlnnz4lijfcif5wdu9gr9xs",
+     "avif": "https://files.skimap.org/z8keea2ke238jxjg1jlguin9fs3y 800w, https://files.skimap.org/8dfbo5u99ojo8j3v00gx6umz5z2i 1200w",
+     "w": 1000,
+     "h": 634,
+     "artist": null,
+     "area": 229
+    }
+   ]
   },
   "powder-mountain": {
-   "id": 42540,
-   "year": 2026,
-   "img": "https://files.skimap.org/es4jqjp9ct9jqkpqxqx89iana2m9",
-   "avif": "https://files.skimap.org/l0k0xw96qas8sf4utl1omz4ndstw 800w, https://files.skimap.org/6lt9wo2bwje3jaa0r7m25r243sos 1200w",
-   "w": 1000,
-   "h": 656,
-   "artist": "James Niehues",
-   "area": 228
+   "maps": [
+    {
+     "id": 42540,
+     "year": 2026,
+     "img": "https://files.skimap.org/es4jqjp9ct9jqkpqxqx89iana2m9",
+     "avif": "https://files.skimap.org/l0k0xw96qas8sf4utl1omz4ndstw 800w, https://files.skimap.org/6lt9wo2bwje3jaa0r7m25r243sos 1200w",
+     "w": 1000,
+     "h": 656,
+     "artist": "James Niehues",
+     "area": 228
+    }
+   ]
   },
   "snowbasin": {
-   "id": 34864,
-   "year": 2024,
-   "img": "https://files.skimap.org/50u49r72o33ucuse0c38nlspkbsv",
-   "avif": "https://files.skimap.org/ze11e8dz1xv0scjh8ifx539d883p 800w, https://files.skimap.org/tleo13q6wwkzdfd9tfkps2yypucg 1200w",
-   "w": 1000,
-   "h": 533,
-   "artist": "James Niehues",
-   "area": 219
+   "maps": [
+    {
+     "id": 34864,
+     "year": 2024,
+     "img": "https://files.skimap.org/50u49r72o33ucuse0c38nlspkbsv",
+     "avif": "https://files.skimap.org/ze11e8dz1xv0scjh8ifx539d883p 800w, https://files.skimap.org/tleo13q6wwkzdfd9tfkps2yypucg 1200w",
+     "w": 1000,
+     "h": 533,
+     "artist": "James Niehues",
+     "area": 219
+    }
+   ]
   },
   "snowbird": {
-   "id": 45644,
-   "year": 2026,
-   "img": "https://files.skimap.org/39bhe9s6lu7cyt9j3k7857a2jklx",
-   "avif": "https://files.skimap.org/sjxtf3nasi63rv7rn4tezym3eh0p 800w, https://files.skimap.org/9ynoy8xzc8oljhevzt1ni42pqsvk 1200w",
-   "w": 1000,
-   "h": 1207,
-   "artist": "James Niehues",
-   "area": 226
+   "maps": [
+    {
+     "id": 45644,
+     "year": 2026,
+     "img": "https://files.skimap.org/39bhe9s6lu7cyt9j3k7857a2jklx",
+     "avif": "https://files.skimap.org/sjxtf3nasi63rv7rn4tezym3eh0p 800w, https://files.skimap.org/9ynoy8xzc8oljhevzt1ni42pqsvk 1200w",
+     "w": 1000,
+     "h": 1207,
+     "artist": "James Niehues",
+     "area": 226
+    }
+   ]
   },
   "solitude": {
-   "id": 46359,
-   "year": 2026,
-   "img": "https://files.skimap.org/ahabuypfp2b4qimwhbsmw9gfpyr2",
-   "avif": "https://files.skimap.org/4nlxcnkta791z1t5wltv9tr6d6np 800w, https://files.skimap.org/4b1mt4n4fc5buy1ywd0fmrzenvjq 1200w",
-   "w": 1000,
-   "h": 773,
-   "artist": "James Niehues",
-   "area": 225
+   "maps": [
+    {
+     "id": 46359,
+     "year": 2026,
+     "img": "https://files.skimap.org/ahabuypfp2b4qimwhbsmw9gfpyr2",
+     "avif": "https://files.skimap.org/4nlxcnkta791z1t5wltv9tr6d6np 800w, https://files.skimap.org/4b1mt4n4fc5buy1ywd0fmrzenvjq 1200w",
+     "w": 1000,
+     "h": 773,
+     "artist": "James Niehues",
+     "area": 225
+    }
+   ]
   },
   "sundance": {
-   "id": 42894,
-   "year": 2025,
-   "img": "https://files.skimap.org/rta543pxxdcqn4ovdvhf37wfcbqd",
-   "avif": "https://files.skimap.org/i2kjp06joym47tk1id5pav8hxml5 800w, https://files.skimap.org/nz4fgi7vct6fgjad52ywoge25who 1200w",
-   "w": 1000,
-   "h": 1286,
-   "artist": null,
-   "area": 230
+   "maps": [
+    {
+     "id": 42894,
+     "year": 2025,
+     "img": "https://files.skimap.org/rta543pxxdcqn4ovdvhf37wfcbqd",
+     "avif": "https://files.skimap.org/i2kjp06joym47tk1id5pav8hxml5 800w, https://files.skimap.org/nz4fgi7vct6fgjad52ywoge25who 1200w",
+     "w": 1000,
+     "h": 1286,
+     "artist": null,
+     "area": 230
+    }
+   ]
   },
   "whistler": {
-   "id": 36017,
-   "year": 2025,
-   "img": "https://files.skimap.org/qjqd36zjgm8bxb2s59nop7uzygx4",
-   "avif": "https://files.skimap.org/b1ov8dpz9xgyyb64odtcda0qmwmv 800w, https://files.skimap.org/7aa1sa95oxv7xny8wbhz4vo0f32t 1200w",
-   "w": 1000,
-   "h": 703,
-   "artist": "James Niehues",
-   "area": 28
+   "maps": [
+    {
+     "id": 36017,
+     "year": 2025,
+     "img": "https://files.skimap.org/qjqd36zjgm8bxb2s59nop7uzygx4",
+     "avif": "https://files.skimap.org/b1ov8dpz9xgyyb64odtcda0qmwmv 800w, https://files.skimap.org/7aa1sa95oxv7xny8wbhz4vo0f32t 1200w",
+     "w": 1000,
+     "h": 703,
+     "artist": "James Niehues",
+     "area": 28
+    }
+   ]
   }
  }
 }
