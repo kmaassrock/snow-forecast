@@ -175,7 +175,11 @@
     </section>
 
     <section class="card resort-only" id="mapCard" data-tab="mountain">
-      <div class="card-head"><h2>Trail map</h2></div>
+      <div class="card-head"><h2>Trail map</h2>
+        <div class="seg" id="mapSeg" role="group" aria-label="Map type">
+          <button data-map="resort">Resort map</button><button data-map="live">Interactive</button>
+        </div>
+      </div>
       <div id="trailMap" class="trail-map"></div>
       <p class="hint" id="mapLinks"></p>
     </section>

@@ -586,6 +586,9 @@ tr.open td:first-child { box-shadow: inset 3px 0 0 var(--day); }
 .best-day { margin: 0 0 12px; padding: 8px 12px; border-radius: 10px; background: color-mix(in srgb, var(--good) 12%, var(--panel-2)); font-size: 0.92rem; }
 .d-type { white-space: normal; }
 .trail-map iframe { width: 100%; height: 100%; border: 0; display: block; }
+.trail-map.resort-map { height: auto; background: none; }
+.trail-map.resort-map img { width: 100%; height: auto; display: block; border-radius: 12px; }
+#mapCard .card-head { flex-wrap: wrap; gap: 8px; }
 
 /* ---------- compare ---------- */
 .cmp-picks { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }

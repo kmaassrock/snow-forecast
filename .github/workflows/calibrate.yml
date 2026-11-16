@@ -22,9 +22,13 @@ jobs:
       - run: node scripts/calibrate.cjs
         env:
           CALIBRATE_MAX: 15
+      # Newest official trail map per resort from skimap.org (new season maps appear in the fall).
+      - run: node scripts/trail-maps.cjs
+        continue-on-error: true
       - run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git add data/calibration.json
-          git diff --cached --quiet || git commit -m "Update model calibration"
+          git add data/calibration.json data/trail-maps.json
+          git diff --cached --quiet || git commit -m "Update model calibration and trail maps"
+          git pull --rebase
           git push

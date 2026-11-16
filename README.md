@@ -98,8 +98,12 @@ the Upcoming Snow ranking and the "last 48 hrs" badge on favorite cards.
 - Getting there (Mountain tab): Google / Apple Maps directions to the base area, plus road-condition sites
   by state (COtrip and the traction law in CO, UDOT and the Cottonwood Canyons page in UT, Caltrans
   QuickMap in CA, DriveBC). Live road data would need a CDOT or UDOT API key (not built yet).
-- Trail map (Mountain tab): OpenSkiMap's embedded ski map, plus a link to the resort's own site
-  (`website` in resorts.js, from OpenSkiMap).
+- Trail map (Mountain tab): the resort's own published trail map (e.g. James Niehues' paintings), the
+  newest winter map in the [skimap.org](https://skimap.org) archive. `scripts/trail-maps.cjs` picks it
+  (weekly, in calibrate.yml) into `data/trail-maps.json`, using the skimap.org areas OpenSkiMap links
+  (`skimapIds` in resorts.js; the best name match wins, so a linked neighbor like Snowbird doesn't
+  replace Alta). Images load from skimap.org; tapping opens the full-size original. An "Interactive"
+  toggle shows OpenSkiMap's embedded map instead.
 
 ## Over-forecast correction
 

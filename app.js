@@ -528,18 +528,46 @@ function loadLeaflet() {
   });
 }
 
-// OpenSkiMap's interactive ski map (runs colored by difficulty, lifts, run names),
-// loaded only when the Mountain tab is open, plus a link to the resort's own site.
-function showTrailMap() {
+// Trail map, two ways: the resort's own published trail map (newest winter map on
+// skimap.org, data/trail-maps.json; tap for the full-size original), or OpenSkiMap's
+// interactive map (runs from OpenStreetMap). Loaded only when the Mountain tab is open.
+let trailMaps = null;
+state.mapMode = store.get('mapMode') === 'live' ? 'live' : 'resort';
+async function showTrailMap() {
   if (state.view !== 'resort' || state.tab !== 'mountain') return;
+  trailMaps ||= fetch('data/trail-maps.json', { cache: 'no-cache' }).then((r) => r.json()).then((d) => d.resorts).catch(() => ({}));
+  const maps = await trailMaps;
   const r = resort();
-  const src = `https://openskimap.org/#13.6/${r.lat}/${r.lon}`;
-  const frame = $('trailMap').querySelector('iframe');
-  if (frame?.dataset.resort === r.id) return;
-  $('trailMap').innerHTML = `<iframe src="${src}" data-resort="${r.id}" title="${r.name} ski map" loading="lazy" allow="geolocation"></iframe>`;
-  $('mapLinks').innerHTML = `Map: <a href="https://openskimap.org/" target="_blank" rel="noopener">OpenSkiMap</a> (from OpenStreetMap; runs are
-    colored by difficulty: green easy, blue intermediate, black advanced)${r.website ? ` · <a href="${r.website}" target="_blank" rel="noopener">${r.name}'s official trail map &amp; site →</a>` : ''}`;
+  const m = maps[r.id];
+  const mode = m ? state.mapMode : 'live';
+  document.querySelectorAll('#mapSeg button').forEach((b) => b.classList.toggle('on', b.dataset.map === mode));
+  $('mapSeg').hidden = !m;
+  const box = $('trailMap');
+  const key = `${r.id}:${mode}`;
+  if (box.dataset.key === key) return;
+  box.dataset.key = key;
+  box.classList.toggle('resort-map', mode === 'resort');
+  const site = r.website ? ` · <a href="${r.website}" target="_blank" rel="noopener">${r.name} website →</a>` : '';
+  if (mode === 'resort') {
+    const full = `https://skimap.org/skimaps/view/${m.id}`;
+    box.innerHTML = `<a href="${full}" target="_blank" rel="noopener" title="Open the full-size map">
+      <picture>${m.avif ? `<source srcset="${m.avif}" sizes="(min-width: 900px) 860px, 100vw" type="image/avif">` : ''}
+        <img src="${m.img}" width="${m.w}" height="${m.h}" alt="${r.name} trail map (${m.year})" loading="lazy" decoding="async"></picture></a>`;
+    $('mapLinks').innerHTML = `${r.name}'s ${m.year} trail map${m.artist ? ` by ${m.artist}` : ''}. <a href="${full}" target="_blank" rel="noopener">Open full size to zoom →</a>
+      · via <a href="https://skimap.org/skiareas/view/${m.area}" target="_blank" rel="noopener">skimap.org</a>${site}`;
+  } else {
+    box.innerHTML = `<iframe src="https://openskimap.org/#13.6/${r.lat}/${r.lon}" title="${r.name} ski map" loading="lazy" allow="geolocation"></iframe>`;
+    $('mapLinks').innerHTML = `Interactive map: <a href="https://openskimap.org/" target="_blank" rel="noopener">OpenSkiMap</a> (from OpenStreetMap; green easy,
+      blue intermediate, black advanced; pinch or scroll to zoom)${site}`;
+  }
 }
+$('mapSeg').addEventListener('click', (e) => {
+  const mode = e.target.closest('button')?.dataset.map;
+  if (!mode || mode === state.mapMode) return;
+  state.mapMode = mode;
+  store.set('mapMode', mode);
+  showTrailMap();
+});
 
 // Road-condition sites by state/province (closures, chain and traction laws, cams).
 const ROAD_SITES = {
