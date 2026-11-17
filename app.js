@@ -156,7 +156,7 @@ const QUALITY = { 't-wet': 'q-wet', 't-med': 'q-med', 't-light': 'q-light', 't-d
 // Period totals + one bar per day for the next 15 days. Bars are colored by snow
 // quality; powder days blend into orange at the top. Shared by the resort view
 // and the favorites cards (interactive = tappable day columns).
-function summaryHTML(days, ens, todayStr, { interactive = true, selected = null, barPx = 90 } = {}) {
+function summaryHTML(days, ens, todayStr, { interactive = true, selected = null, barPx = 112 } = {}) {
   const ti = days.findIndex((d) => d.date === todayStr);
   const up = days.slice(Math.max(0, ti), Math.max(0, ti) + 15);
   const periods = [[0, 4, 'Next 1–5 Days'], [5, 9, 'Next 6–10 Days'], [10, 14, 'Next 11–15 Days']].map(([a, b, label]) => {
@@ -246,7 +246,7 @@ function pastHTML(past) {
   const max = Math.max(3, ...past.map((d) => d.newSnow));
   const bars = past.map((d) => {
     const lbl = dayLabel(d.date, state.todayStr);
-    const h = d.newSnow < 0.05 ? 0 : Math.max(4, (d.newSnow / max) * 90);
+    const h = d.newSnow < 0.05 ? 0 : Math.max(4, (d.newSnow / max) * 112);
     return `<span class="col" aria-label="${lbl.long}: ${fmtIn(d.newSnow)} measured">
       <span class="b-track"><span class="b-val">${d.known ? fmtIn(d.newSnow).replace('"', '') : ''}</span><span class="b ${h ? 'b-measured' : 'none'}" style="height:${h}px"></span></span>
       <span class="b-wk ${lbl.weekend ? 'wknd' : ''}">${lbl.weekend ? lbl.wk.slice(0, 2) : lbl.wk[0]}</span>
@@ -317,10 +317,10 @@ function renderSnowSummary() {
   const keep = stripScroll.resort === state.resortId ? stripScroll.left : null;
   const past = st ? `<div class="strip-part past">${pastHTML(st.past)}</div>` : '';
   // The box sits between past and forecast on wide screens; phones show it as a banner above.
-  $('snowSummary').innerHTML = outlookHTML() + bestDayHTML() + nowBoxHTML('banner')
+  $('snowSummary').innerHTML = nowBoxHTML('banner')
     + `<div class="strip-wrap" data-resort="${state.resortId}"><div class="strip">${past}${nowBoxHTML('inline')}
         <div class="strip-part future">${summaryHTML(state.days, state.ens, state.todayStr, { selected: state.selected })}</div></div></div>`
-    + QUALITY_LEGEND
+    + QUALITY_LEGEND + bestDayHTML() + outlookHTML()
     + `<p class="hint">${st ? `<span class="phone-only">Swipe the bars right for the past 15 days. </span>Past days measured at ${st.station} station. ` : ''}Each forecast day runs 4 pm the day before to 4 pm. Snowy days are adjusted down for typical over-forecasting, more so 8+ days out (Models → Forecast check).</p>`;
   $('snowSummary').querySelectorAll('button.col').forEach((b) => b.addEventListener('click', () => selectDay(b.dataset.date, true)));
   // On narrow screens the strip scrolls sideways; start at the forecast (past days are a swipe left).
@@ -428,8 +428,8 @@ function hourlyChart(hours) {
   hours.forEach((h, i) => { if (h.hour % 6 === 0) s += `<text class="axis" x="${x(i)}" y="${H - 8}" text-anchor="middle">${hourLbl(h.hour)}</text>`; });
   s += `<line class="hc-cursor" x1="0" x2="0" y1="${P.snow.y - 4}" y2="${P.wind.y + P.wind.h}"/>`;
   return `<div class="hourly-chart" data-chart="${id}"><div class="hc-scroll">${s}</svg></div><div class="hc-tip" hidden></div>
-    <p class="legend"><i class="sw sw-snow"></i>Snow <i class="sw sw-temp"></i>Temperature <i class="sw sw-wind"></i>Wind
-      <i class="sw sw-gust"></i>Gusts <i class="sw sw-lift"></i>Lifts open (9a–4p)</p></div>`;
+    <p class="legend"><span><i class="sw sw-snow"></i>Snow</span><span><i class="sw sw-temp"></i>Temperature</span><span><i class="sw sw-wind"></i>Wind</span>
+      <span><i class="sw sw-gust"></i>Gusts</span><span><i class="sw sw-lift"></i>Lifts open (9a–4p)</span></p></div>`;
 }
 
 // Hover (desktop) or tap (phone) a chart to see that hour's numbers.
@@ -765,7 +765,7 @@ function renderDays() {
         <span class="d-day"><b>${lbl.short === 'Today' || lbl.short === 'Tmw' ? lbl.short : lbl.wk}</b><small>${lbl.md}</small></span>
         <span class="d-icon">${icon(d)}</span>
         <span class="d-snow ${d.snow >= POWDER_DAY_IN ? 'big' : ''}">${fmtIn(d.snow)}</span>
-        <span class="d-type">${type ? `<span class="${type.cls}">${type.label}</span>` : d.rainIn >= 0.05 ? '<span class="t-wet">Rain</span>' : ''}${trendChip(d)}${agreeChip(d)}</span>
+        <span class="d-type">${type ? `<span class="${type.cls}">${type.label}</span>` : d.rainIn >= 0.05 ? '<span class="t-rain">Rain</span>' : ''}${trendChip(d)}${agreeChip(d)}</span>
         <span class="d-temp">${Math.round(d.hi)}° <small>${Math.round(d.lo)}°</small></span>
         <span class="d-wind">${compass(d.dir)} ${Math.round(d.wind)}<small> mph</small></span>
         <span class="d-chev">›</span>
@@ -1787,7 +1787,7 @@ function applyTheme() {
   if (theme === 'auto') delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = theme;
   const [icon_, label] = THEMES[theme];
-  $('themeBtn').innerHTML = `${icon_}<span class="wide-only"> ${label}</span>`;
+  $('themeBtn').innerHTML = `<span class="nav-ico" aria-hidden="true">${icon_}</span><span class="nav-lbl">${label}</span>`;
   $('themeBtn').setAttribute('aria-label', `Theme: ${label}`);
   const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
   document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {

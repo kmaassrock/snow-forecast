@@ -29,14 +29,14 @@
     </svg>
     <div class="hero-inner">
       <nav class="topnav" id="topnav" aria-label="Views">
-        <button data-view="favorites">★ Favorites</button>
-        <label class="nav-pick" data-view="resort">All Resorts <span aria-hidden="true">▾</span>
+        <button data-view="favorites"><span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="fill" d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z"/></svg></span><span class="nav-lbl">Favorites</span></button>
+        <label class="nav-pick" data-view="resort"><span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2.5 19.5l6.5-12 4 7 2.5-4 6 9z"/><path d="M7.2 11l1.8 1.6 1.8-1.6"/></svg></span><span class="nav-lbl"><span class="wide-only">All </span>Resorts<span class="caret" aria-hidden="true"> ▾</span></span>
           <select id="resortSel" aria-label="All resorts"></select>
         </label>
-        <button data-view="upcoming">❄ Upcoming<span class="wide-only"> Snow</span></button>
-        <button data-view="compare" aria-label="Compare">⚖<span class="wide-only"> Compare</span></button>
-        <button data-view="alerts" aria-label="Alerts">🔔<span class="wide-only"> Alerts</span></button>
-        <button id="themeBtn" class="hero-btn theme-btn" aria-label="Theme">◐ Auto</button>
+        <button data-view="upcoming"><span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2v20M3.3 7l17.4 10M20.7 7L3.3 17M9.5 3.5L12 6l2.5-2.5M9.5 20.5L12 18l2.5 2.5"/></svg></span><span class="nav-lbl">Upcoming<span class="wide-only"> Snow</span></span></button>
+        <button data-view="compare"><span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span><span class="nav-lbl">Compare</span></button>
+        <button data-view="alerts"><span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2.2 2.2 0 0 0 4 0"/></svg></span><span class="nav-lbl">Alerts</span></button>
+        <button id="themeBtn" class="hero-btn theme-btn" aria-label="Theme"><span class="nav-ico" aria-hidden="true">◐</span><span class="nav-lbl">Auto</span></button>
       </nav>
       <div class="picker-row">
         <h1 id="resortName">Snow Forecast</h1>
@@ -50,14 +50,14 @@
   </header>
 
   <nav class="tabs resort-only" id="tabs" aria-label="Sections">
-    <div class="tabs-inner">
+    <div class="tabs-inner"><div class="tabs-bar">
       <button data-tab="summary">Summary</button>
       <button data-tab="daily">Daily</button>
       <button data-tab="hourly">Hourly</button>
       <button data-tab="models">Models</button>
       <button data-tab="history">History</button>
       <button data-tab="mountain">Mountain</button>
-    </div>
+    </div></div>
   </nav>
 
   <main>
@@ -104,9 +104,9 @@
       <div class="card-head">
         <h2>Before &amp; during lift hours</h2>
         <span class="legend">
-          <i class="sw sw-night"></i>Before lifts open (4p–9a)
-          <i class="sw sw-day"></i>While open (9a–4p)
-          <i class="sw sw-range"></i>Could be as little / as much as
+          <span><i class="sw sw-night"></i>Before lifts open (4p–9a)</span>
+          <span><i class="sw sw-day"></i>While open (9a–4p)</span>
+          <span><i class="sw sw-range"></i>Could be as little / as much as</span>
         </span>
       </div>
       <div id="chart" class="chart"></div>
