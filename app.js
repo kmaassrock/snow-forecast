@@ -299,6 +299,8 @@ function outlookHTML() {
     parts.push(`Snow ${span}: about ${fmtIn(total)}${hi - lo >= 1 ? ` (${fmtRange(lo, hi)})` : ''}${quality ? `, ${quality}` : ''}.`);
     const best = s.days.reduce((a, d) => (d.overnight > a.overnight ? d : a));
     if (best.overnight >= 2) parts.push(`Best powder: ${dayName(best)} morning, ${fmtIn(best.overnight)} by 9 am.`);
+    const windyPowder = win.find((d) => d.snow >= POWDER_DAY_IN && windHold(d));
+    if (windyPowder) parts.push(`${dayName(windyPowder)[0].toUpperCase() + dayName(windyPowder).slice(1)} is a powder day, but lift-hour gusts to ${Math.round(liftGust(windyPowder))} mph make ${windHold(windyPowder).likely ? 'wind holds on upper lifts likely' : 'wind holds possible'}.`);
     if (storms[1]) parts.push(`Another round ${dayName(storms[1].days[0])}, about ${fmtIn(sum(storms[1].days.map((d) => d.snow)))}.`);
   }
   const next3 = up.slice(0, 3);
@@ -675,6 +677,21 @@ function agreeChip(d) {
   return `<span class="chip ${cls}" title="${a.agree} of ${a.total} models show at least ${fmtIn(Math.max(1, 0.4 * (d.rawSnow ?? d.snow)))} this day">${a.agree}/${a.total} models</span>`;
 }
 
+// Wind-hold risk from the strongest lift-hours gust. Model gusts are for the model's
+// smoothed terrain, not a ridgetop lift, so this is a risk, never a closure call.
+const liftGust = (d) => d.liftGust ?? d.gust; // saved forecasts from before liftGust existed
+function windHold(d) {
+  const g = liftGust(d);
+  if (g >= 55) return { likely: true, gust: g, short: 'Holds likely', label: 'Wind holds likely (upper lifts)' };
+  if (g >= 40) return { likely: false, gust: g, short: 'Holds possible', label: 'Wind holds possible' };
+  return null;
+}
+function windChip(d) {
+  const w = windHold(d);
+  if (!w) return '';
+  return `<span class="chip wind-hold ${w.likely ? 'likely' : ''}" title="${w.label}: gusts to ${Math.round(w.gust)} mph during lift hours">💨 ${w.short}</span>`;
+}
+
 // Best day to ski in the next 7: snow by first chair counts most, then snow while
 // open; drier snow, lighter wind and fewer weekend crowds score higher, plus a
 // bluebird bonus for a clear day right after a storm. Dry weeks fall back to weather.
@@ -686,11 +703,13 @@ function bestDayHTML() {
   const score = (d) => {
     const prev = state.days[state.days.indexOf(d) - 1];
     const dry = !d.slr ? 1 : d.slr >= 15 ? 1.25 : d.slr >= 11.5 ? 1.1 : d.slr >= 8 ? 1 : 0.75;
-    const wind = d.gust >= 40 ? 0.6 : d.gust >= 30 ? 0.8 : 1;
+    // One wind factor on lift-hour gusts, stepped at the wind-hold thresholds (no extra hold penalty).
+    const g = liftGust(d);
+    const wind = g >= 55 ? 0.45 : g >= 40 ? 0.6 : g >= 30 ? 0.8 : 1;
     const cold = d.hi < 10 ? 0.85 : 1;
     const crowds = dayLabel(d.date, state.todayStr).weekend ? 0.9 : 1;
     const bluebird = prev && prev.snow >= 4 && d.cloud < 35 ? 2 : 0;
-    const weather = ((100 - d.cloud) / 100) * 0.5 + (d.gust < 25 ? 0.5 : 0); // tie-breaker for dry weeks
+    const weather = ((100 - d.cloud) / 100) * 0.5 + (g < 25 ? 0.5 : 0); // tie-breaker for dry weeks
     return (d.overnight + 0.5 * d.lifts) * dry * wind * cold * crowds + bluebird + weather;
   };
   const best = days.reduce((a, d) => (score(d) > score(a) ? d : a));
@@ -701,7 +720,8 @@ function bestDayHTML() {
   else if (best.snow >= 1) parts.push(`${fmtIn(best.snow)} during the day`);
   if (prev && prev.snow >= 4 && best.cloud < 35) parts.push('clearing after the storm');
   else if (best.snow < 1) parts.push(best.cloud < 30 ? 'sunny' : best.cloud < 70 ? 'partly cloudy' : 'cloudy');
-  parts.push(best.gust < 20 ? 'light winds' : `gusts to ${Math.round(best.gust)} mph`);
+  const bg = liftGust(best);
+  parts.push(bg < 20 ? 'light winds' : `gusts to ${Math.round(bg)} mph${windHold(best) ? ` (${windHold(best).label.toLowerCase()})` : ''}`);
   parts.push(`high ${Math.round(best.hi)}°F`);
   const noSnow = days.every((d) => d.snow < 1);
   return `<p class="best-day">⛷️ <b>Best day to ski${noSnow ? ' (no new snow this week)' : ''}: ${lbl}</b> · ${parts.join(', ')}</p>`;
@@ -738,7 +758,8 @@ function dayDetail(d, lead) {
       ${d.leadFactor && d.leadFactor < 0.97 ? `<dt>Before over-forecast correction</dt><dd>${fmtIn(d.rawSnow)} <span class="muted">(shown ${Math.round((1 - d.leadFactor) * 100)}% lower)</span></dd>` : ''}
       <dt>Snow water</dt><dd>${mmToIn(d.swe).toFixed(2)}"</dd>
       ${d.rainIn >= 0.05 ? `<dt>Rain</dt><dd>${d.rainIn.toFixed(2)}"</dd>` : ''}
-      <dt>Wind (lift hours)</dt><dd>${compass(d.dir)} ${Math.round(d.wind)} mph, gusts ${Math.round(d.gust)}</dd>
+      <dt>Wind (lift hours)</dt><dd>${compass(d.dir)} ${Math.round(d.wind)} mph, gusts ${Math.round(liftGust(d))}</dd>
+      ${windHold(d) ? `<dt>Wind holds</dt><dd>💨 ${windHold(d).label} <span class="muted">· model gusts, a risk not a closure</span></dd>` : ''}
       <dt>Feels like</dt><dd>${Math.round(d.feelsLo)}° to ${Math.round(d.feelsHi)}°F</dd>
       <dt>Humidity (lift hours)</dt><dd>${Math.round(d.rh)}%</dd>
       <dt>Cloud cover</dt><dd>${Math.round(d.cloud)}%</dd>
@@ -765,7 +786,7 @@ function renderDays() {
         <span class="d-day"><b>${lbl.short === 'Today' || lbl.short === 'Tmw' ? lbl.short : lbl.wk}</b><small>${lbl.md}</small></span>
         <span class="d-icon">${icon(d)}</span>
         <span class="d-snow ${d.snow >= POWDER_DAY_IN ? 'big' : ''}">${fmtIn(d.snow)}</span>
-        <span class="d-type">${type ? `<span class="${type.cls}">${type.label}</span>` : d.rainIn >= 0.05 ? '<span class="t-rain">Rain</span>' : ''}${trendChip(d)}${agreeChip(d)}</span>
+        <span class="d-type">${type ? `<span class="${type.cls}">${type.label}</span>` : d.rainIn >= 0.05 ? '<span class="t-rain">Rain</span>' : ''}${trendChip(d)}${agreeChip(d)}${windChip(d)}</span>
         <span class="d-temp">${Math.round(d.hi)}° <small>${Math.round(d.lo)}°</small></span>
         <span class="d-wind">${compass(d.dir)} ${Math.round(d.wind)}<small> mph</small></span>
         <span class="d-chev">›</span>
@@ -1049,6 +1070,45 @@ function renderLeadCheck() {
     <div class="table-wrap"><table><tr><th class="name">Days ahead</th><th>Correction</th><th>Based on</th><th>Snowy days scored</th><th>Forecast as % of what fell</th></tr>${rows}</table></div>`;
 }
 
+// How did we do? (Models tab): the primary SNOTEL station's last few storms, from
+// data/storm-check.json, forecasts as the site showed them (after the lead correction).
+const shortDate = (d) => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+function stormDates(s) {
+  if (s.from === s.to) return shortDate(s.from);
+  return s.from.slice(5, 7) === s.to.slice(5, 7) ? `${shortDate(s.from)}–${+s.to.slice(8)}` : `${shortDate(s.from)}–${shortDate(s.to)}`;
+}
+// Within 25% (or 2") counts as close; otherwise say which way it missed.
+function missText(fc, measured) {
+  if (fc == null) return '';
+  if (Math.abs(fc - measured) <= Math.max(2, 0.25 * measured)) return 'close';
+  return fc < measured ? 'too low' : 'too high';
+}
+function avgMiss(storms, key) {
+  const s = storms.filter((x) => x[key] != null);
+  const fc = sum(s.map((x) => x[key])), m = sum(s.map((x) => x.measuredIn));
+  if (s.length < 2 || m < 2) return null;
+  const pct = Math.round((fc / m - 1) * 100);
+  return Math.abs(pct) < 5 ? 'about right' : `${Math.abs(pct)}% ${pct < 0 ? 'low' : 'high'}`;
+}
+function renderStormCheck() {
+  const st = resort().stations[0];
+  const storms = st?.source === 'snotel' ? state.stormCheck?.stations?.[st.id] : null;
+  $('stormCheckCard').hidden = !storms?.length;
+  if (!storms?.length) return;
+  const cell = (fc, m) => (fc == null ? '–' : `<b>${fmtIn(fc)}</b><br><small class="muted">${missText(fc, m)}</small>`);
+  const rows = storms.map((s) => `<tr><td class="name">${stormDates(s)}</td><td>${cell(s.ahead1In, s.measuredIn)}</td><td>${cell(s.ahead3In, s.measuredIn)}</td><td><b>${fmtIn(s.measuredIn)}</b></td></tr>`).join('');
+  const a1 = avgMiss(storms, 'ahead1In'), a3 = avgMiss(storms, 'ahead3In');
+  const n = storms.length;
+  const summary = a1 || a3
+    ? `Last ${n} storm${n > 1 ? 's' : ''}: ${[a1 && `1-day forecasts averaged ${a1}`, a3 && `3-day ${a3}`].filter(Boolean).join(', ')}.`
+    : `${n === 1 ? 'One storm' : `${n} storms`} scored so far; an average needs a few more.`;
+  $('stormCheck').innerHTML = `<p class="storm-summary"><b>${summary}</b></p>
+    <div class="table-wrap"><table class="storm-check"><tr><th class="name">Storm</th><th>Forecast<br>1 day out</th><th>Forecast<br>3 days out</th><th>Measured</th></tr>${rows}</table></div>
+    <p class="hint">Measured at ${st.name} station from daily snow-depth gains. Forecasts are what the site showed (after the over-forecast
+    correction) at the station, turned from snow water into inches with each storm's measured snow-to-water ratio, so this scores how much fell,
+    not how fluffy it was. "Close" = within 25% or 2".</p>`;
+}
+
 function renderResort() {
   renderBanner();
   renderSnowSummary();
@@ -1060,6 +1120,7 @@ function renderResort() {
   renderRange();
   renderModels();
   renderLeadCheck();
+  renderStormCheck();
 }
 
 // ---------- favorites overview ----------
@@ -1548,7 +1609,7 @@ function applyView() {
 async function loadCalibration() {
   // no-cache: always revalidate, so a recalibration shows up right away.
   const get = (f) => fetch(f, { cache: 'no-cache' }).then((r) => r.json()).catch((e) => { console.warn(`No ${f}`, e); return null; });
-  [state.calibration, state.leadBias, state.trend] = await Promise.all([get('data/calibration.json'), get('data/lead-bias.json'), get('data/forecast-trend.json')]);
+  [state.calibration, state.leadBias, state.trend, state.stormCheck] = await Promise.all([get('data/calibration.json'), get('data/lead-bias.json'), get('data/forecast-trend.json'), get('data/storm-check.json')]);
 }
 
 async function loadStation() {

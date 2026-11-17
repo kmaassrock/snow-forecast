@@ -290,13 +290,16 @@ select {
 .switch { font-size: var(--fs-sm); font-weight: 600; display: inline-flex; align-items: center; gap: var(--s2); min-height: var(--ctl); cursor: pointer; }
 .switch input { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; }
 
-/* ---- small inline chips (trend, model agreement) ---- */
+/* ---- small inline chips (trend, model agreement, wind holds) ---- */
 .chip { display: inline-block; margin: 2px 0 0 6px; padding: 1px 7px; border-radius: var(--r-sm); font-size: var(--fs-xs); font-weight: 700; white-space: nowrap; line-height: 1.4; border: 1px solid transparent; }
 .trend-up { background: color-mix(in srgb, var(--good) 15%, transparent); color: var(--good); }
 .trend-down { background: color-mix(in srgb, var(--warm) 13%, transparent); color: var(--warm); }
 .agree-high { background: var(--panel-2); color: var(--text); border-color: var(--line); }
 .agree-mid { background: var(--panel-2); color: var(--muted); border-color: var(--line); }
 .agree-low { background: transparent; color: var(--muted); border: 1px dashed var(--muted); }
+/* Wind holds: no color meaning, just the icon and text; "likely" gets a solid text-colored outline. */
+.wind-hold { background: var(--panel-2); color: var(--text); border-color: var(--line); font-weight: 600; white-space: normal; max-width: 100%; }
+.wind-hold.likely { border-color: var(--text); font-weight: 700; }
 
 /* ---- pass badges ---- */
 .pass { display: inline-block; font-size: 0.6875rem; font-weight: 700; padding: 0 5px; border-radius: 4px; margin-left: 3px; vertical-align: 1px; color: var(--white); line-height: 1.45; }
@@ -342,6 +345,8 @@ p.card.hint { text-align: center; padding: var(--s6) var(--s5); max-width: none;
 .rn-list > :nth-child(-n+2), .detail dl > :nth-child(-n+2) { border-top: 0; }
 
 /* ---- tables ---- */
+.storm-summary { margin: 0 0 var(--s2); }
+.storm-check td small { white-space: nowrap; }
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 table { border-collapse: collapse; width: 100%; font-size: var(--fs-sm); }
 th, td { padding: 7px 8px; text-align: center; border-bottom: 1px solid var(--line); white-space: nowrap; }
