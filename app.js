@@ -747,6 +747,8 @@ const personSVG = (x) => `<circle cx="${x}" cy="3.2" r="2.2"/><path d="M${x - 3.
 const crowdIcon = (level) => `<svg class="crowd-ico" viewBox="0 0 ${8 + 7 * level} 12" aria-hidden="true">${[0, 1, 2].slice(0, level + 1).map((i) => personSVG(4 + 7 * i)).join('')}</svg>`;
 function crowdChip(d) {
   const c = crowdOf(d);
+  // Quiet is the normal case, so only Busy and Packed get a chip (the day detail still says Quiet).
+  if (c.label === 'Quiet') return '';
   return `<span class="chip crowd lvl-${c.level}" title="Crowds (estimate): ${c.label.toLowerCase()} · ${c.why}">${crowdIcon(c.level)}${c.label}</span>`;
 }
 
