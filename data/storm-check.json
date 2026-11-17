@@ -1,1 +1,314 @@
-{"updated":null,"stations":{}}
+{
+ "updated": "2026-11-17",
+ "stations": {
+  "356:CA:SNTL": [
+   {
+    "from": "2026-11-16",
+    "to": "2026-11-16",
+    "measuredIn": 4,
+    "waterIn": 0.5,
+    "ratio": 8,
+    "ahead1In": 4.4,
+    "ahead3In": 4.1
+   },
+   {
+    "from": "2026-11-13",
+    "to": "2026-11-13",
+    "measuredIn": 5,
+    "waterIn": 0.7,
+    "ratio": 7.1,
+    "ahead1In": 9,
+    "ahead3In": 8.4
+   }
+  ],
+  "428:CA:SNTL": [
+   {
+    "from": "2026-11-13",
+    "to": "2026-11-13",
+    "measuredIn": 12,
+    "waterIn": 1.8,
+    "ratio": 6.7,
+    "ahead1In": 10.5,
+    "ahead3In": 11
+   }
+  ],
+  "518:CA:SNTL": [
+   {
+    "from": "2026-11-13",
+    "to": "2026-11-13",
+    "measuredIn": 7,
+    "waterIn": 1.3,
+    "ratio": 6,
+    "ahead1In": 5.6,
+    "ahead3In": 5.3
+   }
+  ],
+  "848:CA:SNTL": [
+   {
+    "from": "2026-11-15",
+    "to": "2026-11-16",
+    "measuredIn": 8,
+    "waterIn": 1,
+    "ratio": 8,
+    "ahead1In": 7.3,
+    "ahead3In": 6.4
+   },
+   {
+    "from": "2026-11-13",
+    "to": "2026-11-13",
+    "measuredIn": 8,
+    "waterIn": 2.1,
+    "ratio": 6,
+    "ahead1In": 10.1,
+    "ahead3In": 10.6
+   }
+  ],
+  "1067:CA:SNTL": [
+   {
+    "from": "2026-11-16",
+    "to": "2026-11-16",
+    "measuredIn": 8,
+    "waterIn": 0.7,
+    "ratio": 11.4,
+    "ahead1In": 6.7,
+    "ahead3In": 5.5
+   },
+   {
+    "from": "2026-11-13",
+    "to": "2026-11-13",
+    "measuredIn": 7,
+    "waterIn": 0.8,
+    "ratio": 8.7,
+    "ahead1In": 10.5,
+    "ahead3In": 11
+   }
+  ],
+  "834:CA:SNTL": [
+   {
+    "from": "2026-11-13",
+    "to": "2026-11-13",
+    "measuredIn": 5,
+    "waterIn": 1.2,
+    "ratio": 6,
+    "ahead1In": 5.4,
+    "ahead3In": 5.4
+   }
+  ],
+  "784:CA:SNTL": [
+   {
+    "from": "2026-11-15",
+    "to": "2026-11-15",
+    "measuredIn": 1,
+    "waterIn": 0.3,
+    "ratio": 6,
+    "ahead1In": 1.3,
+    "ahead3In": 1.3
+   },
+   {
+    "from": "2026-11-13",
+    "to": "2026-11-13",
+    "measuredIn": 11,
+    "waterIn": 1.6,
+    "ratio": 6.9,
+    "ahead1In": 10.4,
+    "ahead3In": 10.3
+   }
+  ],
+  "463:CA:SNTL": [
+   {
+    "from": "2026-11-16",
+    "to": "2026-11-16",
+    "measuredIn": 11,
+    "waterIn": 0.8,
+    "ratio": 13.8,
+    "ahead1In": 11.6,
+    "ahead3In": 8.7
+   },
+   {
+    "from": "2026-11-13",
+    "to": "2026-11-13",
+    "measuredIn": 8,
+    "waterIn": 1.3,
+    "ratio": 6.2,
+    "ahead1In": 9.8,
+    "ahead3In": 9.9
+   }
+  ],
+  "380:CO:SNTL": [
+   {
+    "from": "2026-11-14",
+    "to": "2026-11-15",
+    "measuredIn": 2,
+    "waterIn": 0.3,
+    "ratio": 6.7,
+    "ahead1In": 1.1,
+    "ahead3In": 0.9
+   }
+  ],
+  "622:CO:SNTL": [
+   {
+    "from": "2026-11-14",
+    "to": "2026-11-14",
+    "measuredIn": 3,
+    "waterIn": 0.4,
+    "ratio": 7.5,
+    "ahead1In": 4.2,
+    "ahead3In": 4.2
+   }
+  ],
+  "780:CO:SNTL": [
+   {
+    "from": "2026-11-13",
+    "to": "2026-11-14",
+    "measuredIn": 7,
+    "waterIn": 0.9,
+    "ratio": 7.8,
+    "ahead1In": 5.9,
+    "ahead3In": 5.3
+   }
+  ],
+  "713:CO:SNTL": [
+   {
+    "from": "2026-11-14",
+    "to": "2026-11-14",
+    "measuredIn": 6,
+    "waterIn": 0.6,
+    "ratio": 10,
+    "ahead1In": 5.1,
+    "ahead3In": 5.5
+   }
+  ],
+  "737:CO:SNTL": [
+   {
+    "from": "2026-11-14",
+    "to": "2026-11-14",
+    "measuredIn": 2,
+    "waterIn": 0.3,
+    "ratio": 6.7,
+    "ahead1In": 2,
+    "ahead3In": 2.1
+   }
+  ],
+  "457:CO:SNTL": [
+   {
+    "from": "2026-11-13",
+    "to": "2026-11-15",
+    "measuredIn": 1,
+    "waterIn": 0.4,
+    "ratio": 6,
+    "ahead1In": 0.7,
+    "ahead3In": 0.6
+   }
+  ],
+  "874:CO:SNTL": [
+   {
+    "from": "2026-11-14",
+    "to": "2026-11-15",
+    "measuredIn": 9,
+    "waterIn": 1.2,
+    "ratio": 7.5,
+    "ahead1In": 5.5,
+    "ahead3In": 3
+   }
+  ],
+  "766:UT:SNTL": [
+   {
+    "from": "2026-11-14",
+    "to": "2026-11-14",
+    "measuredIn": 6,
+    "waterIn": 0.6,
+    "ratio": 10,
+    "ahead1In": 9.4,
+    "ahead3In": 10.6
+   }
+  ],
+  "1154:UT:SNTL": [
+   {
+    "from": "2026-11-13",
+    "to": "2026-11-14",
+    "measuredIn": 11,
+    "waterIn": 1.7,
+    "ratio": 6.5,
+    "ahead1In": 6.6,
+    "ahead3In": 5.1
+   }
+  ],
+  "366:UT:SNTL": [
+   {
+    "from": "2026-11-13",
+    "to": "2026-11-15",
+    "measuredIn": 3,
+    "waterIn": 0.6,
+    "ratio": 6,
+    "ahead1In": 4.6,
+    "ahead3In": 4.8
+   }
+  ],
+  "814:UT:SNTL": [
+   {
+    "from": "2026-11-12",
+    "to": "2026-11-15",
+    "measuredIn": 6,
+    "waterIn": 0.9,
+    "ratio": 6.7,
+    "ahead1In": 4.6,
+    "ahead3In": 4.6
+   }
+  ],
+  "339:UT:SNTL": [
+   {
+    "from": "2026-11-13",
+    "to": "2026-11-14",
+    "measuredIn": 9,
+    "waterIn": 1.1,
+    "ratio": 8.2,
+    "ahead1In": 10.3,
+    "ahead3In": 7
+   }
+  ],
+  "333:UT:SNTL": [
+   {
+    "from": "2026-11-14",
+    "to": "2026-11-14",
+    "measuredIn": 0,
+    "waterIn": 0.9,
+    "ratio": 6,
+    "ahead1In": 4.8,
+    "ahead3In": 4.8
+   }
+  ],
+  "1300:UT:SNTL": [
+   {
+    "from": "2026-11-14",
+    "to": "2026-11-15",
+    "measuredIn": 3,
+    "waterIn": 0.6,
+    "ratio": 6,
+    "ahead1In": 3.9,
+    "ahead3In": 3.5
+   }
+  ],
+  "332:UT:SNTL": [
+   {
+    "from": "2026-11-14",
+    "to": "2026-11-14",
+    "measuredIn": 1,
+    "waterIn": 1.2,
+    "ratio": 6,
+    "ahead1In": 6.3,
+    "ahead3In": 6.5
+   }
+  ],
+  "820:UT:SNTL": [
+   {
+    "from": "2026-11-14",
+    "to": "2026-11-14",
+    "measuredIn": 2,
+    "waterIn": 0.6,
+    "ratio": 6,
+    "ahead1In": 3.5,
+    "ahead3In": 5.3
+   }
+  ]
+ }
+}
