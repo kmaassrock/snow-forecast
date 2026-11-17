@@ -1029,6 +1029,7 @@ function renderRightNow() {
 }
 
 function renderCalibration() {
+  renderStormCheck(); // storm-check.json loads with the calibration, so show it without waiting for the forecast
   const c = state.calibration?.resorts?.[state.resortId];
   const r = resort();
   if (!c) {
