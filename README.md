@@ -176,3 +176,17 @@ IP. That's why it shows every third 10-minute frame (5 frames) and only fetches 
 moving. Frames load before the loop starts; the frame list refreshes every 10 minutes while radar is on, and
 everything stops when the map is hidden, the switch is off or the app goes to the background. The service
 worker skips radar requests so stale frames don't fill the phone's cache.
+
+## Ski day log and rain/snow line
+
+- **I skied today** (Summary card, with Undo): logs the day at that resort with its new snow (the resort report's
+  last 24 hours if there is one, else today's forecast by 9 am) and the powder quality (1–3 flakes). One entry per
+  date; logging another resort the same day asks first and replaces it. **My ski days** (Favorites) shows the season
+  tally (Aug 1–Jul 31: days, 6"+ powder days, resorts, new snow skied) and every day, newest first, each deletable.
+  The log lives in this browser's localStorage only (`skiLog`); Export downloads a JSON file and Import merges one
+  by date (the imported day wins), so it can move between devices. If the browser blocks storage the log is turned off.
+- **Rain/snow line**: core.js asks Open-Meteo for `freezing_level_height`, takes the median of the blend models that
+  return it, and gives each ski day a `snowLevel` (feet): the freezing level minus 1,000 ft, averaged over that ski
+  day's wet hours (null on dry days). The Daily day detail shows "Snow level ~8,900′"; when precipitation is
+  expected and the snow level is above the resort's base, the day row gets a 🌧 "Rain below 9,500′" chip and the
+  Summary outlook says so. It doesn't touch the snow math.

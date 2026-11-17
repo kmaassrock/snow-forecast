@@ -303,6 +303,12 @@ function outlookHTML() {
     if (windyPowder) parts.push(`${dayName(windyPowder)[0].toUpperCase() + dayName(windyPowder).slice(1)} is a powder day, but lift-hour gusts to ${Math.round(liftGust(windyPowder))} mph make ${windHold(windyPowder).likely ? 'wind holds on upper lifts likely' : 'wind holds possible'}.`);
     if (storms[1]) parts.push(`Another round ${dayName(storms[1].days[0])}, about ${fmtIn(sum(storms[1].days.map((d) => d.snow)))}.`);
   }
+  const wet = win.find((d) => rainLine(d));
+  if (wet) {
+    const w = rainLine(wet), when = dayName(wet)[0].toUpperCase() + dayName(wet).slice(1);
+    parts.push(w.toTop ? `${when}: snow level near ${levelLabel(wet.snowLevel)}, so rain even at the summit.`
+      : `${when}: snow level near ${levelLabel(wet.snowLevel)}, so rain below that (base ${ftLabel(resort().elevations.base)}).`);
+  }
   const next3 = up.slice(0, 3);
   const his = next3.map((d) => Math.round(d.hi));
   const windy = next3.reduce((a, d) => (d.gust > a.gust ? d : a));
@@ -762,6 +768,22 @@ function skyChip(d) {
   if (!s) return '';
   return `<span class="chip sky ${s.key}" title="${s.label}: ${Math.round(d.cloud)}% cloud in lift hours, ${s.why}">${s.key === 'flat' ? '🌫️' : '☀️'} ${s.label}</span>`;
 }
+// Rain/snow line. snowLevel is feet (core.js); resort elevations are meters, so compare in
+// meters and print with ftLabel. Rounded to 100 ft: the estimate is no finer than that.
+const ftToM = (ft) => ft / 3.28084;
+const levelLabel = (ft) => ftLabel(ftToM(Math.round(ft / 100) * 100));
+// Rain at the base: precipitation expected (≥ 0.05" of water) and the snow level above the base.
+function rainLine(d, r = resort()) {
+  const water = mmToIn(d.swe) + d.rainIn;
+  if (d.snowLevel == null || water < 0.05 || ftToM(d.snowLevel) <= r.elevations.base) return null;
+  const toTop = ftToM(d.snowLevel) >= r.elevations.summit;
+  return { toTop, text: toTop ? 'Rain to the summit' : `Rain below ${levelLabel(d.snowLevel)}` };
+}
+function rainChip(d) {
+  const w = rainLine(d);
+  if (!w) return '';
+  return `<span class="chip rain-line" title="Snow level about ${levelLabel(d.snowLevel)}; the base is ${ftLabel(resort().elevations.base)}">🌧 ${w.text}</span>`;
+}
 
 // Best day to ski in the next 7: snow by first chair counts most, then snow while
 // open; drier snow, lighter wind and smaller crowds (crowdOf) score higher, plus a
@@ -834,7 +856,7 @@ function dayDetail(d, lead) {
       <dt>Humidity (lift hours)</dt><dd>${Math.round(d.rh)}%</dd>
       <dt>Cloud cover (lift hours)</dt><dd>${Math.round(d.cloud)}%${skyOf(d) ? ` · ${skyOf(d).label}` : ''}</dd>
       <dt>Crowds</dt><dd>${crowdIcon(crowdOf(d).level)} ${crowdOf(d).label} <span class="muted">· ${crowdOf(d).why}; an estimate from the calendar and new snow</span></dd>
-      ${d.snowLevel != null ? `<dt>Snow level</dt><dd>${(Math.round(d.snowLevel / 100) * 100).toLocaleString()} ft</dd>` : ''}
+      ${d.snowLevel != null ? `<dt>Snow level</dt><dd>~${levelLabel(d.snowLevel)}${rainLine(d) ? ` <span class="muted">· ${rainLine(d).toTop ? 'rain even at the summit' : `rain below that (base ${ftLabel(resort().elevations.base)})`}</span>` : ''}</dd>` : ''}
     </dl>
     <p class="hint">${models}</p>
     ${hourlyChart(d.hours)}
@@ -857,7 +879,7 @@ function renderDays() {
         <span class="d-day"><b>${lbl.short === 'Today' || lbl.short === 'Tmw' ? lbl.short : lbl.wk}</b><small>${lbl.md}</small></span>
         <span class="d-icon">${icon(d)}</span>
         <span class="d-snow ${d.snow >= POWDER_DAY_IN ? 'big' : ''}">${fmtIn(d.snow)}</span>
-        <span class="d-type">${type ? `<span class="${type.cls}">${type.label}</span>` : d.rainIn >= 0.05 ? '<span class="t-rain">Rain</span>' : ''}${trendChip(d)}${agreeChip(d)}${windChip(d)}${skyChip(d)}${crowdChip(d)}</span>
+        <span class="d-type">${type ? `<span class="${type.cls}">${type.label}</span>` : d.rainIn >= 0.05 ? '<span class="t-rain">Rain</span>' : ''}${trendChip(d)}${agreeChip(d)}${windChip(d)}${rainChip(d)}${skyChip(d)}${crowdChip(d)}</span>
         <span class="d-temp">${Math.round(d.hi)}° <small>${Math.round(d.lo)}°</small></span>
         <span class="d-wind">${compass(d.dir)} ${Math.round(d.wind)}<small> mph</small></span>
         <span class="d-chev">›</span>
@@ -1193,6 +1215,116 @@ function renderResort() {
   renderModels();
   renderLeadCheck();
   renderStormCheck();
+  renderSkiToday();
+}
+
+// ---------- ski day log ----------
+
+// One entry per date: { date, resortId, newSnow (in), quality (1–3 or null) }, newest first.
+// Kept in localStorage only, so Export/Import moves it between devices.
+const LOG_KEY = 'skiLog';
+const canStore = (() => { try { localStorage.setItem('_t', '1'); localStorage.removeItem('_t'); return true; } catch { return false; } })();
+const validEntry = (e) => e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && typeof e.resortId === 'string';
+function loadLog() {
+  try { return (JSON.parse(store.get(LOG_KEY)) || []).filter(validEntry); } catch { return []; }
+}
+function saveLog(log) {
+  store.set(LOG_KEY, JSON.stringify([...log].sort((a, b) => (a.date < b.date ? 1 : -1))));
+}
+const resortName = (id) => RESORTS.find((r) => r.id === id)?.name || id;
+let logNote = ''; // last Import result, shown in the card
+let replaced = null; // the other resort's entry that "I skied today" replaced, so Undo restores it
+
+// A season runs Aug 1 to Jul 31 and is named for both years ("2026–27").
+function seasonOf(date) {
+  const y = +date.slice(0, 4), start = +date.slice(5, 7) >= 8 ? y : y - 1;
+  return `${start}–${String(start + 1).slice(2)}`;
+}
+
+// New snow for today's entry: the resort report's last 24 hours, else today's forecast by 9 am.
+function todayEntry() {
+  const r = resort(), date = nowLocalHour(r.tz).slice(0, 10);
+  const day = state.days.find((d) => d.date === date);
+  const rep = currentReport();
+  const newSnow = rep?.new24 ?? day?.overnight ?? null;
+  return { date, resortId: r.id, newSnow: newSnow == null ? null : Math.round(newSnow * 10) / 10, quality: powderQuality(day)?.flakes ?? null };
+}
+
+function renderSkiToday() {
+  const el = $('skiToday');
+  if (!canStore) { el.innerHTML = '<p class="hint">Your browser isn\'t allowing saved data here, so the ski day log is off.</p>'; return; }
+  const r = resort(), date = nowLocalHour(r.tz).slice(0, 10);
+  const had = loadLog().find((e) => e.date === date);
+  el.innerHTML = had?.resortId === r.id
+    ? `<span>✓ <b>Skied ${r.name} today</b> · in My ski days on Favorites</span><button class="link-btn" data-log="undo">Undo</button>`
+    : `<button class="ghost" data-log="add">⛷️ I skied today</button>${had ? `<span class="muted">Today is logged at ${resortName(had.resortId)}</span>` : ''}`;
+}
+
+function logToday() {
+  const entry = todayEntry(), log = loadLog();
+  const had = log.find((e) => e.date === entry.date);
+  if (had && had.resortId !== entry.resortId && !confirm(`Today is logged at ${resortName(had.resortId)}. Change it to ${resortName(entry.resortId)}?`)) return;
+  replaced = had && had.resortId !== entry.resortId ? had : null;
+  saveLog([entry, ...log.filter((e) => e.date !== entry.date)]);
+  renderSkiToday();
+}
+function undoToday() {
+  const date = nowLocalHour(resort().tz).slice(0, 10);
+  const rest = loadLog().filter((e) => !(e.date === date && e.resortId === state.resortId));
+  saveLog(replaced?.date === date ? [replaced, ...rest] : rest);
+  replaced = null;
+  renderSkiToday();
+}
+
+function skiLogHTML() {
+  if (!canStore) return '<div class="card ski-log"><div class="card-head"><h2>My ski days</h2></div><p class="hint">Your browser isn\'t allowing saved data here, so the ski day log is off.</p></div>';
+  const log = loadLog();
+  const season = seasonOf(nowLocalHour(resort().tz).slice(0, 10));
+  const days = log.filter((e) => seasonOf(e.date) === season);
+  const stat = (v, k) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`;
+  const tally = `<div class="summary small">${stat(days.length, 'Days skied')}${stat(days.filter((e) => e.newSnow >= POWDER_DAY_IN).length, `Powder days (${POWDER_DAY_IN}"+)`)}`
+    + `${stat(new Set(days.map((e) => e.resortId)).size, 'Resorts')}${stat(fmtIn(sum(days.map((e) => e.newSnow || 0))), 'New snow skied')}</div>`;
+  // Every day, newest first, with a season line where one season ends.
+  let last = season;
+  const rows = log.map((e) => {
+    const head = seasonOf(e.date) !== last ? `<li class="log-season">${(last = seasonOf(e.date))} season</li>` : '';
+    const lbl = new Date(e.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'numeric', day: 'numeric' });
+    const q = e.quality ? `<span class="pq" aria-label="Powder quality ${e.quality} of 3">${flakesHTML(e.quality)}</span>` : '';
+    return `${head}<li class="log-row"><span class="log-date">${lbl}</span><span class="log-name">${resortName(e.resortId)}</span>`
+      + `<span class="log-snow">${e.newSnow == null ? '' : `${fmtIn(e.newSnow)} new`}</span>${q}`
+      + `<button class="link-btn" data-log="del" data-date="${e.date}" aria-label="Delete ${lbl}">✕</button></li>`;
+  }).join('');
+  return `<div class="card ski-log" id="skiLogCard"><div class="card-head"><h2>My ski days</h2><span class="hint">${season} season (Aug 1–Jul 31)</span></div>
+    ${tally}
+    ${log.length ? `<ul class="log-list">${rows}</ul>` : '<p class="hint">No days yet. On a resort\'s Summary, tap “I skied today”.</p>'}
+    <div class="log-tools"><button class="ghost" data-log="export" ${log.length ? '' : 'disabled'}>Export</button><button class="ghost" data-log="import">Import</button>
+      <input type="file" id="logFile" accept="application/json,.json" hidden></div>
+    ${logNote ? `<p class="hint">${logNote}</p>` : ''}
+    <p class="hint">Saved on this device only. Export, then Import on another device to move it.</p></div>`;
+}
+
+function exportLog() {
+  const blob = new Blob([JSON.stringify({ skiDays: loadLog() }, null, 1)], { type: 'application/json' });
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `ski-days-${new Date().toISOString().slice(0, 10)}.json` });
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+// Merges by date: an imported day replaces this device's entry for the same date.
+async function importLog(file) {
+  try {
+    const data = JSON.parse(await file.text());
+    const incoming = (Array.isArray(data) ? data : data.skiDays || []).filter(validEntry)
+      .map(({ date, resortId, newSnow, quality }) => ({ date, resortId, newSnow: Number.isFinite(newSnow) ? newSnow : null, quality: [1, 2, 3].includes(quality) ? quality : null }));
+    const log = loadLog(), have = new Set(log.map((e) => e.date)), dates = new Set(incoming.map((e) => e.date));
+    saveLog([...incoming, ...log.filter((e) => !dates.has(e.date))]);
+    logNote = `Imported ${incoming.length} day${incoming.length === 1 ? '' : 's'} (${incoming.filter((e) => !have.has(e.date)).length} new).`;
+  } catch { logNote = "Couldn't read that file. Pick a file made with Export."; }
+  redrawLog();
+}
+// Redraw just the log card (the forecast cards around it stay as they are).
+function redrawLog() {
+  const el = $('skiLogCard');
+  if (el) el.outerHTML = skiLogHTML();
 }
 
 // ---------- favorites overview ----------
@@ -1216,14 +1348,14 @@ async function loadFavView() {
   renderHeader();
   const resorts = state.favorites.map((id) => RESORTS.find((r) => r.id === id)).filter(Boolean);
   if (!resorts.length) {
-    $('favView').innerHTML = '<p class="card hint">No favorites yet. Open a mountain and tap ☆ next to its name.</p>';
+    $('favView').innerHTML = '<p class="card hint">No favorites yet. Open a mountain and tap ☆ next to its name.</p>' + skiLogHTML();
     return;
   }
   const cards = Object.fromEntries(resorts.map((r) => [r.id, savedForecast(r, state.elev)]));
   const draw = () => {
     if (seq !== favSeq) return;
     $('favView').innerHTML = `<div class="fav-storms">${stormsHTML(resorts.map((r) => r.id))}</div>`
-      + resorts.map((r) => favCard(r, cards[r.id])).join('') + `<div class="card">${QUALITY_LEGEND}</div>`;
+      + resorts.map((r) => favCard(r, cards[r.id])).join('') + skiLogHTML() + `<div class="card">${QUALITY_LEGEND}</div>`;
   };
   draw();
   loadUpcoming().then(draw); // fills in the last-48-hours badges
@@ -2014,9 +2146,24 @@ $('upcomingView').addEventListener('change', (e) => {
   if (e.target.id === 'upSort') { state.upSort = e.target.value; renderUpcoming(); }
   if (e.target.id === 'upDrive') { state.upDrive = +e.target.value; renderUpcoming(); }
 });
+$('skiToday').addEventListener('click', (e) => {
+  const act = e.target.closest('[data-log]')?.dataset.log;
+  if (act === 'add') logToday(); else if (act === 'undo') undoToday();
+});
 $('favView').addEventListener('click', (e) => {
+  const act = e.target.closest('[data-log]')?.dataset.log;
+  if (act === 'export') exportLog();
+  else if (act === 'import') $('logFile').click();
+  else if (act === 'del') {
+    const date = e.target.closest('[data-log]').dataset.date;
+    if (confirm(`Delete your ski day on ${shortDate(date)}?`)) { saveLog(loadLog().filter((x) => x.date !== date)); logNote = ''; redrawLog(); }
+  }
+  if (act) return;
   const card = e.target.closest('.fav-card');
   if (card) switchResort(card.dataset.id);
+});
+$('favView').addEventListener('change', (e) => {
+  if (e.target.id === 'logFile' && e.target.files[0]) importLog(e.target.files[0]);
 });
 $('favView').addEventListener('keydown', (e) => {
   const card = e.target.closest('.fav-card');

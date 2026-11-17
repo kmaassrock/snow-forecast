@@ -58,6 +58,7 @@ function snowType(slr) {
 
 // ---------- helpers ----------
 
+const SNOW_BELOW_FREEZE_FT = 1000; // snow level ≈ freezing level minus this
 const cToF = (c) => (c * 9) / 5 + 32;
 const mToFt = (m) => m * 3.28084;
 const mmToIn = (mm) => mm / 25.4;
@@ -171,7 +172,9 @@ function processModels(data, nowKey, calib) {
       snow: acc.snow / W, swe: acc.swe / W, rain: acc.rain / W,
       tempF: cToF(acc.temp / W), wind: acc.wind / W, gust: acc.gust / W, cloud: acc.cloud / W,
       dir: ((Math.atan2(acc.u, acc.v) * 180) / Math.PI + 360) % 360,
-      freezeFt: fl.length ? mToFt(avg(fl)) : null,
+      // Not every model returns a freezing level; the median of those that do
+      // keeps one outlier from moving the rain/snow line.
+      freezeFt: fl.length ? mToFt(percentile(fl.sort((a, b) => a - b), 0.5)) : null,
     };
   });
 }
@@ -259,8 +262,8 @@ function buildDays(hours, ens, todayStr) {
     // Weather uses the calendar day; wind and cloud focus on lift hours.
     const open = cal.filter((h) => h.hour >= CFG.LIFTS_OPEN && h.hour < CFG.LIFTS_CLOSE);
     const temps = cal.map((h) => h.tempF);
-    const precipHours = hs.filter((h) => h.swe + h.rain > 0.1 && h.freezeFt != null);
-    const flHours = (precipHours.length ? precipHours : cal).filter((h) => h.freezeFt != null);
+    // Snow level only matters when something falls, so it uses the wet hours (≥ 0.1 mm).
+    const flHours = hs.filter((h) => h.swe + h.rain > 0.1 && h.freezeFt != null);
 
     const perModel = {};
     for (const m of MODELS) {
@@ -280,7 +283,8 @@ function buildDays(hours, ens, todayStr) {
       liftGust: open.length ? Math.max(...open.map((h) => h.gust)) : null, // wind-hold risk
       dir: avg(open.map((h) => h.dir)) ?? avg(cal.map((h) => h.dir)),
       cloud: avg(open.map((h) => h.cloud)) ?? avg(cal.map((h) => h.cloud)),
-      snowLevel: flHours.length ? avg(flHours.map((h) => h.freezeFt)) - 1000 : null,
+      // Snow usually reaches ~1,000 ft below the freezing level. Feet; null on dry days.
+      snowLevel: flHours.length ? avg(flHours.map((h) => h.freezeFt)) - SNOW_BELOW_FREEZE_FT : null,
       perModel, nModels: mv.length,
       modelMin: mv.length ? Math.min(...mv) : null, modelMax: mv.length ? Math.max(...mv) : null,
       range: scaledRange(snow, ens[date]),

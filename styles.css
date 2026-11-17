@@ -865,3 +865,22 @@ button.col { cursor: pointer; }
   .topnav > button, .nav-pick { font-size: 0.625rem; letter-spacing: -0.03em; }
   .tabs button { font-size: 0.75rem; }
 }
+
+/* ---------- Rain/snow line + ski day log ---------- */
+/* Rain below the snow level: no color meaning, the 🌧 icon and a dashed outline set it apart. */
+.rain-line { background: var(--panel-2); color: var(--text); border: 1px dashed var(--muted); font-weight: 600; white-space: normal; max-width: 100%; }
+.ski-today { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s1) var(--s3); margin-top: var(--s3); font-size: var(--fs-sm); }
+.ski-today:empty { display: none; }
+.ski-today .hint { margin: 0; }
+.fav-view > .ski-log { grid-column: 1 / -1; }
+.ski-log .summary { margin-bottom: var(--s3); }
+.log-list { list-style: none; margin: 0 0 var(--s3); padding: 0; }
+.log-row { display: flex; align-items: center; gap: var(--s2); border-top: 1px solid var(--line); min-height: var(--ctl); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+.log-date { flex: none; width: 7.5em; color: var(--muted); }
+.log-name { flex: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log-snow { flex: none; }
+.log-row .pq { flex: none; margin: 0; }
+.log-row .link-btn { flex: none; color: var(--muted); }
+.log-season { font-size: var(--fs-xs); font-weight: 700; color: var(--muted); padding: var(--s3) 0 var(--s1); }
+.log-tools { display: flex; gap: var(--s2); flex-wrap: wrap; margin-bottom: var(--s2); }
+@media (max-width: 620px) { .log-date { width: auto; } .log-name { white-space: normal; line-height: 1.25; } }
