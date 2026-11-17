@@ -277,6 +277,7 @@ function buildDays(hours, ens, todayStr) {
       rh: avg(open.map((h) => h.rh)) ?? avg(cal.map((h) => h.rh)),
       wind: avg(open.map((h) => h.wind)) ?? avg(cal.map((h) => h.wind)),
       gust: Math.max(...cal.map((h) => h.gust)),
+      liftGust: open.length ? Math.max(...open.map((h) => h.gust)) : null, // wind-hold risk
       dir: avg(open.map((h) => h.dir)) ?? avg(cal.map((h) => h.dir)),
       cloud: avg(open.map((h) => h.cloud)) ?? avg(cal.map((h) => h.cloud)),
       snowLevel: flHours.length ? avg(flHours.map((h) => h.freezeFt)) - 1000 : null,

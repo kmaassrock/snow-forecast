@@ -8,6 +8,8 @@
 //     weighted by sample size (PRIOR_DAYS), so one storm can't swing it.
 //  4. Writes data/forecast-trend.json: how each station's forecast for every
 //     upcoming day has changed across the daily logs (trend arrows on the site).
+//  5. Writes data/storm-check.json: each station's last few storms, measured snow
+//     vs. what the site showed 1 and 3 days ahead ("How did we do?" on the site).
 //
 //   node scripts/verify-forecasts.cjs
 //   SCORE_ONLY=1 node scripts/verify-forecasts.cjs   # re-score without a new log
@@ -22,6 +24,9 @@ const LOG_DIR = path.join(DATA, 'forecast-log');
 const KEEP_DAYS = 75; // rolling window of logs kept and scored
 const SNOWY_MM = 4; // a "snowy day": forecast of at least ~4 mm water (a few inches of snow)
 const PRIOR_DAYS = 60; // the backtest factor counts as this many snowy station-days
+const STORM_MIN_MM = 7.6; // a storm: consecutive wet days totalling at least 0.3" of water
+const WET_DAY_MM = 1; // a wet day (the gauge reads in 0.1" steps, so anything above noise)
+const STORMS_KEPT = 5;
 const readJSON = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return null; } };
 
 async function withRetry(fn, tries = 3, waitMs = 2000) {
@@ -99,10 +104,11 @@ async function score(today) {
   const leads = {};
   for (let L = 1; L <= 15; L++) leads[L] = { snowyDays: 0, forecastMm: 0, measuredMm: 0, allForecastMm: 0, allMeasuredMm: 0 };
   const scorable = logs.filter((l) => l.made < yesterday);
+  let obs = null;
   if (scorable.length) {
     const ids = [...new Set(scorable.flatMap((l) => Object.keys(l.stations)))];
     // SNOTEL's API has outages (502s) lasting minutes: 5 tries, waiting 15, 30, 45, 60 s.
-    const obs = await withRetry(() => observed(ids, scorable.map((l) => l.made).sort()[0], yesterday), 5, 15000);
+    obs = await withRetry(() => observed(ids, scorable.map((l) => l.made).sort()[0], yesterday), 5, 15000);
     for (const log of scorable) {
       for (const [id, days] of Object.entries(log.stations)) {
         for (const [date, fc] of Object.entries(days)) {
@@ -135,6 +141,7 @@ async function score(today) {
   };
   fs.writeFileSync(path.join(DATA, 'lead-bias.json'), JSON.stringify(out, null, 2) + '\n');
   console.log(`Scored ${scorable.length} logs; measured share by lead: ${Object.values(measuredShare).join(' ')}%`);
+  return { logs, obs, factors };
 }
 
 // For every station and upcoming day: the forecast water from each daily log,
@@ -152,14 +159,95 @@ function writeTrends(logs, today) {
   fs.writeFileSync(path.join(DATA, 'forecast-trend.json'), JSON.stringify(out) + '\n');
 }
 
+// Measured new snow (inches) per station and day: gains in daily snow depth. Gains
+// under 1" (sensor jitter) or over 36" (bad readings) count as none, like upcoming.cjs.
+async function measuredSnow(ids, from, to) {
+  const q = new URLSearchParams({ stationTriplets: ids.join(','), elements: 'SNWD', duration: 'DAILY', beginDate: addDays(from, -1), endDate: to });
+  const r = await fetch(`https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1/data?${q}`);
+  if (!r.ok) throw new Error(`SNOTEL ${r.status}`);
+  const out = {};
+  for (const st of await r.json()) {
+    const depth = Object.fromEntries((st.data?.[0]?.values || []).filter((v) => v.value != null).map((v) => [v.date, v.value]));
+    const days = (out[st.stationTriplet] = {});
+    for (const d of Object.keys(depth)) {
+      const pv = depth[addDays(d, -1)];
+      if (pv == null) continue;
+      const g = depth[d] - pv;
+      days[d] = g >= 1 && g <= 36 ? g : 0;
+    }
+  }
+  return out;
+}
+
+// Runs of consecutive wet days with at least STORM_MIN_MM in all, oldest first.
+function findStorms(days) {
+  const storms = [];
+  let run = null;
+  for (const d of Object.keys(days).sort()) {
+    if (days[d] >= WET_DAY_MM) {
+      if (run && run.dates.at(-1) === addDays(d, -1)) run.dates.push(d);
+      else storms.push((run = { dates: [d] }));
+    } else run = null;
+  }
+  return storms.filter((s) => s.dates.reduce((a, d) => a + days[d], 0) >= STORM_MIN_MM);
+}
+
+// The correction the site applied to that forecast (correctForLead in core.js): the lead's
+// factor in full from ~4 mm of water a day, fading to none at 1 mm.
+const shownFactor = (F, mm) => 1 - (1 - F) * Math.min(1, Math.max(0, (mm - 1) / 3));
+
+// For each station's recent storms: measured snow, and what was forecast 1 and 3 days
+// ahead, in inches of snow. Forecasts are logged as water, so they're converted with
+// the storm's own measured snow/water ratio (6–25, else 12) to compare like with like.
+async function writeStormCheck({ logs, obs, factors }, today) {
+  if (!obs) return;
+  const ids = Object.keys(obs);
+  const from = logs.map((l) => l.made).sort()[0];
+  const snow = await withRetry(() => measuredSnow(ids, from, addDays(today, -1)), 5, 15000);
+  const byMade = Object.fromEntries(logs.map((l) => [l.made, l.stations]));
+  const r1 = (x) => Math.round(x * 10) / 10;
+  const out = { updated: today, stations: {} };
+  for (const id of ids) {
+    const storms = [];
+    for (const { dates } of findStorms(obs[id] || {})) {
+      if (!snow[id] || dates.some((d) => snow[id][d] == null)) continue; // depth sensor gap
+      const waterIn = dates.reduce((a, d) => a + obs[id][d], 0) / 25.4;
+      const measuredIn = dates.reduce((a, d) => a + snow[id][d], 0);
+      const ratio = waterIn < 0.05 ? 12 : Math.min(25, Math.max(6, measuredIn / waterIn));
+      // Forecast for the storm L days ahead: each day from the log made L days before it.
+      const ahead = (L) => {
+        let mm = 0;
+        for (const d of dates) {
+          const fc = byMade[addDays(d, -L)]?.[id]?.[d];
+          if (fc == null) return null; // that log is missing or past the window
+          mm += fc * shownFactor(factors[L], fc);
+        }
+        return r1((mm / 25.4) * ratio);
+      };
+      storms.push({ from: dates[0], to: dates.at(-1), measuredIn: r1(measuredIn), waterIn: Math.round(waterIn * 100) / 100, ratio: r1(ratio), ahead1In: ahead(1), ahead3In: ahead(3) });
+    }
+    const scored = storms.filter((s) => s.ahead1In != null || s.ahead3In != null).slice(-STORMS_KEPT).reverse();
+    if (scored.length) out.stations[id] = scored;
+  }
+  fs.writeFileSync(path.join(DATA, 'storm-check.json'), JSON.stringify(out, null, 1) + '\n');
+  console.log(`Storm check: ${Object.keys(out.stations).length} stations with scored storms`);
+}
+
 // SCORE_ONLY=1 re-scores existing logs without logging a new forecast (local testing).
 // If scoring fails (usually a SNOTEL outage), today's log and the trends are already
 // written: the workflow still commits them, lead-bias.json keeps yesterday's factors,
-// and the run is marked failed so it gets noticed.
+// and the run is marked failed so it gets noticed. The storm check runs last, on its
+// own: if it fails, storm-check.json keeps the last good version and nothing else is lost.
 (async () => {
   const today = process.env.SCORE_ONLY ? fs.readdirSync(LOG_DIR).sort().at(-1).slice(0, 10) : await logToday();
-  try { await score(today); } catch (e) {
+  let scored;
+  try { scored = await score(today); } catch (e) {
     console.error(`Scoring failed; kept today's log and yesterday's factors. ${e.message}`);
+    process.exitCode = 1;
+    return;
+  }
+  try { await writeStormCheck(scored, today); } catch (e) {
+    console.error(`Storm check failed; kept the last storm-check.json. ${e.message}`);
     process.exitCode = 1;
   }
 })().catch((e) => { console.error(e); process.exit(1); });

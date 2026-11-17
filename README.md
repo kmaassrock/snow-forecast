@@ -125,3 +125,16 @@ across the logs), which drives the trend arrows.
 - Model agreement ("3/5 models"): blend models showing at least 1" (or 40% of the blend) that day.
 - Best day to ski: next 7 days scored on snow by first chair, snow quality, wind, cold, weekend crowds,
   with a bonus for a clear day after a storm (`bestDayHTML` in `app.js`).
+
+## How did we do? and wind holds
+
+- **How did we do?** (Models tab, SNOTEL resorts only): the primary station's last 5 storms (runs of wet days
+  with at least 0.3" of water), each with the snow measured (daily snow-depth gains of 1–36") and what the site
+  showed 1 and 3 days ahead, plus the average miss. `scripts/verify-forecasts.cjs` writes `data/storm-check.json`
+  each morning from the forecast logs. Logged forecasts are water, so they're turned into inches with the storm's
+  own measured snow/water ratio (6–25, else 12) and scaled by the current lead-time factor (as `correctForLead`
+  does), so the comparison is about how much fell, not density. If SNOTEL is down the file keeps its last version.
+- **Wind holds** (Daily tab chip, day details, Summary outlook on windy powder days): the strongest gust in lift
+  hours (9 am–4 pm), 40+ mph = "Wind holds possible", 55+ mph = "likely" (upper lifts). Model gusts are for the
+  model's smoothed terrain, so this is a risk, not a closure forecast. The best-day score uses the same lift-hour
+  gust in its single wind factor.
