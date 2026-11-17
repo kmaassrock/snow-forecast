@@ -124,7 +124,7 @@ function renderHeader() {
   const fav = state.view === 'favorites', up = state.view === 'upcoming', cmp = state.view === 'compare', alr = state.view === 'alerts';
   document.title = fav ? 'Favorites · Snow Forecast' : up ? 'Upcoming Snow' : cmp ? 'Compare Resorts' : alr ? 'Powder Alerts' : `${r.name} Snow Forecast`;
   $('resortName').textContent = fav ? '★ Favorites' : up ? '❄ Upcoming Snow' : cmp ? '⚖ Compare' : alr ? '🔔 Powder Alerts' : r.name;
-  $('favBtn').hidden = fav || up || cmp || alr;
+  $('favBtn').hidden = $('shareBtn').hidden = fav || up || cmp || alr;
   $('elevSeg').hidden = up || cmp || alr;
   document.querySelectorAll('#topnav [data-view]').forEach((b) => b.classList.toggle('on', b.dataset.view === state.view));
   const starred = state.favorites.includes(r.id);
@@ -692,37 +692,107 @@ function windChip(d) {
   return `<span class="chip wind-hold ${w.likely ? 'likely' : ''}" title="${w.label}: gusts to ${Math.round(w.gust)} mph during lift hours">💨 ${w.short}</span>`;
 }
 
+// ---------- crowds and sky ----------
+
+// Day of the month of the nth weekday (0 = Sun) in month m (0-based); n = -1 for the last.
+function nthWeekday(y, m, wd, n) {
+  if (n < 0) {
+    const last = new Date(Date.UTC(y, m + 1, 0));
+    return last.getUTCDate() - ((last.getUTCDay() - wd + 7) % 7);
+  }
+  const first = new Date(Date.UTC(y, m, 1)).getUTCDay();
+  return 1 + ((wd - first + 7) % 7) + 7 * (n - 1);
+}
+
+// Holiday period a date falls in, from the calendar alone. Long weekends are packed
+// every day; holiday weeks are busy on weekdays. Whistler follows BC holidays (no US
+// Thanksgiving or MLK; BC Family Day falls on Presidents' Day, the 3rd Monday of Feb).
+function holidayOf(date, resortId) {
+  const [y, mo, dd] = date.split('-').map(Number);
+  const m = mo - 1;
+  const bc = resortId === 'whistler';
+  const inWeekend = (mondayDay) => dd >= mondayDay - 2 && dd <= mondayDay; // Sat–Mon
+  // Thanksgiving Thu–Sun can run into December (Thanksgiving on Nov 28).
+  const sinceThu = (Date.UTC(y, m, dd) - Date.UTC(y, 10, nthWeekday(y, 10, 4, 4))) / 86400000;
+  if (!bc && sinceThu >= 0 && sinceThu <= 3) return { name: 'Thanksgiving weekend', long: true };
+  if ((m === 11 && dd >= 20) || (m === 0 && dd <= 3)) return { name: 'Christmas holidays', long: false };
+  if (!bc && m === 0 && inWeekend(nthWeekday(y, 0, 1, 3))) return { name: 'MLK weekend', long: true };
+  if (m === 1 && inWeekend(nthWeekday(y, 1, 1, 3))) return { name: bc ? 'Family Day weekend' : "Presidents' Day weekend", long: true };
+  if (m === 2 && dd >= 8 && dd <= 28) return { name: 'spring break', long: false };
+  return null;
+}
+
+// Best-guess crowds: weekends and holiday weeks are busy, holiday weekends packed,
+// and a 6"+ powder morning brings everyone out (one level up).
+const CROWD_LABELS = ['Quiet', 'Busy', 'Packed'];
+function crowdOf(d) {
+  const dow = new Date(d.date + 'T12:00:00Z').getUTCDay();
+  const weekend = dow === 0 || dow === 6;
+  const hol = holidayOf(d.date, state.resortId);
+  let level = hol ? (hol.long || weekend ? 2 : 1) : weekend ? 1 : 0;
+  const powder = d.overnight >= POWDER_DAY_IN;
+  if (powder) level = Math.min(2, level + 1);
+  const why = [hol ? hol.name : weekend ? 'weekend' : 'weekday'];
+  if (powder) why.push('powder day');
+  return { level, label: CROWD_LABELS[level], why: why.join(', ') };
+}
+// One to three small people, so the level reads from shape as well as the word.
+const personSVG = (x) => `<circle cx="${x}" cy="3.2" r="2.2"/><path d="M${x - 3.2} 12v-2.6a3.2 3.2 0 0 1 6.4 0V12z"/>`;
+const crowdIcon = (level) => `<svg class="crowd-ico" viewBox="0 0 ${8 + 7 * level} 12" aria-hidden="true">${[0, 1, 2].slice(0, level + 1).map((i) => personSVG(4 + 7 * i)).join('')}</svg>`;
+function crowdChip(d) {
+  const c = crowdOf(d);
+  return `<span class="chip crowd lvl-${c.level}" title="Crowds (estimate): ${c.label.toLowerCase()} · ${c.why}">${crowdIcon(c.level)}${c.label}</span>`;
+}
+
+// Sky during lift hours from average cloud cover. Days with snow or rain while the
+// lifts run get nothing: the snow is already shown.
+function skyOf(d) {
+  if (d.cloud == null || d.lifts >= 0.1 || d.rainIn >= 0.05) return null;
+  const prev = state.days[state.days.indexOf(d) - 1];
+  // New snow: the previous ski day, or the 24 hours before lifts open.
+  const fresh = prev ? Math.max(prev.snow, prev.lifts + d.overnight) : d.overnight;
+  if (d.cloud < 30) return fresh >= 4
+    ? { key: 'bluebird', label: 'Bluebird', why: `clear after ${fmtIn(fresh)} of new snow` }
+    : { key: 'sunny', label: 'Sunny', why: 'mostly clear' };
+  if (d.cloud > 80) return { key: 'flat', label: 'Flat light', why: 'overcast, low contrast' };
+  return null;
+}
+function skyChip(d) {
+  const s = skyOf(d);
+  if (!s) return '';
+  return `<span class="chip sky ${s.key}" title="${s.label}: ${Math.round(d.cloud)}% cloud in lift hours, ${s.why}">${s.key === 'flat' ? '🌫️' : '☀️'} ${s.label}</span>`;
+}
+
 // Best day to ski in the next 7: snow by first chair counts most, then snow while
-// open; drier snow, lighter wind and fewer weekend crowds score higher, plus a
-// bluebird bonus for a clear day right after a storm. Dry weeks fall back to weather.
+// open; drier snow, lighter wind and smaller crowds (crowdOf) score higher, plus a
+// bluebird bonus (skyOf) for a clear day right after a storm. Dry weeks fall back to weather.
 function bestDayHTML() {
   const up = upcoming().slice(0, 7);
   const hour = +nowLocalHour(resort().tz).slice(11, 13);
   const days = up.filter((d, i) => !(i === 0 && hour >= LIFTS_CLOSE));
   if (days.length < 2) return '';
   const score = (d) => {
-    const prev = state.days[state.days.indexOf(d) - 1];
     const dry = !d.slr ? 1 : d.slr >= 15 ? 1.25 : d.slr >= 11.5 ? 1.1 : d.slr >= 8 ? 1 : 0.75;
     // One wind factor on lift-hour gusts, stepped at the wind-hold thresholds (no extra hold penalty).
     const g = liftGust(d);
     const wind = g >= 55 ? 0.45 : g >= 40 ? 0.6 : g >= 30 ? 0.8 : 1;
     const cold = d.hi < 10 ? 0.85 : 1;
-    const crowds = dayLabel(d.date, state.todayStr).weekend ? 0.9 : 1;
-    const bluebird = prev && prev.snow >= 4 && d.cloud < 35 ? 2 : 0;
+    const crowds = [1, 0.9, 0.8][crowdOf(d).level];
+    const bluebird = skyOf(d)?.key === 'bluebird' ? 2 : 0;
     const weather = ((100 - d.cloud) / 100) * 0.5 + (g < 25 ? 0.5 : 0); // tie-breaker for dry weeks
     return (d.overnight + 0.5 * d.lifts) * dry * wind * cold * crowds + bluebird + weather;
   };
   const best = days.reduce((a, d) => (score(d) > score(a) ? d : a));
   const lbl = dayLabel(best.date, state.todayStr).long;
-  const prev = state.days[state.days.indexOf(best) - 1];
   const parts = [];
   if (best.overnight >= 1) parts.push(`${fmtIn(best.overnight)} by 9 am${best.slr ? ` (${snowType(best.slr).label.toLowerCase()})` : ''}`);
   else if (best.snow >= 1) parts.push(`${fmtIn(best.snow)} during the day`);
-  if (prev && prev.snow >= 4 && best.cloud < 35) parts.push('clearing after the storm');
+  if (skyOf(best)?.key === 'bluebird') parts.push('bluebird after the storm');
   else if (best.snow < 1) parts.push(best.cloud < 30 ? 'sunny' : best.cloud < 70 ? 'partly cloudy' : 'cloudy');
   const bg = liftGust(best);
   parts.push(bg < 20 ? 'light winds' : `gusts to ${Math.round(bg)} mph${windHold(best) ? ` (${windHold(best).label.toLowerCase()})` : ''}`);
   parts.push(`high ${Math.round(best.hi)}°F`);
+  if (crowdOf(best).level) parts.push(`likely ${crowdOf(best).label.toLowerCase()}`);
   const noSnow = days.every((d) => d.snow < 1);
   return `<p class="best-day">⛷️ <b>Best day to ski${noSnow ? ' (no new snow this week)' : ''}: ${lbl}</b> · ${parts.join(', ')}</p>`;
 }
@@ -762,7 +832,8 @@ function dayDetail(d, lead) {
       ${windHold(d) ? `<dt>Wind holds</dt><dd>💨 ${windHold(d).label} <span class="muted">· model gusts, a risk not a closure</span></dd>` : ''}
       <dt>Feels like</dt><dd>${Math.round(d.feelsLo)}° to ${Math.round(d.feelsHi)}°F</dd>
       <dt>Humidity (lift hours)</dt><dd>${Math.round(d.rh)}%</dd>
-      <dt>Cloud cover</dt><dd>${Math.round(d.cloud)}%</dd>
+      <dt>Cloud cover (lift hours)</dt><dd>${Math.round(d.cloud)}%${skyOf(d) ? ` · ${skyOf(d).label}` : ''}</dd>
+      <dt>Crowds</dt><dd>${crowdIcon(crowdOf(d).level)} ${crowdOf(d).label} <span class="muted">· ${crowdOf(d).why}; an estimate from the calendar and new snow</span></dd>
       ${d.snowLevel != null ? `<dt>Snow level</dt><dd>${(Math.round(d.snowLevel / 100) * 100).toLocaleString()} ft</dd>` : ''}
     </dl>
     <p class="hint">${models}</p>
@@ -786,7 +857,7 @@ function renderDays() {
         <span class="d-day"><b>${lbl.short === 'Today' || lbl.short === 'Tmw' ? lbl.short : lbl.wk}</b><small>${lbl.md}</small></span>
         <span class="d-icon">${icon(d)}</span>
         <span class="d-snow ${d.snow >= POWDER_DAY_IN ? 'big' : ''}">${fmtIn(d.snow)}</span>
-        <span class="d-type">${type ? `<span class="${type.cls}">${type.label}</span>` : d.rainIn >= 0.05 ? '<span class="t-rain">Rain</span>' : ''}${trendChip(d)}${agreeChip(d)}${windChip(d)}</span>
+        <span class="d-type">${type ? `<span class="${type.cls}">${type.label}</span>` : d.rainIn >= 0.05 ? '<span class="t-rain">Rain</span>' : ''}${trendChip(d)}${agreeChip(d)}${windChip(d)}${skyChip(d)}${crowdChip(d)}</span>
         <span class="d-temp">${Math.round(d.hi)}° <small>${Math.round(d.lo)}°</small></span>
         <span class="d-wind">${compass(d.dir)} ${Math.round(d.wind)}<small> mph</small></span>
         <span class="d-chev">›</span>
@@ -1821,6 +1892,34 @@ $('favBtn').addEventListener('click', () => {
   state.favorites = state.favorites.includes(id) ? state.favorites.filter((x) => x !== id) : [...state.favorites, id];
   store.set('favorites', JSON.stringify(state.favorites));
   renderHeader();
+});
+// Share text from the current forecast: the biggest day in the next 7 and the week's total.
+function shareText() {
+  const r = resort();
+  const week = upcoming().slice(0, 7);
+  if (!week.length) return `${r.name} snow forecast`;
+  const total = sum(week.map((d) => d.snow));
+  const best = week.reduce((a, d) => (d.snow > a.snow ? d : a));
+  if (best.snow < 1) return `${r.name}: no big snow in the next 7 days (${fmtIn(total)} total)`;
+  const l = dayLabel(best.date, state.todayStr);
+  const when = l.short === 'Today' ? 'today' : l.short === 'Tmw' ? 'tomorrow' : l.wk;
+  const morning = best.overnight >= 1 ? ` (${fmtIn(best.overnight)} by 9 am)` : '';
+  return `${r.name}: ${fmtIn(best.snow)} ${when}${morning} · next 7 days ${fmtIn(total)}`;
+}
+// The default resort opens on the bare URL, so it's shared without a hash.
+const shareURL = () => location.origin + location.pathname + (state.resortId === DEFAULT_RESORT ? '' : '#' + state.resortId);
+
+let shareMsgTimer;
+$('shareBtn').addEventListener('click', async () => {
+  const data = { title: `${resort().name} Snow Forecast`, text: shareText(), url: shareURL() };
+  if (navigator.share) {
+    try { await navigator.share(data); } catch {} // closing the share sheet throws AbortError
+    return;
+  }
+  try { await navigator.clipboard.writeText(data.url); } catch { prompt('Link:', data.url); return; }
+  $('shareMsg').textContent = 'Link copied';
+  clearTimeout(shareMsgTimer);
+  shareMsgTimer = setTimeout(() => { $('shareMsg').textContent = ''; }, 2000);
 });
 $('elevSeg').addEventListener('click', (e) => {
   const k = e.target.closest('button')?.dataset.elev;

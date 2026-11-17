@@ -300,6 +300,12 @@ select {
 /* Wind holds: no color meaning, just the icon and text; "likely" gets a solid text-colored outline. */
 .wind-hold { background: var(--panel-2); color: var(--text); border-color: var(--line); font-weight: 600; white-space: normal; max-width: 100%; }
 .wind-hold.likely { border-color: var(--text); font-weight: 700; }
+/* Sky and crowds: no color meaning either. Bluebird and Packed get the solid outline;
+   the crowd level also shows as 1–3 people. Quiet is dashed and muted. */
+.sky, .crowd { background: var(--panel-2); color: var(--text); border-color: var(--line); font-weight: 600; }
+.sky.bluebird, .crowd.lvl-2 { border-color: var(--text); font-weight: 700; }
+.crowd.lvl-0 { background: transparent; color: var(--muted); border: 1px dashed var(--line); }
+.crowd-ico { height: 0.8em; width: auto; fill: currentColor; margin-right: 4px; vertical-align: -0.05em; }
 
 /* ---- pass badges ---- */
 .pass { display: inline-block; font-size: 0.6875rem; font-weight: 700; padding: 0 5px; border-radius: 4px; margin-left: 3px; vertical-align: 1px; color: var(--white); line-height: 1.45; }
@@ -421,6 +427,10 @@ tr:last-child > td, tr:last-child > th { border-bottom: 0; }
 .fav { flex: none; background: none; border: 0; font-size: 1.6rem; line-height: 1; color: var(--hero-soft); width: 44px; height: 44px; border-radius: var(--r-pill); }
 .fav.on { color: var(--star); }
 @media (hover: hover) { .fav:hover { background: var(--hero-glass); } }
+.share svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+.share[hidden] + .share-msg { display: none; }
+.share-msg { flex: none; color: var(--hero-text); font-size: var(--fs-sm); font-weight: 600; white-space: nowrap; }
+.share-msg:empty { display: none; }
 .meta-row { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s3); justify-content: space-between; align-items: center; margin-top: var(--s1); }
 .hero .sub { color: var(--hero-soft); font-size: var(--fs-md); }
 .hero-seg { background: var(--hero-shade); border-color: var(--hero-glass-line); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
