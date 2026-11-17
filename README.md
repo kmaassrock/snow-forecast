@@ -123,8 +123,8 @@ across the logs), which drives the trend arrows.
 
 - Trend arrows (↑/↓): how a day's forecast changed vs ~3 days earlier, from `data/forecast-trend.json`.
 - Model agreement ("3/5 models"): blend models showing at least 1" (or 40% of the blend) that day.
-- Best day to ski: next 7 days scored on snow by first chair, snow quality, wind, cold, weekend crowds,
-  with a bonus for a clear day after a storm (`bestDayHTML` in `app.js`).
+- Best day to ski: next 7 days scored on snow by first chair, snow quality, wind, cold and the crowd meter,
+  with a bonus for a bluebird day (`bestDayHTML` in `app.js`).
 
 ## How did we do? and wind holds
 
@@ -138,3 +138,18 @@ across the logs), which drives the trend arrows.
   hours (9 am–4 pm), 40+ mph = "Wind holds possible", 55+ mph = "likely" (upper lifts). Model gusts are for the
   model's smoothed terrain, so this is a risk, not a closure forecast. The best-day score uses the same lift-hour
   gust in its single wind factor.
+
+## Crowds, bluebird / flat light, sharing
+
+- **Crowd meter** (Daily tab chip with 1–3 people, day details): a calendar guess, Quiet / Busy / Packed
+  (`crowdOf` in `app.js`). Weekdays are quiet, weekends busy. Holiday weeks (Dec 20–Jan 3, spring break
+  Mar 8–28) are busy on weekdays and packed on weekends; holiday weekends (Thanksgiving Thu–Sun, MLK and
+  Presidents' Day Sat–Mon) are packed. A 6"+ powder morning bumps it up one level. Whistler uses BC holidays:
+  no US Thanksgiving or MLK; Family Day is the 3rd Monday of February, the same weekend as Presidents' Day.
+  It is an estimate, not ticket or parking data.
+- **Sky** (`skyOf`): average lift-hour cloud cover (9 am–4 pm). Under 30% = Sunny, or Bluebird after 4"+ of
+  new snow (previous ski day, or the 24 hours before lifts open); over 80% = Flat light. Days with snow or
+  rain during lift hours get nothing extra. The best-day bluebird bonus uses the same function.
+- **Share** (button next to the favorite star on a resort page): the phone's share sheet with a line like
+  `Purgatory: 9" Wed (6" by 9 am) · next 7 days 16"` and the resort's link (`#<id>`, the bare URL for the
+  default resort). Browsers without the Web Share API copy the link and show "Link copied".
