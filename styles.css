@@ -680,7 +680,13 @@ button.col { cursor: pointer; }
 .map-label { font-size: 11px; font-weight: 700; padding: 1px 5px; }
 .leaflet-popup-content a { font-weight: 600; }
 .leaflet-container { font-family: var(--font); }
-.dark-tiles .leaflet-tile { filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9); }
+/* Radar row sits above the map so it never covers the zoom buttons, attribution or legend. */
+.radar-bar { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; margin-bottom: var(--s2); min-width: 0; }
+.radar-label { font-size: var(--fs-sm); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 0; }
+.radar-label b { color: var(--text); }
+.radar-bar .ghost.small { font-size: var(--fs-md); }
+.radar-link { margin-left: auto; }
+.dark-tiles .base-tiles .leaflet-tile { filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9); }
 
 /* ---------- Compare ---------- */
 .cmp-picks { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; margin-bottom: var(--s3); }

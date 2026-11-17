@@ -10,6 +10,8 @@ self.addEventListener('activate', (e) => e.waitUntil(
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  // Radar frames go stale in minutes; caching every tile would only fill the phone.
+  if (new URL(e.request.url).hostname.endsWith('rainviewer.com')) return;
   // Site files: revalidate with the server instead of trusting the 10-minute HTTP cache.
   const sameOrigin = new URL(e.request.url).origin === self.location.origin;
   e.respondWith(

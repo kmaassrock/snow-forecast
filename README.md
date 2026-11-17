@@ -164,3 +164,15 @@ across the logs), which drives the trend arrows.
 - **Share** (button next to the favorite star on a resort page): the phone's share sheet with a line like
   `Purgatory: 9" Wed (6" by 9 am) · next 7 days 16"` and the resort's link (`#<id>`, the bare URL for the
   default resort). Browsers without the Web Share API copy the link and show "Link copied".
+
+## Live radar
+
+Upcoming Snow → Map has a **Radar** switch (off by default, remembered on the device) that overlays
+[RainViewer](https://www.rainviewer.com/)'s free radar on the snow map and loops the past 2 hours with a
+play/pause button and the frame's local time. A **Radar →** link on each resort's Summary card opens the map
+centered on that resort with radar on. It follows the free tier's limits: one color scheme (Universal Blue,
+snow mask on), 256 px tiles, zoom 7 at most (closer zooms scale those tiles up), 100 requests a minute per
+IP. That's why it shows every third 10-minute frame (5 frames) and only fetches tiles when the map stops
+moving. Frames load before the loop starts; the frame list refreshes every 10 minutes while radar is on, and
+everything stops when the map is hidden, the switch is off or the app goes to the background. The service
+worker skips radar requests so stale frames don't fill the phone's cache.
