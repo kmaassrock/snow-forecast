@@ -481,8 +481,11 @@ tr:last-child > td, tr:last-child > th { border-bottom: 0; }
 .strip { display: flex; gap: var(--s4); align-items: stretch; min-width: 100%; width: max-content; }
 .strip-part { flex: 1 1 0; min-width: 270px; }
 .periods { display: flex; gap: 6px; text-align: center; }
-.period { min-width: 0; }
-.p-label { color: var(--muted); font-size: var(--fs-xs); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.period { min-width: 0; display: flex; flex-direction: column; }
+/* Labels wrap rather than cut off when columns are narrow ("Next 11–15 Days"); the label
+   grows to the row's tallest so the totals under it stay lined up. */
+.p-label { color: var(--muted); font-size: var(--fs-xs); font-weight: 600; line-height: 1.25; text-wrap: balance;
+  flex: 1 0 auto; display: flex; align-items: flex-end; justify-content: center; }
 .p-total { display: flex; align-items: center; gap: var(--s2); font-weight: 800; font-size: var(--fs-2xl); line-height: 1.2; letter-spacing: -0.02em; color: var(--text); }
 .p-total::before, .p-total::after { content: ''; flex: 1; height: 2px; background: var(--line); border-radius: 1px; }
 .p-range { color: var(--muted); font-size: var(--fs-xs); }
