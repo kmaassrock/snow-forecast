@@ -1575,6 +1575,20 @@ function renderAlerts() {
     const rs = RESORTS.filter((r) => r.state === code && !state.favorites.includes(r.id) && match(r));
     return rs.length ? `<h3 class="sub-head">${label}</h3>${rs.map(row).join('')}` : '';
   }).join('');
+  // Weekend outlook channels: one per region plus all regions (scripts/weekend-alert.cjs).
+  const regionName = (id) => (id === 'all' ? 'All regions' : STATE_NAMES[id.toUpperCase()]);
+  const regionNote = (id) => { // a region with fewer than 5 mountains names them instead (BC is just Whistler)
+    const rs = RESORTS.filter((r) => r.state.toLowerCase() === id);
+    return id === 'all' ? 'Top 5 anywhere' : rs.length > 5 ? 'Top 5 in the region' : rs.map((r) => r.name).join(', ');
+  };
+  const weekendRows = WEEKEND_REGIONS.filter((id) => !q || `${regionName(id)} weekend`.toLowerCase().includes(q)).map((id) => `<div class="alert-row">
+      <span class="up-name"><b>${regionName(id)}</b><small>${regionNote(id)}</small></span>
+      <span class="alert-btns"><a class="road-btn" href="https://ntfy.sh/${weekendTopic(id)}" target="_blank" rel="noopener">Subscribe</a>
+        <button class="ghost small copy" data-copy="${weekendTopic(id)}" aria-label="Copy the weekend channel name for ${regionName(id)}" title="Copy channel name">⧉</button></span>
+    </div>`).join('');
+  const weekend = weekendRows && `<h3 class="sub-head">Weekend outlook</h3>
+      <p class="hint">Arrives Thursday evenings: the 5 mountains with the best Saturday and Sunday (snow falling Friday counts toward Saturday),
+        with the best day called out. On a quiet weekend it names the best bet and its base depth.</p>${weekendRows}`;
   $('alertsView').innerHTML = `
     <section class="card">
       <div class="card-head"><h2>How it works</h2></div>
@@ -1591,8 +1605,9 @@ function renderAlerts() {
     </section>
     <section class="card">
       <div class="up-tools"><input id="alertSearch" class="alert-search" type="search" placeholder="Find a mountain" value="${state.alertQuery.replace(/"/g, '&quot;')}" aria-label="Find a mountain"></div>
+      ${weekend}
       ${favs.length ? `<h3 class="sub-head">★ Your favorites</h3>${favs.map(row).join('')}` : ''}
-      ${groups || (favs.length ? '' : '<p class="hint">No mountains match.</p>')}
+      ${groups || (favs.length || weekend ? '' : '<p class="hint">No mountains match.</p>')}
     </section>`;
 }
 
