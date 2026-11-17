@@ -52,6 +52,17 @@ call (the evening before). What was sent is kept in the Actions cache (`alert-st
 Dry run: `node scripts/channel-alerts.cjs`. ntfy.sh allows ~250 free messages a day per sender; a storm
 across every resort can come close.
 
+### Weekend outlook (Thursday evenings)
+
+`scripts/weekend-alert.cjs` (`.github/workflows/weekend-alert.yml`, Thursday ~6 pm MST) ranks resorts for the coming
+Saturday and Sunday from the published `data/upcoming.json`. Friday's snow counts toward Saturday (it's there for first
+chair), Saturday's counts half toward Sunday. It posts to one public channel per region (Colorado, Utah, California,
+British Columbia) plus one for all regions (`weekendTopic` in `alert-topics.js`, Subscribe buttons at the top of the
+Alerts page): the top 5 with Sat/Sun amounts and the single best day, e.g. `Best: Wolf Creek Sat, 11" + 4" Fri`. When
+nothing in a region gets 2"+ Fri–Sun it sends a short "quiet weekend" note with the best bet and its base depth. If
+`NTFY_TOPIC` is set, the same outlook for just the `ALERT_RESORTS` mountains goes to your private topic.
+Dry run: `node scripts/weekend-alert.cjs` (add `SEND=1` to send). It refuses data more than 8 hours old.
+
 `.github/workflows/calibrate.yml` recalibrates the 15 stalest resorts every week, so each resort is
 refreshed about monthly while staying inside Open-Meteo's free limits.
 

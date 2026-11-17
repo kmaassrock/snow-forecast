@@ -1,0 +1,23 @@
+name: Weekend outlook
+
+on:
+  schedule:
+    # 01:00 UTC Friday = 6 pm MST / 7 pm MDT Thursday, after the afternoon model runs
+    - cron: '0 1 * * 5'
+  workflow_dispatch:
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # Public weekend channels (Alerts page) plus your private topic for ALERT_RESORTS.
+      - run: node scripts/weekend-alert.cjs
+        env:
+          SEND: '1'
+          SITE_URL: ${{ vars.SITE_URL }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          ALERT_RESORTS: ${{ vars.ALERT_RESORTS }}
