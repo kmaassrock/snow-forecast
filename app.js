@@ -1350,10 +1350,11 @@ function renderUpcoming() {
     </form>`;
   const rows = upcomingRows();
   const ids = rows.map((x) => x.r.id);
+  radarStop(); // the map (and its radar layers) is rebuilt below
 
   let body;
   if (state.upMode === 'map') {
-    body = '<div id="snowMap" class="snow-map"></div><div id="mapLegend" class="q-legend"></div>';
+    body = radarBarHTML() + '<div id="snowMap" class="snow-map"></div><div id="mapLegend" class="q-legend"></div>';
   } else {
     const max = Math.max(3, ...rows.flatMap(({ e }) => e.days.map((x) => x.snow)));
     const first = rows[0]?.e;
@@ -1420,7 +1421,7 @@ async function renderSnowMap(rows) {
   if (snowMap) snowMap.remove();
   snowMap = L.map('snowMap', { scrollWheelZoom: false });
   // Standard OpenStreetMap tiles; in dark mode CSS inverts them (see .dark-tiles).
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 12, attribution: '© OpenStreetMap contributors' }).addTo(snowMap);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 12, className: 'base-tiles', attribution: '© OpenStreetMap contributors' }).addTo(snowMap);
   $('snowMap').classList.toggle('dark-tiles', dark);
   snowLayer = L.layerGroup().addTo(snowMap);
   const vals = rows.map(({ e }) => value(e) ?? 0);
@@ -1438,9 +1439,110 @@ async function renderSnowMap(rows) {
   }
   if (state.drive) L.circleMarker([state.drive.lat, state.drive.lon], { radius: 6, color: '#fff', weight: 2, fillColor: '#16a34a', fillOpacity: 1 }).addTo(snowLayer).bindTooltip('You');
   const pts = rows.map(({ r }) => [r.lat, r.lon]);
-  if (pts.length) snowMap.fitBounds(pts, { padding: [30, 30], maxZoom: 9 });
+  const focus = RESORTS.find((r) => r.id === state.mapFocus); // set by a Summary card's "Radar →"
+  if (focus) snowMap.setView([focus.lat, focus.lon], 8);
+  else if (pts.length) snowMap.fitBounds(pts, { padding: [30, 30], maxZoom: 9 });
+  if (state.radar) radarStart();
   $('mapLegend').innerHTML = `${UP_SORTS[metric].label}: ` + [['#9ca3af', 'none'], ['#7dd3fc', '0.5"+'], ['#3b82f6', '2"+'], ['#a78bfa', '6"+'], ['#f28c28', '12"+']]
     .map(([c, l]) => `<span><i class="q" style="background:${c};border-radius:50%"></i>${l}</span>`).join('') + '<span class="muted">Bigger dot = more snow. Tap a dot for details.</span>';
+}
+
+// ---------- live radar (RainViewer) ----------
+// Free tier (since Jan 2026): one color scheme (Universal Blue), 256 px tiles, zoom 7 at most,
+// 100 requests a minute per IP, attribution required. Tiles past zoom 7 are scaled up, not fetched.
+const RADAR_API = 'https://api.rainviewer.com/public/weather-maps.json';
+const RADAR_STEP = 3; // every third 10-minute frame: 5 frames over 2 hours keeps a load or pan under the request limit
+const RADAR_REFRESH_MS = 10 * 60e3; // RainViewer adds a frame every 10 minutes
+const RADAR_OPACITY = 0.55; // low enough that the snow dots stay readable on top
+state.radar = store.get('radar') === 'on';
+state.mapFocus = null; // resort id to center the snow map on (Summary card "Radar →")
+const radar = { list: null, listAt: 0, layers: [], idx: 0, playing: true, timer: null, refresh: null, seq: 0 };
+
+const radarTime = (t) => new Date(t * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+
+function radarBarHTML() {
+  return `<div class="radar-bar">
+    <label class="switch"><input type="checkbox" id="radarToggle" ${state.radar ? 'checked' : ''}> Radar</label>
+    <button id="radarPlay" class="ghost small" ${state.radar ? '' : 'hidden'} aria-label="Pause radar">⏸</button>
+    <span id="radarLabel" class="radar-label" aria-live="off">${state.radar ? 'Loading radar…' : 'Past 2 hours of rain and snow'}</span>
+  </div>`;
+}
+
+// The frame list, reused for up to 10 minutes across map redraws.
+async function radarFrames() {
+  if (!radar.list || Date.now() - radar.listAt > RADAR_REFRESH_MS) {
+    const d = await (await fetch(RADAR_API)).json();
+    const past = d.radar?.past || [];
+    // Every third frame, always ending on the newest.
+    radar.list = past.filter((_, i) => (past.length - 1 - i) % RADAR_STEP === 0)
+      .map((f) => ({ time: f.time, url: `${d.host}${f.path}/256/{z}/{x}/{y}/2/1_1.png` }));
+    radar.listAt = Date.now();
+  }
+  return radar.list;
+}
+
+function radarLayer(f) {
+  return L.tileLayer(f.url, {
+    pane: 'radar', opacity: 0, maxNativeZoom: 7, maxZoom: 12, tileSize: 256, className: 'radar-tiles',
+    updateWhenIdle: true, // no tile requests mid-pan or mid-zoom
+    attribution: '<a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer</a>',
+  });
+}
+
+// Loads every frame (hidden), then animates. Safe to call again: it replaces what's there.
+async function radarStart() {
+  const seq = ++radar.seq, map = snowMap;
+  radarClear();
+  if (!map || map.getContainer() !== $('snowMap')) return; // map still loading; renderSnowMap starts radar
+  $('radarLabel').textContent = 'Loading radar…';
+  let frames;
+  try { frames = await radarFrames(); } catch { frames = null; }
+  if (seq !== radar.seq || map !== snowMap) return; // stopped or redrawn meanwhile
+  if (!frames?.length) { $('radarLabel').textContent = 'Radar unavailable right now'; return; }
+  if (!map.getPane('radar')) map.createPane('radar').style.zIndex = 350; // above the base map, below the dots
+  radar.layers = frames.map((f) => radarLayer(f).addTo(map));
+  // Preload: wait for each frame's tiles (or 10 s, so one slow tile doesn't stall it).
+  await Promise.all(radar.layers.map((l) => new Promise((ok) => { l.once('load', ok); setTimeout(ok, 10e3); })));
+  if (seq !== radar.seq) return;
+  radar.idx = radar.layers.length - 1;
+  radarShow();
+  radarTick();
+  radar.refresh = setInterval(() => { if (map === snowMap) radarStart(); }, RADAR_REFRESH_MS);
+}
+
+function radarShow() {
+  radar.layers.forEach((l, i) => l.setOpacity(i === radar.idx ? RADAR_OPACITY : 0));
+  const f = radar.list[radar.idx], last = radar.idx === radar.layers.length - 1;
+  $('radarLabel').innerHTML = `<b>${radarTime(f.time)}</b>${last ? ' · latest' : ''}`;
+  const b = $('radarPlay');
+  b.hidden = false;
+  b.textContent = radar.playing ? '⏸' : '▶';
+  b.setAttribute('aria-label', radar.playing ? 'Pause radar' : 'Play radar');
+}
+
+// Half a second per frame, with a longer hold on the newest one.
+function radarTick() {
+  clearTimeout(radar.timer);
+  if (!radar.playing || !radar.layers.length) return;
+  const hold = radar.idx === radar.layers.length - 1 ? 1500 : 500;
+  radar.timer = setTimeout(() => {
+    radar.idx = (radar.idx + 1) % radar.layers.length;
+    radarShow();
+    radarTick();
+  }, hold);
+}
+
+function radarClear() {
+  clearTimeout(radar.timer);
+  clearInterval(radar.refresh);
+  radar.layers.forEach((l) => l.remove());
+  radar.layers = [];
+}
+
+// Stops the animation, the 10-minute refresh and any load in progress.
+function radarStop() {
+  radar.seq++;
+  radarClear();
 }
 
 async function loadUpcomingView() {
@@ -1601,6 +1703,7 @@ function applyView() {
   document.body.classList.toggle('list-mode', state.view !== 'resort');
   $('favView').hidden = state.view !== 'favorites';
   $('upcomingView').hidden = state.view !== 'upcoming';
+  if (state.view !== 'upcoming') { radarStop(); state.mapFocus = null; }
   $('compareView').hidden = state.view !== 'compare';
   $('alertsView').hidden = state.view !== 'alerts';
 }
@@ -1723,9 +1826,15 @@ document.addEventListener('click', (e) => {
 $('upcomingView').addEventListener('click', async (e) => {
   const b = e.target.closest('button');
   if (!b) return;
+  if (b.dataset.filter || b.dataset.pass || b.dataset.mode) state.mapFocus = null;
   if (b.dataset.filter) { state.upFilter = b.dataset.filter; renderUpcoming(); return; }
   if (b.dataset.pass) { state.upPass = b.dataset.pass; renderUpcoming(); return; }
   if (b.dataset.mode) { state.upMode = b.dataset.mode; renderUpcoming(); return; }
+  if (b.id === 'radarPlay') {
+    radar.playing = !radar.playing;
+    if (radar.layers.length) { radarShow(); radarTick(); }
+    return;
+  }
   if (b.id === 'changeLoc') { state.locEditing = true; renderUpcoming(); $('locQuery')?.focus(); return; }
   if (b.id === 'locate') {
     b.disabled = true;
@@ -1805,6 +1914,17 @@ $('alertsView').addEventListener('click', async (e) => {
   }
 });
 $('upcomingView').addEventListener('change', (e) => {
+  if (e.target.id === 'radarToggle') {
+    state.radar = e.target.checked;
+    store.set('radar', state.radar ? 'on' : 'off');
+    if (state.radar) { radar.playing = true; radarStart(); } else {
+      radarStop();
+      $('radarPlay').hidden = true;
+      $('radarLabel').textContent = 'Past 2 hours of rain and snow';
+    }
+    return;
+  }
+  if (e.target.id === 'upSort' || e.target.id === 'upDrive') state.mapFocus = null;
   if (e.target.id === 'upSort') { state.upSort = e.target.value; renderUpcoming(); }
   if (e.target.id === 'upDrive') { state.upDrive = +e.target.value; renderUpcoming(); }
 });
@@ -1830,10 +1950,19 @@ $('elevSeg').addEventListener('click', (e) => {
   if (state.view === 'favorites') loadFavView(); else if (state.view === 'resort') load();
 });
 $('refresh').addEventListener('click', load);
+// Summary card "Radar →": the Upcoming Snow map, centered here, radar on.
+$('radarLink').addEventListener('click', () => {
+  state.radar = true;
+  store.set('radar', 'on');
+  radar.playing = true;
+  state.upMode = 'map';
+  state.mapFocus = state.resortId;
+  switchResort('upcoming');
+});
 
 // Reopening the app later (it stays in memory on iPhone) refreshes a stale forecast.
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState !== 'visible') return;
+  if (document.visibilityState !== 'visible') { radarStop(); return; } // reopening redraws the map, radar too
   if (state.view === 'favorites') loadFavView();
   else if (state.view === 'upcoming') loadUpcomingView();
   else if (state.view === 'compare') loadCompareView();
