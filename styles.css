@@ -565,6 +565,8 @@ button.col { cursor: pointer; }
 .cams { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--s2); }
 .cam { position: relative; display: block; border-radius: var(--r-md); overflow: hidden; background: var(--panel-2); aspect-ratio: 16 / 9; }
 .cam img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cams-link { margin: var(--s2) 0 0; font-size: var(--fs-sm); overflow-wrap: anywhere; }
+.cams-link a { color: var(--accent); font-weight: 600; text-decoration: none; }
 .cam span { position: absolute; left: 8px; bottom: 8px; background: var(--scrim); color: var(--white); font-size: var(--fs-xs); font-weight: 600; padding: 2px 8px; border-radius: var(--r-sm); }
 
 /* ---------- Daily ---------- */
