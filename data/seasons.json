@@ -9,7 +9,7 @@
   "loveland-basin": { "status": "open", "opened": "2026-11-07" },
   "copper-mountain": { "status": "open", "opened": "2026-11-08" },
   "breckenridge": { "status": "open", "opened": "2026-11-11" },
-  "winter-park": { "status": "open" },
+  "winter-park": { "status": "open", "opened": "2026-11-13" },
   "vail": { "status": "open", "opened": "2026-11-13" },
   "purgatory": { "status": "planned", "open": "2026-11-20" },
   "steamboat": { "status": "planned", "open": "2026-11-21" },
