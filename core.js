@@ -86,20 +86,35 @@ const skiDate = (time) => (+time.slice(11, 13) >= CFG.LIFTS_CLOSE ? addDays(time
 
 // ---------- data fetch ----------
 
-async function fetchJSON(url) {
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
-  return r.json();
+// Open-Meteo sometimes stalls for a minute or answers "Too many concurrent requests"
+// (429). Give each try 30 seconds and retry twice on a stall, 429 or server error,
+// so the page never waits forever.
+async function fetchJSON(url, { tries = 3, timeoutMs = 30e3 } = {}) {
+  for (let i = 1; ; i++) {
+    let r;
+    try {
+      r = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+    } catch (e) {
+      if (i >= tries) throw new Error(e.name === 'TimeoutError' ? 'the weather service (Open-Meteo) is not responding' : e.message);
+      await new Promise((ok) => setTimeout(ok, 1500 * i));
+      continue;
+    }
+    if (r.ok) return r.json();
+    const body = await r.text();
+    if (i >= tries || !(r.status === 429 || r.status >= 500)) throw new Error(`${r.status} ${body}`);
+    await new Promise((ok) => setTimeout(ok, 2000 * i));
+  }
 }
 
 // lean: only what snow totals need (blend models, 5 variables, 8 days), about a
 // quarter of the API cost, for ranking every resort in the background job.
 const LEAN_VARS = ['temperature_2m', 'precipitation', 'snowfall', 'temperature_700hPa', 'wind_speed_10m'];
-function fetchDeterministic(resort, elevM, lean = false, leanDays = 8) {
+// only: limit the request to these model ids (see MODEL_GROUPS).
+function fetchDeterministic(resort, elevM, lean = false, leanDays = 8, only = null) {
   const q = new URLSearchParams({
     latitude: resort.lat, longitude: resort.lon, elevation: elevM,
     hourly: (lean ? LEAN_VARS : HOURLY_VARS).join(','),
-    models: MODELS.filter((m) => (!lean || !m.ref) && !m.hideAt?.includes(resort.id)).map((m) => m.id).join(','),
+    models: MODELS.filter((m) => (!lean || !m.ref) && !m.hideAt?.includes(resort.id) && (!only || only.includes(m.id))).map((m) => m.id).join(','),
     forecast_days: lean ? leanDays : FORECAST_DAYS, past_days: lean ? 1 : PAST_DAYS, timezone: resort.tz, wind_speed_unit: 'mph',
   });
   return fetchJSON(`https://api.open-meteo.com/v1/forecast?${q}`);
@@ -319,11 +334,18 @@ function periodTotal(days, ens, from, to) {
 // also trims the model request to snow totals only (see fetchDeterministic).
 // leadBias (data/lead-bias.json) corrects for over-forecasting by lead time; pass
 // correct: false for the raw blend (used when logging forecasts to score them).
-async function getForecast(resort, elevM, calib, { ensemble = true, lean = false, leanDays, leadBias = null, correct = true } = {}) {
-  const [det, ensRaw] = await Promise.all([
-    fetchDeterministic(resort, elevM, lean, leanDays),
-    ensemble ? fetchEnsemble(resort, elevM).catch((e) => { console.warn('Ensemble failed', e); return null; }) : null,
-  ]);
+// The resort page fetches the models in three requests instead of one, so a model that is
+// slow or down at Open-Meteo only holds up its own group: the forecast shows with the
+// models that came in, and fills in when the rest arrive.
+const MODEL_GROUPS = [
+  ['ncep_hrrr_conus', 'ncep_nbm_conus'],
+  ['ecmwf_ifs', 'gfs_global'],
+  ['gem_seamless', 'icon_seamless', 'ukmo_seamless', 'ecmwf_aifs025_single', 'ncep_aigfs025'],
+];
+const PARTIAL_AFTER_MS = 6000;
+const wait = (ms) => new Promise((ok) => setTimeout(ok, ms));
+
+function buildForecast(resort, det, ensRaw, calib, { leadBias, correct }) {
   const nowKey = nowLocalHour(resort.tz);
   const todayStr = nowKey.slice(0, 10);
   const hours = processModels(det, nowKey, calib);
@@ -334,6 +356,59 @@ async function getForecast(resort, elevM, calib, { ensemble = true, lean = false
   for (const d of days) d.pop = chance.day[d.date] ?? null;
   if (correct) correctForLead(days, ens, todayStr, leadBias);
   return { days, ens, todayStr, hasEnsemble: !!ensRaw };
+}
+
+// Full forecast for one resort and elevation. { ensemble: false } skips the
+// ensemble request (no uncertainty ranges) for lightweight overviews; { lean: true }
+// also trims the model request to snow totals only (see fetchDeterministic).
+// leadBias (data/lead-bias.json) corrects for over-forecasting by lead time; pass
+// correct: false for the raw blend (used when logging forecasts to score them).
+// onPartial(forecast) gets an early forecast when some model groups are still loading
+// after a few seconds; forecast.missing names the models that aren't in it.
+async function getForecast(resort, elevM, calib, { ensemble = true, lean = false, leanDays, leadBias = null, correct = true, onPartial = null } = {}) {
+  const opts = { leadBias, correct };
+  // Background jobs and overview cards (no onPartial) keep one request per resort, so
+  // they don't multiply concurrent requests (Open-Meteo answers 429 when there are too many).
+  if (lean || !onPartial) {
+    const [det, ensRaw] = await Promise.all([
+      fetchDeterministic(resort, elevM, lean, leanDays),
+      ensemble ? fetchEnsemble(resort, elevM).catch((e) => { console.warn('Ensemble failed', e); return null; }) : null,
+    ]);
+    return { ...buildForecast(resort, det, ensRaw, calib, opts), missing: [] };
+  }
+  let ensRaw = null, ensDone = !ensemble;
+  const ensP = ensemble
+    ? fetchEnsemble(resort, elevM).then((d) => { ensRaw = d; }, (e) => console.warn('Ensemble failed', e)).finally(() => { ensDone = true; })
+    : Promise.resolve();
+  const groups = MODEL_GROUPS.map((ids) => MODELS.filter((m) => ids.includes(m.id) && !m.hideAt?.includes(resort.id)).map((m) => m.id)).filter((g) => g.length);
+  const parts = new Map(); // group index -> response
+  const errors = [];
+  const reqs = groups.map((g, i) => fetchDeterministic(resort, elevM, false, 0, g)
+    .then((d) => {
+      // With a single model Open-Meteo leaves the model name off the keys; add it back.
+      if (g.length === 1) d.hourly = Object.fromEntries(Object.entries(d.hourly).map(([k, v]) => [k === 'time' ? k : `${k}_${g[0]}`, v]));
+      parts.set(i, d);
+    }, (e) => { errors.push(e); console.warn(`Models ${g.join(', ')} failed`, e); }));
+  const all = Promise.all(reqs);
+  const merged = () => {
+    const list = [...parts.values()];
+    return { hourly: Object.assign({}, ...list.map((d) => d.hourly)) };
+  };
+  const missingNames = () => MODELS.filter((m) => !m.ref && groups.some((g, i) => !parts.has(i) && g.includes(m.id))).map((m) => m.name);
+
+  let finished = false;
+  all.then(() => { finished = true; });
+  await Promise.race([all, wait(PARTIAL_AFTER_MS)]);
+  // Nothing in yet: show something as soon as the first group lands.
+  if (!finished && !parts.size) {
+    const firstIn = Promise.any(reqs.map((r, i) => r.then(() => { if (!parts.has(i)) throw new Error('failed'); }))).catch(() => {});
+    await Promise.race([all, firstIn]);
+  }
+  if (!finished && parts.size) onPartial({ ...buildForecast(resort, merged(), ensDone ? ensRaw : null, calib, opts), missing: missingNames(), partial: true });
+  await all;
+  await ensP;
+  if (!parts.size) throw errors[0] || new Error('No forecast models loaded');
+  return { ...buildForecast(resort, merged(), ensRaw, calib, opts), missing: missingNames() };
 }
 
 // Starting factors, from backtesting the calibrated blend against SNOTEL (winters

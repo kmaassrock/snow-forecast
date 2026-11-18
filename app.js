@@ -182,7 +182,8 @@ function renderStatus() {
   if (state.view !== 'resort' || !state.fetchedAt) return;
   $('status').className = 'status';
   $('status').textContent = `Updated ${ago(state.fetchedAt)}${state.refreshing ? ' · refreshing…' : ''}`
-    + ` · ${state.elev} mountain ${ftLabel(resort().elevations[state.elev])}${state.hasEnsemble ? '' : ' · range unavailable'}`;
+    + ` · ${state.elev} mountain ${ftLabel(resort().elevations[state.elev])}${state.hasEnsemble ? '' : ' · range unavailable'}`
+    + (state.missing?.length ? ` · ${state.partial ? 'still loading' : 'without'} ${state.missing.join(', ')}` : '');
 }
 
 // ---------- snow summary (OpenSnow style) ----------
@@ -2009,7 +2010,7 @@ function showSaved() {
   renderCalibration();
   const saved = savedForecast(r, state.elev);
   if (saved) {
-    Object.assign(state, { days: saved.days, ens: saved.ens || {}, todayStr: saved.todayStr, fetchedAt: saved.savedAt, refreshing: true, hasEnsemble: !!Object.keys(saved.ens || {}).length });
+    Object.assign(state, { days: saved.days, ens: saved.ens || {}, todayStr: saved.todayStr, fetchedAt: saved.savedAt, refreshing: true, hasEnsemble: !!Object.keys(saved.ens || {}).length, missing: [], partial: false });
     renderResort();
     renderStatus();
   } else {
@@ -2027,11 +2028,24 @@ async function load({ redraw = true } = {}) {
   const elevM = r.elevations[state.elev];
   if (redraw) showSaved();
   else { renderCalibration(); state.refreshing = true; renderStatus(); }
+  // Say so when the weather service is slow, instead of a silent "Loading…".
+  const slow = setTimeout(() => {
+    if (seq !== loadSeq || state.fetchedAt) return;
+    $('status').textContent = 'Still loading. The weather service (Open-Meteo) is slow right now; this can take up to a minute…';
+  }, 8000);
   try {
-    const f = await getForecast(r, elevM, state.calibration?.resorts?.[r.id], { leadBias: state.leadBias });
+    // Show the models that came in if some are slow; the rest fill in when they land.
+    const onPartial = (p) => {
+      // Keep a saved full forecast from the last few hours over a partial fresh one.
+      if (seq !== loadSeq || (state.days.length && Date.now() - state.fetchedAt < 6 * 3600e3)) return;
+      Object.assign(state, { days: p.days, ens: p.ens, todayStr: p.todayStr, fetchedAt: Date.now(), refreshing: true, hasEnsemble: p.hasEnsemble, missing: p.missing, partial: true });
+      renderResort();
+      renderStatus();
+    };
+    const f = await getForecast(r, elevM, state.calibration?.resorts?.[r.id], { leadBias: state.leadBias, onPartial });
     if (seq !== loadSeq) return; // a newer request replaced this one
-    saveForecast(r.id, state.elev, f);
-    Object.assign(state, { days: f.days, ens: f.ens, todayStr: f.todayStr, fetchedAt: Date.now(), refreshing: false, hasEnsemble: f.hasEnsemble });
+    if (!f.missing.length) saveForecast(r.id, state.elev, f);
+    Object.assign(state, { days: f.days, ens: f.ens, todayStr: f.todayStr, fetchedAt: Date.now(), refreshing: false, hasEnsemble: f.hasEnsemble, missing: f.missing, partial: false });
     renderResort();
     renderStatus();
   } catch (e) {
@@ -2041,8 +2055,8 @@ async function load({ redraw = true } = {}) {
     $('status').className = 'status err';
     $('status').textContent = state.fetchedAt
       ? `Showing the forecast from ${ago(state.fetchedAt)}; couldn't refresh (${e.message})`
-      : `Couldn't load the forecast: ${e.message}`;
-  }
+      : `Couldn't load the forecast: ${e.message}. Tap ↻ to try again.`;
+  } finally { clearTimeout(slow); }
 }
 
 function switchResort(id) {
