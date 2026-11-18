@@ -119,6 +119,39 @@ function renderPicker() {
   $('resortSel').innerHTML = html;
 }
 
+// ---------- season dates (data/seasons.json, kept by hand from resort announcements) ----------
+
+let seasons = {}, seasonName = '';
+async function loadSeasons() {
+  try {
+    const d = await (await fetch('data/seasons.json', { cache: 'no-cache' })).json();
+    seasons = d.resorts || {};
+    seasonName = (d.season || '').replace('-', '–');
+  } catch (e) { console.warn('No season dates', e); }
+}
+const seasonDate = (d, weekday) => new Date(`${d}T12:00:00`).toLocaleDateString('en-US', { weekday: weekday ? 'short' : undefined, month: 'short', day: 'numeric' });
+
+// Where a resort is in its season: opening day, open now, or closed. `short` is for list rows
+// and is empty once a resort is open (unless its closing day has been announced).
+function seasonInfo(id, today) {
+  const s = seasons[id];
+  if (!s) return null;
+  if (s.status === 'closed') return { long: `Closed for the ${seasonName} season${s.why ? ` (${s.why})` : ''}`, short: 'Not opening' };
+  if (s.close && today > s.close) return { long: `Season ended ${seasonDate(s.close)}`, short: 'Season over' };
+  const closes = s.close ? ` · last day ${seasonDate(s.close, true)}` : '';
+  const closeShort = s.close ? `Last day ${seasonDate(s.close)}` : '';
+  if (s.status === 'open') return { long: `Open${s.opened ? ` since ${seasonDate(s.opened)}` : ' for the season'}${closes}`, short: closeShort };
+  if (s.status === 'tba') return { long: 'Opening day not announced yet', short: 'Opening TBA' };
+  if (s.open === today) return { long: `Opening day today${s.status === 'estimate' ? ' (estimate)' : ''}`, short: 'Opens today' };
+  if (s.open < today) {
+    // The planned day has passed but this file hasn't caught up yet.
+    return { long: `${s.status === 'estimate' ? 'Expected to open' : 'Planned to open'} ${seasonDate(s.open)}; check the resort to confirm${closes}`, short: closeShort };
+  }
+  return s.status === 'estimate'
+    ? { long: `Expected to open around ${seasonDate(s.open)} (not announced)`, short: `Opens ~${seasonDate(s.open)}` }
+    : { long: `Opens ${seasonDate(s.open, true)}`, short: `Opens ${seasonDate(s.open)}` };
+}
+
 function renderHeader() {
   const r = resort();
   const fav = state.view === 'favorites', up = state.view === 'upcoming', cmp = state.view === 'compare', alr = state.view === 'alerts';
@@ -137,6 +170,9 @@ function renderHeader() {
     ? `${state.favorites.length} mountain${state.favorites.length === 1 ? '' : 's'} · tap one to open it`
     : up ? `Next 7 days at mid-mountain, every resort · most snow first`
     : `${ftLabel(r.elevations.base)}–${ftLabel(r.elevations.summit)} · ${r.region}${driveTo(r.id) != null ? ` · 🚗 ${fmtDrive(driveTo(r.id))} drive` : ''}`;
+  const season = state.view === 'resort' ? seasonInfo(r.id, nowLocalHour(r.tz).slice(0, 10)) : null;
+  $('seasonLine').hidden = !season;
+  $('seasonLine').textContent = season ? `📅 ${season.long}` : '';
   $('elevSeg').innerHTML = ['base', 'mid', 'summit'].map((k) =>
     `<button data-elev="${k}" class="${k === state.elev ? 'on' : ''}" title="${fav ? '' : ftLabel(r.elevations[k])}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('');
   renderPicker();
@@ -1580,10 +1616,11 @@ function renderUpcoming() {
       }).join('');
       const [xv, xl] = extra(r, e);
       const dt = driveTo(r.id);
+      const season = seasonInfo(r.id, nowLocalHour(r.tz).slice(0, 10))?.short;
       return `<button class="up-row" data-id="${r.id}">
         <span class="up-rank">${i + 1}</span>
         <span class="up-name"><b>${state.favorites.includes(r.id) ? '★ ' : ''}${r.name}</b>
-          <small>${r.state} · ${ftLabel(r.elevations.mid)}${dt != null ? ` · 🚗 ${fmtDrive(dt)}` : ''} ${passBadges(r.id)}</small></span>
+          <small>${r.state} · ${ftLabel(r.elevations.mid)}${dt != null ? ` · 🚗 ${fmtDrive(dt)}` : ''} ${passBadges(r.id)}</small>${season ? `<small class="up-season">${season}</small>` : ''}</span>
         <span class="up-bars">${bars}</span>
         <span class="up-num ${state.upSort === 'next7' ? 'sorted' : ''}"><b>${fmtIn(e.next7)}</b><small>7 days</small></span>
         <span class="up-num wide ${state.upSort === 'tomorrow' ? 'sorted' : ''}"><b>${fmtIn(e.tomorrowBy9)}</b><small>by 9am tmw</small></span>
@@ -2281,6 +2318,7 @@ applyTheme();
 if (state.view === 'resort') showSaved();
 if (state.view === 'alerts') { renderHeader(); renderAlerts(); }
 loadCalibration().then(() => (state.view === 'favorites' ? loadFavView() : state.view === 'upcoming' ? loadUpcomingView() : state.view === 'compare' ? loadCompareView() : state.view === 'alerts' ? null : load({ redraw: false })));
+loadSeasons().then(() => { renderHeader(); if (state.view === 'upcoming' && state.upcoming) renderUpcoming(); });
 loadReports().then(() => { if (state.view === 'resort') { renderSnowReport(); if (state.days.length) renderSnowSummary(); } });
 if (state.view === 'resort') loadResortExtras();
 

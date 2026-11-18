@@ -433,6 +433,7 @@ tr:last-child > td, tr:last-child > th { border-bottom: 0; }
 .share-msg:empty { display: none; }
 .meta-row { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s3); justify-content: space-between; align-items: center; margin-top: var(--s1); }
 .hero .sub { color: var(--hero-soft); font-size: var(--fs-md); }
+.hero .season-line { margin-top: var(--s1); color: var(--hero-text); font-weight: 600; }
 .hero-seg { background: var(--hero-shade); border-color: var(--hero-glass-line); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
 .hero-seg button { color: var(--hero-soft); }
 .hero-seg button.on { background: var(--white); color: var(--hero-1); }
@@ -667,6 +668,7 @@ button.col { cursor: pointer; }
 .up-rank { color: var(--muted); font-weight: 700; font-size: var(--fs-sm); text-align: center; }
 .up-name b { display: block; font-size: var(--fs-md); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .up-name small, .up-num small { color: var(--muted); font-size: var(--fs-xs); display: block; }
+.up-name .up-season { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .up-bars { display: flex; align-items: flex-end; gap: 3px; height: 36px; }
 .ub { flex: 1; background: var(--q, var(--q-med)); border-radius: 3px 3px 0 0; }
 .ub.none { background: var(--line); }
