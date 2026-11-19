@@ -1129,12 +1129,22 @@ const scaledRangeOf = (total, members) => (Object.keys(members).length >= 10 ? s
 // ---------- webcams ----------
 
 function renderCams() {
-  const cams = CAMS[state.resortId];
-  $('camsCard').hidden = !cams;
-  if (!cams) return;
+  const cams = CAMS[state.resortId] || [];
+  const page = CAM_PAGES[state.resortId];
+  $('camsCard').hidden = !cams.length && !page;
+  if (!cams.length && !page) return;
   const t = Math.floor(Date.now() / 300e3); // new image every 5 minutes, cached in between
-  $('cams').innerHTML = cams.map((c) => `<a class="cam" href="${c.live}" target="_blank" rel="noopener">
-      <img src="${c.img}?t=${t}" alt="${c.name} webcam" loading="lazy"><span>${c.name}</span></a>`).join('');
+  const grid = $('cams');
+  grid.hidden = !cams.length;
+  grid.innerHTML = cams.map((c) => `<a class="cam" href="${c.live || page || c.img}" target="_blank" rel="noopener">
+      <img src="${c.img}${c.img.includes('?') ? '&' : '?'}t=${t}" alt="${c.name} webcam" loading="lazy"><span>${c.name}</span></a>`).join('');
+  // A camera that fails to load drops its tile; with none left only the link shows.
+  grid.querySelectorAll('img').forEach((img) => img.addEventListener('error', () => {
+    img.parentElement.remove();
+    if (!grid.children.length) grid.hidden = true;
+  }));
+  $('camsLink').hidden = !page;
+  if (page) $('camsLink').innerHTML = `<a href="${page}" target="_blank" rel="noopener">All webcams on ${resort().name}'s site →</a>`;
 }
 
 // ---------- right now ----------

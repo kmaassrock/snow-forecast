@@ -81,9 +81,13 @@ Wolf Creek. Other resorts use their nearest SNOTEL station for measured snow. Si
 
 ## Webcams
 
-`cams.js` lists each resort's cameras (Brown Rice snapshot stills; tapping opens the live view).
-Purgatory and Wolf Creek are set up. To add one, find the camera ids on the resort's webcam page
-(`player.brownrice.com/embed/<id>`) and add them there.
+`cams.js` has two tables. `CAMS` lists up to four live pictures per resort (53 resorts as of Nov 2026), snow stake first,
+from Brown Rice, YouTube live, ipcamlive, HDRelay, Roundshot, Ozolio, Prism or a resort's own image URL. The helpers at the
+top of the file say where to find each camera id on a resort's webcam page. A picture that fails to load hides itself.
+`CAM_PAGES` maps each resort to its official webcam page, shown as a link under the pictures (left out where a resort has none).
+
+One limit: a YouTube picture can't tell when its stream has ended and been replaced by a new video, so a resort that restarts
+its stream leaves a frozen picture until the id here is updated.
 
 ## Models
 
