@@ -1136,7 +1136,7 @@ function renderCams() {
   const t = Math.floor(Date.now() / 300e3); // new image every 5 minutes, cached in between
   const grid = $('cams');
   grid.hidden = !cams.length;
-  grid.innerHTML = cams.map((c) => `<a class="cam" href="${c.live}" target="_blank" rel="noopener">
+  grid.innerHTML = cams.map((c) => `<a class="cam" href="${c.live || page || c.img}" target="_blank" rel="noopener">
       <img src="${c.img}${c.img.includes('?') ? '&' : '?'}t=${t}" alt="${c.name} webcam" loading="lazy"><span>${c.name}</span></a>`).join('');
   // A camera that fails to load drops its tile; with none left only the link shows.
   grid.querySelectorAll('img').forEach((img) => img.addEventListener('error', () => {
