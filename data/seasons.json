@@ -1,6 +1,6 @@
 {
  "season": "2026-27",
- "updated": "2026-11-18",
+ "updated": "2026-11-19",
  "note": "Hand-kept from resort announcements and ski news (OnTheSnow, Ski Utah, Teton Gravity, Uncover Colorado). status: open = lifts are running (opened = that date, when known); planned = the resort's announced target; estimate = a projection, not announced; tba = no date yet; closed = not operating this season. close is only filled in once the resort announces its closing day.",
  "resorts": {
   "arapahoe-basin": { "status": "open", "opened": "2026-10-28" },
@@ -30,7 +30,7 @@
   "silverton-mountain": { "status": "estimate", "open": "2026-12-31" },
   "hesperus": { "status": "tba" },
 
-  "brian-head": { "status": "planned", "open": "2026-11-17" },
+  "brian-head": { "status": "open", "opened": "2026-11-17", "close": "2027-05-09" },
   "alta": { "status": "planned", "open": "2026-11-20" },
   "park-city": { "status": "planned", "open": "2026-11-20" },
   "solitude": { "status": "planned", "open": "2026-11-20" },
