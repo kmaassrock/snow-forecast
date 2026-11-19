@@ -1,15 +1,24 @@
 {
- "updated": "2026-11-18",
+ "updated": "2026-11-19",
  "stations": {
   "356:CA:SNTL": [
+   {
+    "from": "2026-11-18",
+    "to": "2026-11-18",
+    "measuredIn": 13,
+    "waterIn": 2,
+    "ratio": 6.5,
+    "ahead1In": 11.4,
+    "ahead3In": 9.8
+   },
    {
     "from": "2026-11-16",
     "to": "2026-11-16",
     "measuredIn": 4,
     "waterIn": 0.5,
     "ratio": 8,
-    "ahead1In": 4.5,
-    "ahead3In": 4.4
+    "ahead1In": 4.4,
+    "ahead3In": 4.5
    },
    {
     "from": "2026-11-13",
@@ -18,10 +27,19 @@
     "waterIn": 0.7,
     "ratio": 7.1,
     "ahead1In": 9.1,
-    "ahead3In": 9
+    "ahead3In": 9.1
    }
   ],
   "428:CA:SNTL": [
+   {
+    "from": "2026-11-18",
+    "to": "2026-11-18",
+    "measuredIn": 17,
+    "waterIn": 2.3,
+    "ratio": 7.4,
+    "ahead1In": 15.9,
+    "ahead3In": 12.8
+   },
    {
     "from": "2026-11-16",
     "to": "2026-11-16",
@@ -37,11 +55,20 @@
     "measuredIn": 12,
     "waterIn": 2,
     "ratio": 6,
-    "ahead1In": 9.6,
-    "ahead3In": 10.6
+    "ahead1In": 9.5,
+    "ahead3In": 10.8
    }
   ],
   "518:CA:SNTL": [
+   {
+    "from": "2026-11-18",
+    "to": "2026-11-18",
+    "measuredIn": 3,
+    "waterIn": 0.8,
+    "ratio": 6,
+    "ahead1In": 8,
+    "ahead3In": 6.2
+   },
    {
     "from": "2026-11-16",
     "to": "2026-11-16",
@@ -58,18 +85,27 @@
     "waterIn": 1.3,
     "ratio": 6,
     "ahead1In": 5.7,
-    "ahead3In": 5.6
+    "ahead3In": 5.7
    }
   ],
   "848:CA:SNTL": [
    {
+    "from": "2026-11-18",
+    "to": "2026-11-18",
+    "measuredIn": 16,
+    "waterIn": 2.1,
+    "ratio": 7.6,
+    "ahead1In": 17.8,
+    "ahead3In": 14.5
+   },
+   {
     "from": "2026-11-15",
     "to": "2026-11-16",
     "measuredIn": 8,
-    "waterIn": 1,
-    "ratio": 8,
-    "ahead1In": 7.5,
-    "ahead3In": 6.9
+    "waterIn": 0.9,
+    "ratio": 8.9,
+    "ahead1In": 8.2,
+    "ahead3In": 7.7
    },
    {
     "from": "2026-11-13",
@@ -78,10 +114,19 @@
     "waterIn": 2.1,
     "ratio": 6,
     "ahead1In": 10.2,
-    "ahead3In": 11.3
+    "ahead3In": 11.5
    }
   ],
   "1067:CA:SNTL": [
+   {
+    "from": "2026-11-18",
+    "to": "2026-11-18",
+    "measuredIn": 13,
+    "waterIn": 2.6,
+    "ratio": 6,
+    "ahead1In": 10.2,
+    "ahead3In": 8.6
+   },
    {
     "from": "2026-11-16",
     "to": "2026-11-16",
@@ -89,7 +134,7 @@
     "waterIn": 0.7,
     "ratio": 11.4,
     "ahead1In": 6.8,
-    "ahead3In": 5.8
+    "ahead3In": 5.9
    },
    {
     "from": "2026-11-13",
@@ -97,11 +142,20 @@
     "measuredIn": 7,
     "waterIn": 0.8,
     "ratio": 8.7,
-    "ahead1In": 10.7,
-    "ahead3In": 11.8
+    "ahead1In": 10.6,
+    "ahead3In": 11.9
    }
   ],
   "834:CA:SNTL": [
+   {
+    "from": "2026-11-18",
+    "to": "2026-11-18",
+    "measuredIn": 11,
+    "waterIn": 1.5,
+    "ratio": 7.3,
+    "ahead1In": 10,
+    "ahead3In": 7.6
+   },
    {
     "from": "2026-11-16",
     "to": "2026-11-16",
@@ -118,18 +172,18 @@
     "waterIn": 1.2,
     "ratio": 6,
     "ahead1In": 5.5,
-    "ahead3In": 5.7
+    "ahead3In": 5.8
    }
   ],
   "784:CA:SNTL": [
    {
     "from": "2026-11-15",
-    "to": "2026-11-17",
-    "measuredIn": 14,
-    "waterIn": 2.1,
-    "ratio": 6.7,
-    "ahead1In": 6.5,
-    "ahead3In": 4.9
+    "to": "2026-11-18",
+    "measuredIn": 20,
+    "waterIn": 3.7,
+    "ratio": 6,
+    "ahead1In": 18.9,
+    "ahead3In": 14.8
    },
    {
     "from": "2026-11-13",
@@ -137,19 +191,28 @@
     "measuredIn": 11,
     "waterIn": 1.6,
     "ratio": 6.9,
-    "ahead1In": 10.6,
-    "ahead3In": 11
+    "ahead1In": 10.5,
+    "ahead3In": 11.2
    }
   ],
   "463:CA:SNTL": [
+   {
+    "from": "2026-11-18",
+    "to": "2026-11-18",
+    "measuredIn": 4,
+    "waterIn": 1.2,
+    "ratio": 6,
+    "ahead1In": 11.9,
+    "ahead3In": 10.9
+   },
    {
     "from": "2026-11-16",
     "to": "2026-11-16",
     "measuredIn": 11,
     "waterIn": 0.8,
     "ratio": 13.8,
-    "ahead1In": 11.8,
-    "ahead3In": 9.3
+    "ahead1In": 11.7,
+    "ahead3In": 9.4
    },
    {
     "from": "2026-11-13",
@@ -157,8 +220,8 @@
     "measuredIn": 8,
     "waterIn": 1.3,
     "ratio": 6.2,
-    "ahead1In": 10,
-    "ahead3In": 10.6
+    "ahead1In": 9.9,
+    "ahead3In": 10.8
    }
   ],
   "1101:CO:SNTL": [
@@ -174,6 +237,15 @@
   ],
   "380:CO:SNTL": [
    {
+    "from": "2026-11-17",
+    "to": "2026-11-18",
+    "measuredIn": 2,
+    "waterIn": 0.3,
+    "ratio": 6.7,
+    "ahead1In": 0.9,
+    "ahead3In": 1.3
+   },
+   {
     "from": "2026-11-14",
     "to": "2026-11-15",
     "measuredIn": 2,
@@ -181,6 +253,17 @@
     "ratio": 6.7,
     "ahead1In": 1.1,
     "ahead3In": 0.9
+   }
+  ],
+  "701:CO:SNTL": [
+   {
+    "from": "2026-11-17",
+    "to": "2026-11-18",
+    "measuredIn": 2,
+    "waterIn": 0.3,
+    "ratio": 6.7,
+    "ahead1In": 0.7,
+    "ahead3In": 0.5
    }
   ],
   "622:CO:SNTL": [
@@ -191,7 +274,7 @@
     "waterIn": 0.3,
     "ratio": 6,
     "ahead1In": 1.9,
-    "ahead3In": 1.7
+    "ahead3In": 1.8
    },
    {
     "from": "2026-11-14",
@@ -200,7 +283,7 @@
     "waterIn": 0.4,
     "ratio": 7.5,
     "ahead1In": 4.3,
-    "ahead3In": 4.5
+    "ahead3In": 4.6
    }
   ],
   "780:CO:SNTL": [
@@ -211,7 +294,7 @@
     "waterIn": 0.9,
     "ratio": 6,
     "ahead1In": 3,
-    "ahead3In": 2.9
+    "ahead3In": 3
    },
    {
     "from": "2026-11-13",
@@ -219,8 +302,8 @@
     "measuredIn": 7,
     "waterIn": 0.9,
     "ratio": 7.8,
-    "ahead1In": 6,
-    "ahead3In": 5.6
+    "ahead1In": 5.9,
+    "ahead3In": 5.7
    }
   ],
   "713:CO:SNTL": [
@@ -231,7 +314,7 @@
     "waterIn": 0.7,
     "ratio": 7.1,
     "ahead1In": 2.5,
-    "ahead3In": 2.1
+    "ahead3In": 2.2
    },
    {
     "from": "2026-11-14",
@@ -240,38 +323,38 @@
     "waterIn": 0.5,
     "ratio": 12,
     "ahead1In": 6.2,
-    "ahead3In": 7.1
+    "ahead3In": 7.2
    }
   ],
   "737:CO:SNTL": [
    {
-    "from": "2026-11-16",
+    "from": "2026-11-17",
     "to": "2026-11-17",
     "measuredIn": 4,
-    "waterIn": 0.6,
-    "ratio": 6.7,
-    "ahead1In": 2.9,
-    "ahead3In": 1.5
+    "waterIn": 0.5,
+    "ratio": 8,
+    "ahead1In": 3.5,
+    "ahead3In": 1.8
    },
    {
     "from": "2026-11-14",
-    "to": "2026-11-14",
+    "to": "2026-11-15",
     "measuredIn": 2,
-    "waterIn": 0.3,
-    "ratio": 6.7,
-    "ahead1In": 2,
-    "ahead3In": 2.2
+    "waterIn": 0.5,
+    "ratio": 6,
+    "ahead1In": 1.8,
+    "ahead3In": 2.1
    }
   ],
   "457:CO:SNTL": [
    {
     "from": "2026-11-17",
-    "to": "2026-11-17",
+    "to": "2026-11-18",
     "measuredIn": 0,
-    "waterIn": 0.3,
+    "waterIn": 0.4,
     "ratio": 6,
-    "ahead1In": 1,
-    "ahead3In": 0.3
+    "ahead1In": 1.5,
+    "ahead3In": 1.7
    },
    {
     "from": "2026-11-14",
@@ -297,23 +380,23 @@
   "874:CO:SNTL": [
    {
     "from": "2026-11-14",
-    "to": "2026-11-17",
+    "to": "2026-11-18",
     "measuredIn": 14,
-    "waterIn": 2.5,
+    "waterIn": 2.6,
     "ratio": 6,
-    "ahead1In": 8.8,
-    "ahead3In": 5.7
+    "ahead1In": 9.2,
+    "ahead3In": 8.2
    }
   ],
   "766:UT:SNTL": [
    {
     "from": "2026-11-17",
-    "to": "2026-11-17",
+    "to": "2026-11-18",
     "measuredIn": 17,
-    "waterIn": 1.8,
-    "ratio": 9.4,
-    "ahead1In": 13.8,
-    "ahead3In": 11.4
+    "waterIn": 2,
+    "ratio": 8.5,
+    "ahead1In": 12.8,
+    "ahead3In": 12.2
    },
    {
     "from": "2026-11-14",
@@ -322,7 +405,7 @@
     "waterIn": 0.6,
     "ratio": 10,
     "ahead1In": 9.6,
-    "ahead3In": 11.4
+    "ahead3In": 11.5
    }
   ],
   "1115:UT:SNTL": [
@@ -330,10 +413,10 @@
     "from": "2026-11-17",
     "to": "2026-11-17",
     "measuredIn": 3,
-    "waterIn": 0.5,
+    "waterIn": 0.6,
     "ratio": 6,
-    "ahead1In": 3.2,
-    "ahead3In": 3
+    "ahead1In": 3.1,
+    "ahead3In": 3.1
    }
   ],
   "1154:UT:SNTL": [
@@ -343,8 +426,8 @@
     "measuredIn": 8,
     "waterIn": 1.3,
     "ratio": 6.2,
-    "ahead1In": 8.2,
-    "ahead3In": 7.3
+    "ahead1In": 8.1,
+    "ahead3In": 7.4
    },
    {
     "from": "2026-11-13",
@@ -359,12 +442,12 @@
   "366:UT:SNTL": [
    {
     "from": "2026-11-17",
-    "to": "2026-11-17",
+    "to": "2026-11-18",
     "measuredIn": 13,
-    "waterIn": 1.1,
-    "ratio": 11.8,
-    "ahead1In": 11.5,
-    "ahead3In": 11.1
+    "waterIn": 1.6,
+    "ratio": 8.1,
+    "ahead1In": 8.3,
+    "ahead3In": 8.8
    },
    {
     "from": "2026-11-13",
@@ -383,8 +466,8 @@
     "measuredIn": 6,
     "waterIn": 0.7,
     "ratio": 8.6,
-    "ahead1In": 7.4,
-    "ahead3In": 7
+    "ahead1In": 7.3,
+    "ahead3In": 7.1
    },
    {
     "from": "2026-11-12",
@@ -392,19 +475,19 @@
     "measuredIn": 6,
     "waterIn": 0.9,
     "ratio": 6.7,
-    "ahead1In": 4.7,
-    "ahead3In": 4.9
+    "ahead1In": 4.6,
+    "ahead3In": 5
    }
   ],
   "339:UT:SNTL": [
    {
-    "from": "2026-11-16",
-    "to": "2026-11-17",
+    "from": "2026-11-17",
+    "to": "2026-11-18",
     "measuredIn": 4,
-    "waterIn": 0.6,
-    "ratio": 6.7,
-    "ahead1In": 6.4,
-    "ahead3In": 5.8
+    "waterIn": 0.7,
+    "ratio": 6,
+    "ahead1In": 5.7,
+    "ahead3In": 5.4
    },
    {
     "from": "2026-11-13",
@@ -412,19 +495,19 @@
     "measuredIn": 9,
     "waterIn": 1.1,
     "ratio": 8.2,
-    "ahead1In": 10.5,
-    "ahead3In": 7.5
+    "ahead1In": 10.4,
+    "ahead3In": 7.6
    }
   ],
   "333:UT:SNTL": [
    {
     "from": "2026-11-17",
-    "to": "2026-11-17",
+    "to": "2026-11-18",
     "measuredIn": 3,
-    "waterIn": 0.7,
+    "waterIn": 0.9,
     "ratio": 6,
-    "ahead1In": 8.1,
-    "ahead3In": 5.5
+    "ahead1In": 8.5,
+    "ahead3In": 7
    },
    {
     "from": "2026-11-14",
@@ -432,19 +515,19 @@
     "measuredIn": 0,
     "waterIn": 0.9,
     "ratio": 6,
-    "ahead1In": 4.9,
-    "ahead3In": 5.1
+    "ahead1In": 4.8,
+    "ahead3In": 5.2
    }
   ],
   "1300:UT:SNTL": [
    {
     "from": "2026-11-17",
-    "to": "2026-11-17",
+    "to": "2026-11-18",
     "measuredIn": 13,
-    "waterIn": 1.4,
-    "ratio": 9.3,
-    "ahead1In": 10.4,
-    "ahead3In": 6.6
+    "waterIn": 1.6,
+    "ratio": 8.1,
+    "ahead1In": 9.6,
+    "ahead3In": 7.7
    },
    {
     "from": "2026-11-14",
@@ -453,18 +536,18 @@
     "waterIn": 0.6,
     "ratio": 6,
     "ahead1In": 4,
-    "ahead3In": 3.7
+    "ahead3In": 3.8
    }
   ],
   "332:UT:SNTL": [
    {
     "from": "2026-11-16",
-    "to": "2026-11-17",
+    "to": "2026-11-18",
     "measuredIn": 8,
-    "waterIn": 1.2,
-    "ratio": 6.7,
-    "ahead1In": 12.6,
-    "ahead3In": 8.4
+    "waterIn": 1.4,
+    "ratio": 6,
+    "ahead1In": 11.8,
+    "ahead3In": 9.6
    },
    {
     "from": "2026-11-14",
@@ -473,18 +556,18 @@
     "waterIn": 1.2,
     "ratio": 6,
     "ahead1In": 6.4,
-    "ahead3In": 7
+    "ahead3In": 7.1
    }
   ],
   "820:UT:SNTL": [
    {
     "from": "2026-11-17",
-    "to": "2026-11-17",
+    "to": "2026-11-18",
     "measuredIn": 10,
-    "waterIn": 1.3,
-    "ratio": 7.7,
-    "ahead1In": 8.7,
-    "ahead3In": 6.1
+    "waterIn": 1.4,
+    "ratio": 7.1,
+    "ahead1In": 8.3,
+    "ahead3In": 6.8
    },
    {
     "from": "2026-11-14",
@@ -493,7 +576,7 @@
     "waterIn": 0.6,
     "ratio": 6,
     "ahead1In": 3.6,
-    "ahead3In": 5.6
+    "ahead3In": 5.7
    }
   ]
  }
