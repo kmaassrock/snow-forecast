@@ -1204,13 +1204,15 @@ function renderLeadCheck() {
     const promised = s.ratio ? `${Math.round(100 / s.ratio)}%` : '–';
     return `<tr><td>${L} day${L > 1 ? 's' : ''}</td><td><b>${f < 1 ? '−' : '+'}${Math.abs(Math.round((1 - f) * 100))}%</b></td>
       <td>${lb.measuredShare?.[L] ? `${lb.measuredShare[L]}% this season, ${100 - lb.measuredShare[L]}% past winters` : L <= 7 ? 'Past winters' : 'Day 7 (not yet measured)'}</td>
-      <td>${s.snowyDays || 0}</td><td>${promised}</td></tr>`;
+      <td>${s.snowyDates ?? s.snowyDays ?? 0}</td><td>${promised}</td></tr>`;
   }).join('');
   $('leadCheck').innerHTML = `<p class="hint">On snowy days, forecasts tend to promise more snow than actually falls. Each day's snow is reduced by the
-    amount below for how far ahead it is, and from day 8 on the forecast also leans toward the middle of the 82 ensemble runs.
+    amount below for how far ahead it is (never raised), and from day 8 on the forecast leans more and more toward the middle of the 82 ensemble runs,
+    which swing far less than the few models that reach that far: by day 12 the middle run is 80% of the number.
     Scoring started ${new Date(lb.logsSince + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}. Each correction blends what this
-    season's scoring has measured with past winters, leaning more on this season as snowy days add up (past winters count as ${lb.priorDays ?? 60} days).</p>
-    <div class="table-wrap"><table><tr><th class="name">Days ahead</th><th>Correction</th><th>Based on</th><th>Snowy days scored</th><th>Forecast as % of what fell</th></tr>${rows}</table></div>`;
+    season's scoring has measured with past winters, leaning more on this season as separate snowy dates add up (past winters count as ${lb.priorDates ?? 30} dates;
+    one storm hits many stations, so it counts once per date, not once per station).</p>
+    <div class="table-wrap"><table><tr><th class="name">Days ahead</th><th>Correction</th><th>Based on</th><th>Snowy dates scored</th><th>Forecast as % of what fell</th></tr>${rows}</table></div>`;
 }
 
 // How did we do? (Models tab): the primary SNOTEL station's last few storms, from

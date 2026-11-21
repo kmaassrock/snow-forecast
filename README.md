@@ -130,7 +130,11 @@ found 10–20% too much at 1–7 days ahead), and far-out days rest on just a fe
 ensemble median. `scripts/verify-forecasts.cjs` runs every morning (`.github/workflows/verify.yml`): it logs
 the raw blend at every SNOTEL station 1–15 days ahead (`data/forecast-log/`, 75-day window), scores past logs
 against what fell, and writes `data/lead-bias.json`. Each lead's factor blends its measured ratio with the backtest
-factor by sample size (the backtest counts as 60 snowy station-days); days 8–15 start from day 7's.
+factor by sample size, counted in separate snowy dates (the backtest counts as 30), since one storm soaks dozens of
+stations at once; days 8–15 start from day 7's. Factors are capped at 1, so the correction only ever trims.
+From day 8 the blend's share falls by 15 points a day (85% at day 8, 55% at day 10, 20% from day 12), with
+the rest from the ensemble median. Each log also keeps the ensemble median (`ensemble` beside `stations`), and
+`lead-bias.json` → `ensembleCheck` compares the two by lead (average miss in mm of water).
 The same job writes `data/forecast-trend.json` (how each station's forecast for every upcoming day changed
 across the logs), which drives the trend arrows.
 

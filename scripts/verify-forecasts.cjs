@@ -5,7 +5,10 @@
 //  2. Scores earlier logs against what each station measured, by days ahead.
 //  3. Writes data/lead-bias.json: the correction factors core.js applies. Each
 //     lead's factor blends its measured ratio with the backtest starting factor,
-//     weighted by sample size (PRIOR_DAYS), so one storm can't swing it.
+//     weighted by how many separate snowy dates were scored (PRIOR_DATES), so one
+//     storm can't swing it. Factors never go above 1: a correction only trims.
+//     It also compares the ensemble median with the blend (ensembleCheck), from
+//     the ensemble medians each log keeps alongside the blend.
 //  4. Writes data/forecast-trend.json: how each station's forecast for every
 //     upcoming day has changed across the daily logs (trend arrows on the site).
 //  5. Writes data/storm-check.json: each station's last few storms, measured snow
@@ -17,13 +20,17 @@
 const fs = require('fs');
 const path = require('path');
 const { RESORTS } = require('../resorts.js');
-const { getForecast, addDays, DEFAULT_LEAD_FACTORS } = require('../core.js');
+const { getForecast, addDays, DEFAULT_LEAD_FACTORS, ENSEMBLE_PARENT } = require('../core.js');
 
 const DATA = path.join(__dirname, '..', 'data');
 const LOG_DIR = path.join(DATA, 'forecast-log');
 const KEEP_DAYS = 75; // rolling window of logs kept and scored
 const SNOWY_MM = 4; // a "snowy day": forecast of at least ~4 mm water (a few inches of snow)
-const PRIOR_DAYS = 60; // the backtest factor counts as this many snowy station-days
+// The backtest factor counts as this many snowy dates. Dates, not station-days: one
+// storm soaks dozens of stations at once, so station-days overstate the evidence
+// (two November storms once pushed the factors to +15%).
+const PRIOR_DATES = 30;
+const MAX_FACTOR = 1; // never scale snow up; the backtest found over-forecasting at every lead
 const STORM_MIN_MM = 7.6; // a storm: consecutive wet days totalling at least 0.3" of water
 const WET_DAY_MM = 1; // a wet day (the gauge reads in 0.1" steps, so anything above noise)
 const STORMS_KEPT = 5;
@@ -44,7 +51,7 @@ async function logToday() {
     const st = r.stations[0];
     if (st?.source === 'snotel' && !byStation.has(st.id)) byStation.set(st.id, { r, st });
   }
-  const log = { made: null, stations: {} };
+  const log = { made: null, stations: {}, ensemble: {} };
   for (const { r, st } of byStation.values()) {
     try {
       const f = await withRetry(() => getForecast({ ...r, lat: st.lat, lon: st.lon }, st.elev, calibration[r.id], { ensemble: false, lean: true, leanDays: 16, correct: false }));
@@ -62,13 +69,55 @@ async function logToday() {
       log.stations[st.id] = days;
     } catch (e) {
       console.error(`${st.name}: ${e.message.split('\n')[0]}`);
+      continue;
+    }
+    try {
+      log.ensemble[st.id] = await withRetry(() => ensembleMedian(st, r.tz, calibration[r.id], log.made));
+    } catch (e) {
+      console.error(`${st.name} ensemble: ${e.message.split('\n')[0]}`);
     }
   }
   if (!log.made) throw new Error('No forecasts logged');
   fs.mkdirSync(LOG_DIR, { recursive: true });
   fs.writeFileSync(path.join(LOG_DIR, `${log.made}.json`), JSON.stringify(log) + '\n');
-  console.log(`Logged ${Object.keys(log.stations).length} station forecasts for ${log.made}`);
+  console.log(`Logged ${Object.keys(log.stations).length} station forecasts (${Object.keys(log.ensemble).length} with ensemble) for ${log.made}`);
   return log.made;
+}
+
+// Median of the 82 ensemble runs (GEFS + ECMWF), water per calendar day 1–15 days
+// ahead, with each run scaled by its parent model's calibration like the site does.
+// Logged so the daily scoring can show whether the median beats the blend far out.
+async function ensembleMedian(st, tz, calib, made) {
+  const q = new URLSearchParams({
+    latitude: st.lat, longitude: st.lon, elevation: st.elev, hourly: 'precipitation',
+    models: 'gfs_seamless,ecmwf_ifs025', forecast_days: 16, timezone: tz,
+  });
+  const r = await fetch(`https://ensemble-api.open-meteo.com/v1/ensemble?${q}`, { signal: AbortSignal.timeout(30e3) });
+  if (!r.ok) throw new Error(`ensemble ${r.status}`);
+  const h = (await r.json()).hourly;
+  const byDate = {};
+  for (const key of Object.keys(h)) {
+    const m = key.match(/^precipitation(_member\d+)?_(.+)$/);
+    if (!m) continue;
+    const k = calib?.models?.[ENSEMBLE_PARENT[m[2]]]?.ratio ?? 1;
+    const water = {}, hours = {};
+    h.time.forEach((t, i) => {
+      if (h[key][i] == null) return;
+      const d = t.slice(0, 10);
+      water[d] = (water[d] || 0) + h[key][i] * k;
+      hours[d] = (hours[d] || 0) + 1;
+    });
+    for (const [d, mm] of Object.entries(water)) if (hours[d] === 24) (byDate[d] ||= []).push(mm);
+  }
+  const days = {};
+  for (const [date, vals] of Object.entries(byDate)) {
+    const lead = Math.round((Date.parse(date) - Date.parse(made)) / 86400e3);
+    if (lead < 1 || lead > 15 || vals.length < 10) continue;
+    vals.sort((a, b) => a - b);
+    const mid = (vals.length - 1) / 2;
+    days[date] = Math.round(((vals[Math.floor(mid)] + vals[Math.ceil(mid)]) / 2) * 10) / 10;
+  }
+  return days;
 }
 
 // Measured daily precipitation (mm) per station, same method as calibration: the
@@ -102,7 +151,12 @@ async function score(today) {
   writeTrends(logs, today); // needs no station data, so it updates even if SNOTEL is down
   const yesterday = addDays(today, -1);
   const leads = {};
-  for (let L = 1; L <= 15; L++) leads[L] = { snowyDays: 0, forecastMm: 0, measuredMm: 0, allForecastMm: 0, allMeasuredMm: 0 };
+  const dates = {}, ensCheck = {};
+  for (let L = 1; L <= 15; L++) {
+    leads[L] = { snowyDays: 0, snowyDates: 0, forecastMm: 0, measuredMm: 0, allForecastMm: 0, allMeasuredMm: 0 };
+    dates[L] = new Set();
+    ensCheck[L] = { days: 0, blendErrMm: 0, ensErrMm: 0 };
+  }
   const scorable = logs.filter((l) => l.made < yesterday);
   let obs = null;
   if (scorable.length) {
@@ -118,26 +172,33 @@ async function score(today) {
           const s = leads[L];
           if (!s) continue;
           s.allForecastMm += fc; s.allMeasuredMm += o;
-          if (fc >= SNOWY_MM) { s.snowyDays++; s.forecastMm += fc; s.measuredMm += o; }
+          if (fc >= SNOWY_MM) { s.snowyDays++; s.forecastMm += fc; s.measuredMm += o; dates[L].add(date); }
+          const ens = log.ensemble?.[id]?.[date];
+          if (ens != null) { const e = ensCheck[L]; e.days++; e.blendErrMm += Math.abs(fc - o); e.ensErrMm += Math.abs(ens - o); }
         }
       }
     }
   }
-  // Blend measured and backtest factors by sample size: with n snowy days the
-  // measured ratio gets weight n / (n + PRIOR_DAYS). Days 8–15 start from day 7's.
+  // Blend measured and backtest factors by sample size: with n separate snowy dates
+  // the measured ratio gets weight n / (n + PRIOR_DATES). Days 8–15 start from day 7's.
   const factors = {}, measuredShare = {};
   for (let L = 1; L <= 15; L++) {
     const s = leads[L];
     s.ratio = s.forecastMm ? Math.round((1000 * s.measuredMm) / s.forecastMm) / 1000 : null;
     for (const k of ['forecastMm', 'measuredMm', 'allForecastMm', 'allMeasuredMm']) s[k] = Math.round(s[k]);
     const prior = DEFAULT_LEAD_FACTORS[L] ?? factors[7];
-    const w = s.ratio == null ? 0 : s.snowyDays / (s.snowyDays + PRIOR_DAYS);
-    factors[L] = Math.round(1000 * Math.min(1.15, Math.max(0.5, w * s.ratio + (1 - w) * prior))) / 1000;
+    s.snowyDates = dates[L].size;
+    const w = s.ratio == null ? 0 : s.snowyDates / (s.snowyDates + PRIOR_DATES);
+    factors[L] = Math.round(1000 * Math.min(MAX_FACTOR, Math.max(0.5, w * s.ratio + (1 - w) * prior))) / 1000;
     measuredShare[L] = Math.round(100 * w);
   }
   const out = {
-    updated: today, logsSince: logs.map((l) => l.made).sort()[0] || today, snowyMm: SNOWY_MM, priorDays: PRIOR_DAYS,
+    updated: today, logsSince: logs.map((l) => l.made).sort()[0] || today, snowyMm: SNOWY_MM, priorDates: PRIOR_DATES,
     factors, measuredShare, leads,
+    // Average miss per station-day (mm of water), blend vs ensemble median, by lead.
+    ensembleCheck: Object.fromEntries(Object.entries(ensCheck).filter(([, e]) => e.days).map(([L, e]) => [L, {
+      days: e.days, blendMaeMm: Math.round((10 * e.blendErrMm) / e.days) / 10, ensMaeMm: Math.round((10 * e.ensErrMm) / e.days) / 10,
+    }])),
   };
   fs.writeFileSync(path.join(DATA, 'lead-bias.json'), JSON.stringify(out, null, 2) + '\n');
   console.log(`Scored ${scorable.length} logs; measured share by lead: ${Object.values(measuredShare).join(' ')}%`);

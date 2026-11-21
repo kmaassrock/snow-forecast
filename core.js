@@ -419,7 +419,8 @@ const DEFAULT_LEAD_FACTORS = { 1: 0.85, 2: 0.87, 3: 0.91, 4: 0.89, 5: 0.89, 6: 0
 // Past forecasts over-promised snowy days by 10–20%, so snow on snowy days is
 // scaled by the factor for how many days ahead it is (light days barely change).
 // From day 8 the blend also leans toward the ensemble median, which swings far
-// less than the few model runs that reach that far out.
+// less than the two or three model runs that reach that far out: by day 11 the
+// median counts more than the blend, and from day 12 it is 80% of the number.
 function correctForLead(days, ens, todayStr, leadBias) {
   const ti = days.findIndex((d) => d.date === todayStr);
   if (ti < 0) return;
@@ -433,7 +434,7 @@ function correctForLead(days, ens, todayStr, leadBias) {
     let target = d.snow * (1 - (1 - F) * strength);
     const members = ens[d.date] ? Object.values(ens[d.date]).sort((a, b) => a - b) : [];
     if (lead >= 8 && members.length >= 10) {
-      const w = Math.max(0.4, 1 - 0.075 * (lead - 7)); // 0.93 at day 8 → 0.4 by day 15
+      const w = Math.max(0.2, 1 - 0.15 * (lead - 7)); // blend share: 0.85 day 8, 0.55 day 10, 0.2 from day 12
       target = w * target + (1 - w) * percentile(members, 0.5);
     }
     const k = target / d.snow;
@@ -446,5 +447,5 @@ function correctForLead(days, ens, todayStr, leadBias) {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { MODELS, FORECAST_DAYS, DEFAULT_LEAD_FACTORS, getForecast, periodTotal, snowType, mmToIn, sum, addDays, nowLocalHour };
+  module.exports = { MODELS, FORECAST_DAYS, DEFAULT_LEAD_FACTORS, ENSEMBLE_PARENT, getForecast, periodTotal, snowType, mmToIn, sum, addDays, nowLocalHour };
 }
