@@ -1,6 +1,6 @@
 {
  "season": "2026-27",
- "updated": "2026-11-21",
+ "updated": "2026-11-22",
  "note": "Hand-kept from resort announcements and ski news (OnTheSnow, Ski Utah, Teton Gravity, Uncover Colorado). status: open = lifts are running (opened = that date, when known); planned = the resort's announced target; estimate = a projection, not announced; tba = no date yet; closed = not operating this season. close is only filled in once the resort announces its closing day.",
  "resorts": {
   "arapahoe-basin": { "status": "open", "opened": "2026-10-28" },
@@ -37,7 +37,7 @@
   "snowbird": { "status": "planned", "open": "2026-11-27" },
   "snowbasin": { "status": "estimate", "open": "2026-11-27" },
   "sundance": { "status": "estimate", "open": "2026-12-04" },
-  "deer-valley": { "status": "estimate", "open": "2026-12-05" },
+  "deer-valley": { "status": "planned", "open": "2026-12-05" },
   "powder-mountain": { "status": "estimate", "open": "2026-12-11" },
   "nordic-valley": { "status": "estimate", "open": "2026-12-18" },
   "brighton": { "status": "tba" },
