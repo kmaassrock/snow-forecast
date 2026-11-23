@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-16",
+ "updated": "2026-11-23",
  "resorts": {
   "badger-pass": {
    "maps": [
@@ -102,13 +102,13 @@
   "heavenly": {
    "maps": [
     {
-     "id": 30139,
-     "year": 2024,
-     "img": "https://files.skimap.org/q0mg7yvyz7msrclr98roib0abmg7",
-     "avif": "https://files.skimap.org/jn5xpreg87pggyjkhidbrangp11s 800w, https://files.skimap.org/gjjpnfuiuzd4ynitjaja8ri5iqne 1200w",
+     "id": 48798,
+     "year": 2025,
+     "img": "https://files.skimap.org/ujymk96phxwprx66kkzhfziwrqbh",
+     "avif": "https://files.skimap.org/xfd28welai18tr1av6b3mf1j066s 800w, https://files.skimap.org/phtm9mh4etb05ai55s9ncthe8sje 1200w",
      "w": 1000,
-     "h": 1342,
-     "artist": "James Niehues",
+     "h": 1000,
+     "artist": null,
      "area": 544
     }
    ]
@@ -130,13 +130,13 @@
   "june-mountain": {
    "maps": [
     {
-     "id": 40710,
-     "year": 2025,
-     "img": "https://files.skimap.org/fdpsz5rs4fi9r45klgbcr9rc0a68",
-     "avif": "https://files.skimap.org/8b4s2oqms9eqt54uec7k87hjkiex 800w, https://files.skimap.org/iffxzucer6kny2sta14fds6ym27m 1200w",
+     "id": 49328,
+     "year": 2026,
+     "img": "https://files.skimap.org/kzmo0fcvu7isckyukck6walxtwk0",
+     "avif": "https://files.skimap.org/tfy8b6z89anbnft945dtu3v3r8mb 800w, https://files.skimap.org/04rsqg9vtsk0yt3u45gsd1qoh46r 1200w",
      "w": 1000,
      "h": 706,
-     "artist": "Steve Fick",
+     "artist": null,
      "area": 540
     }
    ]
@@ -210,13 +210,13 @@
   "mt-baldy": {
    "maps": [
     {
-     "id": 45904,
-     "year": 2023,
-     "img": "https://files.skimap.org/hk5g375tccgrdzr97943y9bz0of7",
-     "avif": null,
+     "id": 49329,
+     "year": 2026,
+     "img": "https://files.skimap.org/wdl17wa0h9boq1g3jh2nc5r7cxds",
+     "avif": "https://files.skimap.org/7jxmwkhp99a3uu7ub5q6rr72t0f7 800w, https://files.skimap.org/p66x37cuepijvpkfdb2xf6levb01 1200w",
      "w": 1000,
-     "h": 684,
-     "artist": "VistaMap (Gary Milliken)",
+     "h": 686,
+     "artist": null,
      "area": 541
     }
    ]
@@ -238,13 +238,13 @@
   "northstar": {
    "maps": [
     {
-     "id": 36907,
+     "id": 48799,
      "year": 2025,
-     "img": "https://files.skimap.org/b1vh8n03tswr8jg7ml3orr80k0tx",
-     "avif": "https://files.skimap.org/uzw925570wcrw0wljkp1otw20mg0 800w, https://files.skimap.org/tsowve2qzv4lm78p82m17i8qino3 1200w",
+     "img": "https://files.skimap.org/cnr80z61pxt0q8seszyrxrye9ymc",
+     "avif": "https://files.skimap.org/55aw839gv2nju379yyrzk3peoldc 800w, https://files.skimap.org/c68s7fgqmpg84aokq0joi4gd5uok 1200w",
      "w": 1000,
-     "h": 658,
-     "artist": "Alex Tait",
+     "h": 1000,
+     "artist": null,
      "area": 531
     }
    ]
@@ -282,6 +282,16 @@
      "avif": "https://files.skimap.org/3wy37qsm3i2iuwwh2r3aeycbst5v 800w, https://files.skimap.org/ylxj96b1ewu5sxgvtrmfulvlrs47 1200w",
      "w": 1000,
      "h": 677,
+     "artist": null,
+     "area": 538
+    },
+    {
+     "id": 36309,
+     "year": 2025,
+     "img": "https://files.skimap.org/zgqg96z3x47wqtmg4uzsj08xu1ef",
+     "avif": "https://files.skimap.org/8g7s1fyk2rd6v0wkew4cwhw4jcqi 800w, https://files.skimap.org/ijdr9jdj7js70zh3pmv40600y4po 1200w",
+     "w": 1000,
+     "h": 663,
      "artist": null,
      "area": 538
     }
@@ -326,6 +336,16 @@
      "h": 1221,
      "artist": "James Niehues",
      "area": 539
+    },
+    {
+     "id": 49324,
+     "year": 2026,
+     "img": "https://files.skimap.org/0ulincco4eshk1waol1218t75ubq",
+     "avif": "https://files.skimap.org/6i3jeupqfgih1l17ml4ine9snp27 800w, https://files.skimap.org/ucr9auybcevw70lwnper272oisk2 1200w",
+     "w": 1000,
+     "h": 712,
+     "artist": null,
+     "area": 539
     }
    ]
   },
@@ -346,13 +366,13 @@
   "sugar-bowl": {
    "maps": [
     {
-     "id": 42049,
+     "id": 49331,
      "year": 2025,
-     "img": "https://files.skimap.org/vaaa84euimmxdqitw4b418t2980r",
-     "avif": "https://files.skimap.org/dneu4z3fb1w5ed4shjyqp9pcbmck 800w, https://files.skimap.org/deza205vviir2qdibvd6hsnbzp6f 1200w",
+     "img": "https://files.skimap.org/yqal73fzkmwsmi8g8jkh0kvees4o",
+     "avif": "https://files.skimap.org/4nq9wmpbmkdt5y2pc2ko49s3jxn8 800w, https://files.skimap.org/d8t1hk855f0wqvz38sd2m1iuthbz 1200w",
      "w": 1000,
-     "h": 533,
-     "artist": "James Niehues",
+     "h": 541,
+     "artist": null,
      "area": 543
     }
    ]
@@ -374,10 +394,10 @@
   "aspen-highlands": {
    "maps": [
     {
-     "id": 36380,
-     "year": 2025,
-     "img": "https://files.skimap.org/81uhcyufb98jp02xl9aq21s6omix",
-     "avif": "https://files.skimap.org/s8zyettpt0pkrryqkcrwa37dv61x 800w, https://files.skimap.org/p2l6oopmf8oczbkv8e4yje8n71aa 1200w",
+     "id": 49175,
+     "year": 2026,
+     "img": "https://files.skimap.org/t18mzvi2n9lgjej9pf49rsv6ykww",
+     "avif": "https://files.skimap.org/2c5dpmj0e5asw05dht44odzen48g 800w, https://files.skimap.org/asib5o8os9kut7f3gdygvvihxt8u 1200w",
      "w": 1000,
      "h": 1417,
      "artist": "James Niehues",
@@ -388,10 +408,10 @@
   "aspen-mountain": {
    "maps": [
     {
-     "id": 36390,
-     "year": 2025,
-     "img": "https://files.skimap.org/pepmk0ohfd4rldhl8kup4wvmefa2",
-     "avif": "https://files.skimap.org/d0rb6lsiujy19mf1vkwnbqs2rbrw 800w, https://files.skimap.org/flqjs1r0vb27esiq4e0sqc9gdy15 1200w",
+     "id": 49174,
+     "year": 2026,
+     "img": "https://files.skimap.org/orokr3edaxqgutnunnwm21jl9mmq",
+     "avif": "https://files.skimap.org/l3pfwqu7mnxgfwue5w74oh19seh7 800w, https://files.skimap.org/uquyvu1i0sehg7ssvsbouij587kf 1200w",
      "w": 1000,
      "h": 1242,
      "artist": "Rad Smith",
@@ -402,13 +422,13 @@
   "beaver-creek": {
    "maps": [
     {
-     "id": 37647,
-     "year": 2025,
-     "img": "https://files.skimap.org/5e5aas2p7v63kslvflpav2p79twl",
-     "avif": "https://files.skimap.org/hqt319ulpwn9aaj1zltgegp4iuv7 800w, https://files.skimap.org/0sr8v6bodw4mltfqfr6dcsr0dzn7 1200w",
+     "id": 49310,
+     "year": 2026,
+     "img": "https://files.skimap.org/o56y3jaml1d85zpopewsag2av1qg",
+     "avif": "https://files.skimap.org/2b2co5zhjqh4q29aptn01nanu82f 800w, https://files.skimap.org/a9vkvbx51tqsyx47i0pcp9mghkdv 1200w",
      "w": 1000,
-     "h": 892,
-     "artist": "VistaMap (Gary Milliken)",
+     "h": 875,
+     "artist": null,
      "area": 497
     }
    ]
@@ -430,10 +450,10 @@
   "buttermilk": {
    "maps": [
     {
-     "id": 36389,
-     "year": 2025,
-     "img": "https://files.skimap.org/ps1ozbfkme5oxca7x17e71c2soaz",
-     "avif": "https://files.skimap.org/xko5vkxkt31efvavl23nvzt8lpb1 800w, https://files.skimap.org/0ni1dktwyadkluwxo1r0m78vks9b 1200w",
+     "id": 49177,
+     "year": 2026,
+     "img": "https://files.skimap.org/ff1rf8dj72lvx30fl9om2otn6f16",
+     "avif": "https://files.skimap.org/cule9royy0nx8059c9pwkujs34h7 800w, https://files.skimap.org/8h3sjyylgj5zaa2j0jpqhsv5yaf5 1200w",
      "w": 1000,
      "h": 648,
      "artist": "Bill C. Brown",
@@ -634,13 +654,23 @@
   "purgatory": {
    "maps": [
     {
-     "id": 37217,
-     "year": 2025,
-     "img": "https://files.skimap.org/khr1rkq4btjpyw9se0ajibj3g2ha",
-     "avif": "https://files.skimap.org/cpnrn27zp4d6qpz9zv5axs436r1v 800w, https://files.skimap.org/ucjgqm8ew7t3g536i438tibxqqa3 1200w",
+     "id": 48835,
+     "year": 2026,
+     "img": "https://files.skimap.org/cfia3wyc8b368tatfzy8uncl4ea5",
+     "avif": "https://files.skimap.org/b8442z3xrfk4q8qvhya4x28tek5u 800w, https://files.skimap.org/a3wnu1q458wqtd2e7npzvqdtkbdy 1200w",
      "w": 1000,
      "h": 596,
-     "artist": "James Niehues",
+     "artist": null,
+     "area": 518
+    },
+    {
+     "id": 48836,
+     "year": 2026,
+     "img": "https://files.skimap.org/y5p7pmee200ifi5dppu3ru84bwu8",
+     "avif": "https://files.skimap.org/ge1zyaozsophd27imrhfvgg5xkve 800w, https://files.skimap.org/ufzf94jwhhmq7nfd9t3tucmwwhwd 1200w",
+     "w": 1000,
+     "h": 750,
+     "artist": null,
      "area": 518
     }
    ]
@@ -676,12 +706,12 @@
   "snowmass": {
    "maps": [
     {
-     "id": 35274,
-     "year": 2025,
-     "img": "https://files.skimap.org/8ensgzh3ehg37mfzymv8q2htlhss",
-     "avif": "https://files.skimap.org/8joi5rtxzapw0uy26fpg7nyqlmns 800w, https://files.skimap.org/dhjs5c7zua513ouiu4vbbce8ghl5 1200w",
+     "id": 49176,
+     "year": 2026,
+     "img": "https://files.skimap.org/s6lb4lxi6wdm83st8kce56c49iqe",
+     "avif": "https://files.skimap.org/igzu7fesredh5esvnavjk05zdgb8 800w, https://files.skimap.org/4jstowc5akvn4cn1u1tck6lhv9yf 1200w",
      "w": 1000,
-     "h": 380,
+     "h": 480,
      "artist": "Bill C. Brown",
      "area": 1033
     }
@@ -766,13 +796,13 @@
   "winter-park": {
    "maps": [
     {
-     "id": 47103,
+     "id": 49311,
      "year": 2026,
-     "img": "https://files.skimap.org/xja5hdke001onaxg40n50clhev1l",
-     "avif": "https://files.skimap.org/wrdt5lvueuimq23xp4si1vxlrm7q 800w, https://files.skimap.org/524yu70cbwkwxd10zqkblnp8jt8r 1200w",
+     "img": "https://files.skimap.org/b57lb428zoabx43gqwk2s7it5lzg",
+     "avif": "https://files.skimap.org/h2n4b8d7d0mrtkfneb7c0rx8f9p2 800w, https://files.skimap.org/ehkb2ohkmrb66bu5c3hhbafayby1 1200w",
      "w": 1000,
-     "h": 704,
-     "artist": "James Niehues",
+     "h": 698,
+     "artist": null,
      "area": 503
     }
    ]
@@ -794,13 +824,13 @@
   "alta": {
    "maps": [
     {
-     "id": 36318,
-     "year": 2025,
-     "img": "https://files.skimap.org/ow2dq6ieejhm6xhm5pz1zvvntpsy",
-     "avif": "https://files.skimap.org/y0vfja8naop8xthbumc0z1imuzy0 800w, https://files.skimap.org/q2l9c1x0r35j89l7lsll1yh8yl0o 1200w",
+     "id": 49251,
+     "year": 2026,
+     "img": "https://files.skimap.org/6ozambpdwausytvi88lqix7vjgiv",
+     "avif": "https://files.skimap.org/qsl0dj9ah6z8anown9f5ia2wg1io 800w, https://files.skimap.org/0b1cyjrx5o531hliscr6kxytq4qn 1200w",
      "w": 1000,
      "h": 615,
-     "artist": "James Niehues",
+     "artist": null,
      "area": 224
     }
    ]
@@ -864,13 +894,13 @@
   "deer-valley": {
    "maps": [
     {
-     "id": 48005,
+     "id": 49250,
      "year": 2026,
-     "img": "https://files.skimap.org/rjdtdzxkn0s3e3n5lnrgntq3c5nd",
-     "avif": "https://files.skimap.org/6lixh78nwofpcsh2obzg9krigvnt 800w, https://files.skimap.org/ldncfu6z8ym26xbaxhe183mvdnul 1200w",
+     "img": "https://files.skimap.org/65pbf5e7o20vnbt318qnwx35d7yk",
+     "avif": "https://files.skimap.org/k6oceqls8grqh3q1jk6qs09q420n 800w, https://files.skimap.org/923swacphd0uk2evc2mwondq6drc 1200w",
      "w": 1000,
-     "h": 646,
-     "artist": "Rad Smith",
+     "h": 700,
+     "artist": null,
      "area": 223
     }
    ]
