@@ -1,6 +1,6 @@
 {
  "season": "2026-27",
- "updated": "2026-11-22",
+ "updated": "2026-11-23",
  "note": "Hand-kept from resort announcements and ski news (OnTheSnow, Ski Utah, Teton Gravity, Uncover Colorado). status: open = lifts are running (opened = that date, when known); planned = the resort's announced target; estimate = a projection, not announced; tba = no date yet; closed = not operating this season. close is only filled in once the resort announces its closing day.",
  "resorts": {
   "arapahoe-basin": { "status": "open", "opened": "2026-10-28" },
@@ -51,8 +51,8 @@
   "bear-valley": { "status": "planned", "open": "2026-11-21" },
   "china-peak": { "status": "planned", "open": "2026-11-21" },
   "snow-summit": { "status": "planned", "open": "2026-11-21" },
-  "palisades-tahoe-olympic-valley": { "status": "planned", "open": "2026-11-25" },
-  "palisades-tahoe-alpine-meadows": { "status": "planned", "open": "2026-11-25" },
+  "palisades-tahoe-olympic-valley": { "status": "planned", "open": "2026-11-21" },
+  "palisades-tahoe-alpine-meadows": { "status": "planned", "open": "2026-11-21" },
   "boreal": { "status": "estimate", "open": "2026-11-27" },
   "sugar-bowl": { "status": "estimate", "open": "2026-11-27" },
   "bear-mountain": { "status": "estimate", "open": "2026-11-27" },
