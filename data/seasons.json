@@ -1,6 +1,6 @@
 {
  "season": "2026-27",
- "updated": "2026-11-23",
+ "updated": "2026-11-24",
  "note": "Hand-kept from resort announcements and ski news (OnTheSnow, Ski Utah, Teton Gravity, Uncover Colorado). status: open = lifts are running (opened = that date, when known); planned = the resort's announced target; estimate = a projection, not announced; tba = no date yet; closed = not operating this season. close is only filled in once the resort announces its closing day.",
  "resorts": {
   "arapahoe-basin": { "status": "open", "opened": "2026-10-28" },
@@ -12,7 +12,7 @@
   "winter-park": { "status": "open", "opened": "2026-11-13" },
   "vail": { "status": "open", "opened": "2026-11-13" },
   "purgatory": { "status": "planned", "open": "2026-11-20" },
-  "steamboat": { "status": "planned", "open": "2026-11-21" },
+  "steamboat": { "status": "planned", "open": "2026-11-27" },
   "beaver-creek": { "status": "planned", "open": "2026-11-25" },
   "crested-butte": { "status": "planned", "open": "2026-11-25" },
   "aspen-mountain": { "status": "planned", "open": "2026-11-26" },
