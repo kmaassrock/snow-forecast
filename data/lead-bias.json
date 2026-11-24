@@ -1,168 +1,168 @@
 {
-  "updated": "2026-11-22",
+  "updated": "2026-11-23",
   "logsSince": "2026-11-07",
   "snowyMm": 4,
   "priorDates": 30,
   "factors": {
-    "1": 0.851,
-    "2": 0.889,
-    "3": 0.931,
-    "4": 0.944,
-    "5": 0.937,
-    "6": 0.928,
-    "7": 0.909,
-    "8": 0.963,
-    "9": 0.957,
-    "10": 0.997,
-    "11": 0.942,
-    "12": 0.931,
-    "13": 0.882,
-    "14": 0.886,
-    "15": 0.909
+    "1": 0.85,
+    "2": 0.888,
+    "3": 0.926,
+    "4": 0.942,
+    "5": 0.933,
+    "6": 0.915,
+    "7": 0.904,
+    "8": 0.961,
+    "9": 0.951,
+    "10": 0.982,
+    "11": 0.932,
+    "12": 0.889,
+    "13": 0.855,
+    "14": 0.877,
+    "15": 0.904
   },
   "measuredShare": {
-    "1": 23,
-    "2": 23,
-    "3": 23,
-    "4": 23,
-    "5": 19,
-    "6": 19,
-    "7": 19,
-    "8": 19,
-    "9": 17,
-    "10": 14,
+    "1": 25,
+    "2": 25,
+    "3": 25,
+    "4": 25,
+    "5": 21,
+    "6": 21,
+    "7": 21,
+    "8": 21,
+    "9": 19,
+    "10": 17,
     "11": 12,
-    "12": 9,
-    "13": 6,
+    "12": 12,
+    "13": 9,
     "14": 3,
     "15": 0
   },
   "leads": {
     "1": {
-      "snowyDays": 117,
-      "snowyDates": 9,
-      "forecastMm": 2753,
-      "measuredMm": 2352,
-      "allForecastMm": 2890,
-      "allMeasuredMm": 2776,
-      "ratio": 0.854
+      "snowyDays": 120,
+      "snowyDates": 10,
+      "forecastMm": 2771,
+      "measuredMm": 2357,
+      "allForecastMm": 2926,
+      "allMeasuredMm": 2802,
+      "ratio": 0.851
     },
     "2": {
-      "snowyDays": 118,
-      "snowyDates": 9,
-      "forecastMm": 2458,
-      "measuredMm": 2337,
-      "allForecastMm": 2607,
-      "allMeasuredMm": 2769,
-      "ratio": 0.951
+      "snowyDays": 125,
+      "snowyDates": 10,
+      "forecastMm": 2512,
+      "measuredMm": 2362,
+      "allForecastMm": 2669,
+      "allMeasuredMm": 2794,
+      "ratio": 0.94
     },
     "3": {
-      "snowyDays": 115,
-      "snowyDates": 9,
-      "forecastMm": 2340,
-      "measuredMm": 2344,
-      "allForecastMm": 2511,
-      "allMeasuredMm": 2756,
-      "ratio": 1.002
+      "snowyDays": 123,
+      "snowyDates": 10,
+      "forecastMm": 2426,
+      "measuredMm": 2362,
+      "allForecastMm": 2606,
+      "allMeasuredMm": 2781,
+      "ratio": 0.974
     },
     "4": {
-      "snowyDays": 118,
-      "snowyDates": 9,
-      "forecastMm": 2067,
-      "measuredMm": 2324,
-      "allForecastMm": 2266,
-      "allMeasuredMm": 2751,
-      "ratio": 1.124
+      "snowyDays": 127,
+      "snowyDates": 10,
+      "forecastMm": 2136,
+      "measuredMm": 2347,
+      "allForecastMm": 2345,
+      "allMeasuredMm": 2776,
+      "ratio": 1.099
     },
     "5": {
-      "snowyDays": 128,
-      "snowyDates": 7,
-      "forecastMm": 1865,
-      "measuredMm": 2123,
-      "allForecastMm": 2062,
-      "allMeasuredMm": 2746,
-      "ratio": 1.138
+      "snowyDays": 138,
+      "snowyDates": 8,
+      "forecastMm": 1953,
+      "measuredMm": 2134,
+      "allForecastMm": 2156,
+      "allMeasuredMm": 2771,
+      "ratio": 1.092
     },
     "6": {
-      "snowyDays": 123,
-      "snowyDates": 7,
-      "forecastMm": 1609,
-      "measuredMm": 1892,
-      "allForecastMm": 1790,
-      "allMeasuredMm": 2736,
-      "ratio": 1.176
+      "snowyDays": 133,
+      "snowyDates": 8,
+      "forecastMm": 1745,
+      "measuredMm": 1890,
+      "allForecastMm": 1939,
+      "allMeasuredMm": 2761,
+      "ratio": 1.083
     },
     "7": {
-      "snowyDays": 129,
-      "snowyDates": 7,
-      "forecastMm": 1506,
-      "measuredMm": 1819,
-      "allForecastMm": 1643,
-      "allMeasuredMm": 2421,
-      "ratio": 1.207
+      "snowyDays": 142,
+      "snowyDates": 8,
+      "forecastMm": 1604,
+      "measuredMm": 1836,
+      "allForecastMm": 1759,
+      "allMeasuredMm": 2451,
+      "ratio": 1.145
     },
     "8": {
-      "snowyDays": 116,
-      "snowyDates": 7,
-      "forecastMm": 1518,
-      "measuredMm": 1811,
-      "allForecastMm": 1681,
-      "allMeasuredMm": 2134,
-      "ratio": 1.193
+      "snowyDays": 124,
+      "snowyDates": 8,
+      "forecastMm": 1564,
+      "measuredMm": 1839,
+      "allForecastMm": 1738,
+      "allMeasuredMm": 2164,
+      "ratio": 1.176
     },
     "9": {
-      "snowyDays": 141,
-      "snowyDates": 6,
-      "forecastMm": 1533,
-      "measuredMm": 1836,
-      "allForecastMm": 1646,
-      "allMeasuredMm": 2093,
-      "ratio": 1.198
-    },
-    "10": {
-      "snowyDays": 126,
-      "snowyDates": 5,
-      "forecastMm": 1003,
-      "measuredMm": 1529,
-      "allForecastMm": 1107,
-      "allMeasuredMm": 1925,
-      "ratio": 1.525
-    },
-    "11": {
-      "snowyDays": 81,
-      "snowyDates": 4,
-      "forecastMm": 881,
-      "measuredMm": 1052,
-      "allForecastMm": 991,
-      "allMeasuredMm": 1509,
-      "ratio": 1.193
-    },
-    "12": {
-      "snowyDays": 34,
-      "snowyDates": 3,
-      "forecastMm": 272,
-      "measuredMm": 312,
-      "allForecastMm": 374,
-      "allMeasuredMm": 1079,
+      "snowyDays": 150,
+      "snowyDates": 7,
+      "forecastMm": 1602,
+      "measuredMm": 1844,
+      "allForecastMm": 1726,
+      "allMeasuredMm": 2123,
       "ratio": 1.151
     },
+    "10": {
+      "snowyDays": 144,
+      "snowyDates": 6,
+      "forecastMm": 1134,
+      "measuredMm": 1554,
+      "allForecastMm": 1283,
+      "allMeasuredMm": 1951,
+      "ratio": 1.37
+    },
+    "11": {
+      "snowyDays": 84,
+      "snowyDates": 4,
+      "forecastMm": 920,
+      "measuredMm": 1052,
+      "allForecastMm": 1083,
+      "allMeasuredMm": 1537,
+      "ratio": 1.143
+    },
+    "12": {
+      "snowyDays": 55,
+      "snowyDates": 4,
+      "forecastMm": 430,
+      "measuredMm": 333,
+      "allForecastMm": 556,
+      "allMeasuredMm": 1107,
+      "ratio": 0.774
+    },
     "13": {
-      "snowyDays": 16,
-      "snowyDates": 2,
-      "forecastMm": 133,
-      "measuredMm": 64,
-      "allForecastMm": 182,
-      "allMeasuredMm": 500,
-      "ratio": 0.477
+      "snowyDays": 21,
+      "snowyDates": 3,
+      "forecastMm": 167,
+      "measuredMm": 61,
+      "allForecastMm": 256,
+      "allMeasuredMm": 516,
+      "ratio": 0.365
     },
     "14": {
       "snowyDays": 8,
       "snowyDates": 1,
       "forecastMm": 153,
-      "measuredMm": 28,
-      "allForecastMm": 156,
-      "allMeasuredMm": 135,
-      "ratio": 0.182
+      "measuredMm": 10,
+      "allForecastMm": 170,
+      "allMeasuredMm": 145,
+      "ratio": 0.066
     },
     "15": {
       "snowyDays": 0,
@@ -174,5 +174,11 @@
       "ratio": null
     }
   },
-  "ensembleCheck": {}
+  "ensembleCheck": {
+    "1": {
+      "days": 37,
+      "blendMaeMm": 1.8,
+      "ensMaeMm": 1.5
+    }
+  }
 }
