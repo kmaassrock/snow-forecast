@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-25",
+ "updated": "2026-11-26",
  "stations": {
   "356:CA:SNTL": [
    {
@@ -449,9 +449,9 @@
   "737:CO:SNTL": [
    {
     "from": "2026-11-17",
-    "to": "2026-11-24",
+    "to": "2026-11-25",
     "measuredIn": 11,
-    "waterIn": 2,
+    "waterIn": 2.2,
     "ratio": 6,
     "ahead1In": 7.4,
     "ahead3In": 8.3
