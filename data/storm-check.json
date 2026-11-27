@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-26",
+ "updated": "2026-11-27",
  "stations": {
   "356:CA:SNTL": [
    {
     "from": "2026-11-18",
     "to": "2026-11-20",
     "measuredIn": 21,
-    "waterIn": 3.7,
+    "waterIn": 3.6,
     "ratio": 6,
     "ahead1In": 20,
     "ahead3In": 17.4
@@ -64,10 +64,10 @@
     "from": "2026-11-18",
     "to": "2026-11-19",
     "measuredIn": 15,
-    "waterIn": 2.6,
+    "waterIn": 2.5,
     "ratio": 6,
     "ahead1In": 15.9,
-    "ahead3In": 13.3
+    "ahead3In": 13.4
    },
    {
     "from": "2026-11-16",
@@ -91,12 +91,12 @@
   "848:CA:SNTL": [
    {
     "from": "2026-11-18",
-    "to": "2026-11-21",
+    "to": "2026-11-20",
     "measuredIn": 26,
-    "waterIn": 5.1,
+    "waterIn": 4.9,
     "ratio": 6,
-    "ahead1In": 27.2,
-    "ahead3In": 24.1
+    "ahead1In": 27.1,
+    "ahead3In": 23.7
    },
    {
     "from": "2026-11-15",
@@ -154,7 +154,7 @@
     "waterIn": 2.8,
     "ratio": 7.5,
     "ahead1In": 17.7,
-    "ahead3In": 15.4
+    "ahead3In": 15.5
    },
    {
     "from": "2026-11-16",
@@ -172,7 +172,7 @@
     "waterIn": 1.2,
     "ratio": 6,
     "ahead1In": 5.6,
-    "ahead3In": 5.5
+    "ahead3In": 5.6
    }
   ],
   "784:CA:SNTL": [
@@ -203,7 +203,7 @@
     "waterIn": 3.9,
     "ratio": 6,
     "ahead1In": 26.1,
-    "ahead3In": 23
+    "ahead3In": 23.1
    },
    {
     "from": "2026-11-16",
@@ -449,9 +449,9 @@
   "737:CO:SNTL": [
    {
     "from": "2026-11-17",
-    "to": "2026-11-25",
+    "to": "2026-11-26",
     "measuredIn": 11,
-    "waterIn": 2.2,
+    "waterIn": 2.3,
     "ratio": 6,
     "ahead1In": 7.4,
     "ahead3In": 8.3
@@ -516,7 +516,7 @@
     "waterIn": 3.8,
     "ratio": 7.4,
     "ahead1In": 23.7,
-    "ahead3In": 25.1
+    "ahead3In": 25.2
    },
    {
     "from": "2026-11-14",
@@ -654,7 +654,7 @@
     "waterIn": 2.9,
     "ratio": 6,
     "ahead1In": 22.6,
-    "ahead3In": 21.4
+    "ahead3In": 21.5
    },
    {
     "from": "2026-11-14",
